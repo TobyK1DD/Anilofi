@@ -1,5 +1,53 @@
-<!-- YouTube Player -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Anime Focus App</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    color: white;
+    text-align: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("https://images.unsplash.com/photo-1549880338-65ddcdfd017b") no-repeat center/cover;
+}
+.container {
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 20px;
+}
+#timer { font-size: 60px; margin: 20px 0; }
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.start { background: #4CAF50; }
+.pause { background: #f39c12; }
+.reset { background: #e74c3c; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>🎌 Anime Focus</h1>
+<div id="mode">Focus</div>
+<div id="timer">25:00</div>
+
+<button onclick="startTimer()">Start</button>
+<button onclick="pauseTimer()">Pause</button>
+<button onclick="resetTimer()">Reset</button>
+
 <div id="player"></div>
+</div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -10,7 +58,10 @@ let time = focusTime;
 let timer;
 let isRunning = false;
 let isFocus = true;
+
 let player;
+let playerReady = false;
+let retryInterval = null;
 
 // Load YouTube player
 function onYouTubeIframeAPIReady() {
@@ -20,25 +71,58 @@ function onYouTubeIframeAPIReady() {
         videoId: 'jfKfPfyJRdk',
         playerVars: {
             autoplay: 0,
-            controls: 1
+            controls: 1,
+            mute: 1 // helps autoplay work
+        },
+        events: {
+            onReady: () => {
+                playerReady = true;
+                console.log("Player ready");
+            }
         }
     });
 }
 
-function updateDisplay() {
-    let minutes = Math.floor(time / 60);
-    let seconds = time % 60;
-    document.getElementById("timer").innerText =
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+// Keep trying to play (handles ads)
+function tryPlayVideo() {
+    if (!playerReady) return;
+
+    if (retryInterval) clearInterval(retryInterval);
+
+    retryInterval = setInterval(() => {
+        let state = player.getPlayerState();
+
+        // 1 = playing
+        if (state === 1) {
+            clearInterval(retryInterval);
+            player.unMute(); // unmute once actually playing
+            console.log("Video playing");
+        } else {
+            player.playVideo();
+            console.log("Retrying play...");
+        }
+    }, 2000);
 }
 
+function stopRetry() {
+    if (retryInterval) clearInterval(retryInterval);
+}
+
+// Timer display
+function updateDisplay() {
+    let m = Math.floor(time / 60);
+    let s = time % 60;
+    document.getElementById("timer").innerText =
+        `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+// Start
 function startTimer() {
     if (isRunning) return;
 
     isRunning = true;
 
-    // ▶️ PLAY VIDEO
-    if (player) player.playVideo();
+    tryPlayVideo(); // 🔥 key fix
 
     timer = setInterval(() => {
         time--;
@@ -47,7 +131,8 @@ function startTimer() {
             clearInterval(timer);
             isRunning = false;
 
-            if (player) player.pauseVideo(); // pause on switch
+            if (playerReady) player.pauseVideo();
+            stopRetry();
 
             if (isFocus) {
                 isFocus = false;
@@ -60,22 +145,22 @@ function startTimer() {
                 document.getElementById("mode").innerText = "Focus";
                 alert("Back to focus!");
             }
-
-            updateDisplay();
         }
 
         updateDisplay();
     }, 1000);
 }
 
+// Pause
 function pauseTimer() {
     clearInterval(timer);
     isRunning = false;
 
-    // ⏸️ PAUSE VIDEO
-    if (player) player.pauseVideo();
+    if (playerReady) player.pauseVideo();
+    stopRetry();
 }
 
+// Reset
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
@@ -83,11 +168,14 @@ function resetTimer() {
     time = focusTime;
     document.getElementById("mode").innerText = "Focus";
 
-    // ⏹️ STOP VIDEO (reset to start)
-    if (player) player.stopVideo();
+    if (playerReady) player.stopVideo();
+    stopRetry();
 
     updateDisplay();
 }
 
 updateDisplay();
 </script>
+
+</body>
+</html>
