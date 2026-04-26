@@ -1,0 +1,237 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* =====================
+   THEME VARIABLES
+===================== */
+:root {
+  --bg: #aac0c9;
+  --bg-soft: #c7eafb;
+  --text: #000000;
+  --primary: #f6c14e;
+  --border: #ffffff;
+  --accent: #aac6d3;
+
+  --btn-bg: var(--primary);
+  --btn-text: var(--text);
+}
+
+body.darkmode {
+  --bg: #121212;
+  --bg-soft: #1e1e1e;
+  --text: #ffffff;
+  --primary: #f78af2;
+  --border: #333333;
+  --accent: #2a2a2a;
+
+  --btn-bg: var(--primary);
+  --btn-text: #000000;
+}
+
+/* =====================
+   BASE STYLES
+===================== */
+body {
+  font-family: "Sour Gummy", sans-serif;
+  padding: 10px;
+  background: var(--bg);
+  color: var(--text);
+  height: 90vh;
+}
+
+main {
+  background-color: var(--bg);
+}
+
+a,
+p,
+h1,
+h2,
+h3,
+ol {
+  color: var(--text);
+  font-family: "Sour Gummy", sans-serif;
+}
+
+/* =====================
+   DARK MODE BUTTON
+===================== */
+#change-darkmode {
+  height: 50px;
+  width: 50px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
+
+/* =====================
+   HEADER & FOOTER
+===================== */
+header {
+  background-color: var(--bg);
+  color: var(--text);
+  padding: 10px 0;
+  text-align: center;
+  font-size: 40px;
+  font-family: monospace;
+  margin: 0 auto;
+}
+
+footer,
+.footer {
+  background-color: var(--bg);
+  color: var(--text);
+  text-align: center;
+  margin-top: 10px;
+  padding: 10px;
+  clear: both;
+}
+
+/* =====================
+   NAVIGATION
+===================== */
+#navigation {
+  width: 100%;
+  background-color: var(--bg);
+  height: 35px;
+  text-align: center;
+}
+
+/* =====================
+   UNIVERSAL BUTTON STYLE
+   (links, nav, buttons)
+===================== */
+button,
+.links a,
+#navigation a,
+.Button,
+.Button2 {
+  font-family: "Sour Gummy", sans-serif;
+  font-size: 18px;
+  color: var(--btn-text);
+  background-color: var(--btn-bg);
+  border: 3px solid var(--border);
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover (shared) */
+button:hover,
+.links a:hover,
+#navigation a:hover,
+.Button:hover,
+.Button2:hover {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* =====================
+   LINKS GROUP
+===================== */
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* =====================
+   CONTAINERS
+===================== */
+.container {
+  text-align: center;
+  padding: 20px;
+}
+
+.container2 {
+  padding: 20px;
+}
+
+/* =====================
+   COLUMNS
+===================== */
+.leftcolumn {
+  float: left;
+  width: 70%;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-soft);
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.rightcolumn {
+  float: right;
+  width: 28.5%;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-soft);
+  padding: 10px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+/* =====================
+   HEADER BLOCK
+===================== */
+.header {
+  padding: 1px;
+  font-size: 40px;
+  text-align: center;
+  background: var(--bg);
+}
+
+/* =====================
+   RESPONSIVE
+===================== */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .links {
+    flex-direction: column;
+  }
+
+  .links a {
+    width: 100%;
+  }
+}
+
+.note-item {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  border-radius: 12px;
+}
+
+.darkmode .modal-content {
+  background: #1e1e1e;
+  color: white;
+}
