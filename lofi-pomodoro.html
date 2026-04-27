@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lofi pomodoro ✿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #aac0c9;
+  --bg-soft: #c7eafb;
+  --text:    #000000;
+  --primary: #f6c14e;
+  --border:  #ffffff;
+  --accent:  #aac6d3;
+  --btn-bg:  #f6c14e;
+  --btn-text:#000000;
+}
+body.darkmode {
+  --bg:      #121212;
+  --bg-soft: #1e1e1e;
+  --text:    #ffffff;
+  --primary: #f78af2;
+  --border:  #333333;
+  --accent:  #2a2a2a;
+  --btn-bg:  #f78af2;
+  --btn-text:#000000;
+}
+
+body {
+  font-family: "Sour Gummy", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 10px;
+  transition: background 0.3s, color 0.3s;
+}
+
+a, p, h1, h2, h3 { color: var(--text); font-family: "Sour Gummy", sans-serif; }
+
+/* dark mode toggle */
+#change-darkmode {
+  height: 50px; width: 50px; padding: 0;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  position: fixed; top: 20px; right: 20px;
+  cursor: pointer; font-size: 20px;
+  transition: all 0.3s; z-index: 100;
+}
+#change-darkmode:hover { background: var(--btn-bg); }
+
+/* header */
+header {
+  background-color: var(--bg);
+  padding: 10px 0 6px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 900;
+  font-family: "Sour Gummy", sans-serif;
+}
+
+/* navigation */
+#navigation {
+  width: 100%;
+  background-color: var(--bg);
+  text-align: center;
+  margin-bottom: 0;
+  padding: 8px 0;
+}
+.links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* universal button */
+button, .links button, .stream-btn {
+  font-family: "Sour Gummy", sans-serif;
+  font-size: 16px;
+  color: var(--btn-text);
+  background-color: var(--btn-bg);
+  border: 3px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+button:hover, .links button:hover, .stream-btn:hover {
+  background-color: var(--bg);
+  color: var(--text);
+}
+.links button.active {
+  background-color: var(--bg);
+  color: var(--text);
+  font-weight: 700;
+  border-color: var(--primary);
+}
+
+/* columns */
+.col-wrap {
+  display: flex;
+  gap: 16px;
+  max-width: 860px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+.leftcolumn {
+  float: none; flex: 1;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-soft);
+  padding: 20px;
+  margin-top: 20px;
+}
+.rightcolumn {
+  float: none; width: 260px; flex-shrink: 0;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-soft);
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.container { text-align: center; padding: 10px 0; }
+
+/* ring timer */
+.ring-wrap {
+  position: relative;
+  width: 220px; height: 220px;
+  margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ring-wrap svg { position: absolute; top:0; left:0; transform: rotate(-90deg); }
+.ring-track    { fill: none; stroke: var(--accent); stroke-width: 10; opacity: 0.45; }
+.ring-progress {
+  fill: none; stroke: var(--primary);
+  stroke-width: 10; stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke 0.4s;
+}
+.ring-inner { position: relative; z-index:1; text-align:center; }
+.mode-label {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  opacity: 0.55; margin-bottom: 4px;
+}
+.timer-digits {
+  font-family: "Sour Gummy", sans-serif;
+  font-size: 62px; font-weight: 900;
+  line-height: 1; letter-spacing: -2px;
+}
+.session-dots { display:flex; gap:8px; justify-content:center; margin-top:10px; }
+.dot {
+  width:11px; height:11px; border-radius:50%;
+  background: var(--accent); border: 2px solid var(--border);
+  transition: background 0.3s;
+}
+.dot.done    { background: var(--primary); }
+.dot.current {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--bg-soft), 0 0 0 5px var(--primary);
+  animation: dpulse 1.2s ease-in-out infinite;
+}
+@keyframes dpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+/* control buttons */
+.btn-row { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
+.ctrl { font-size:16px; padding:10px 20px; display:flex; align-items:center; gap:6px; }
+.ctrl.big { font-size:20px; font-weight:700; padding:12px 32px; }
+
+/* music bar */
+.music-bar {
+  display:flex; align-items:center; gap:10px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  padding: 10px 14px;
+}
+.eq { display:flex; align-items:flex-end; gap:3px; height:18px; flex-shrink:0; }
+.eq-b {
+  width:4px; border-radius:2px;
+  background: var(--primary); border: 1px solid var(--border);
+  animation: eqA 0.7s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+.eq-b:nth-child(1){height:7px;  animation-delay:0s;}
+.eq-b:nth-child(2){height:15px; animation-delay:.13s;}
+.eq-b:nth-child(3){height:10px; animation-delay:.26s;}
+.eq-b:nth-child(4){height:18px; animation-delay:.07s;}
+.eq-b:nth-child(5){height:6px;  animation-delay:.2s;}
+.eq.paused .eq-b { animation-play-state: paused; }
+@keyframes eqA { from{transform:scaleY(0.2)} to{transform:scaleY(1)} }
+
+.music-info { flex:1; min-width:0; }
+.music-name   { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.music-status { font-size:11px; opacity:0.55; margin-top:1px; }
+
+.vol-row { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.vol-lbl { font-size:11px; font-weight:700; }
+input[type=range].vol {
+  -webkit-appearance:none; width:64px; height:5px;
+  border-radius:4px; background:var(--accent); outline:none; border:none; cursor:pointer;
+}
+input[type=range].vol::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:var(--primary); border:3px solid var(--border); cursor:pointer;
+}
+
+/* right column content */
+.section-title {
+  font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.1em;
+  opacity:0.55; margin-bottom:8px; margin-top:14px;
+}
+.section-title:first-child { margin-top:0; }
+
+.stream-btn {
+  display:block; width:100%;
+  text-align:left; font-size:14px;
+  padding:8px 12px; margin-bottom:7px;
+}
+.stream-btn.active {
+  background-color: var(--bg);
+  color: var(--text);
+  font-weight: 700;
+  border-color: var(--primary);
+}
+
+.info-row {
+  display:flex; justify-content:space-between;
+  font-size:13px; margin-bottom:6px;
+  border-bottom:1px solid var(--accent); padding-bottom:5px;
+}
+.info-row:last-child { border-bottom:none; margin-bottom:0; }
+.info-row span:first-child { opacity:0.6; }
+.info-row span:last-child  { font-weight:700; }
+
+/* footer */
+footer {
+  background-color: var(--bg);
+  color: var(--text);
+  text-align: center;
+  margin-top: 16px; padding: 10px;
+  font-size: 13px; opacity: 0.65; clear: both;
+}
+
+/* toast */
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background: var(--primary); color: var(--btn-text);
+  border: 3px solid var(--border); border-radius:8px;
+  padding:10px 24px;
+  font-family:"Sour Gummy",sans-serif; font-size:15px; font-weight:700;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s, bottom 0.3s;
+  z-index:200; white-space:nowrap;
+}
+.toast.show { opacity:1; bottom:36px; }
+
+@media (max-width:620px) {
+  .col-wrap { flex-direction:column; }
+  .rightcolumn { width:100%; }
+  .timer-digits { font-size:50px; }
+  .links { gap:6px; }
+  .links button { font-size:13px; padding:6px 12px; }
+}
+</style>
+</head>
+<body>
+
+<button id="change-darkmode" onclick="toggleDark()">🌙</button>
+<div class="toast" id="toast"></div>
+
+<header>✿ lofi pomodoro ✿</header>
+
+<div id="navigation">
+  <div class="links">
+    <button class="active" onclick="setMode('focus',this)">🍅 Focus</button>
+    <button onclick="setMode('short',this)">☕ Short Break</button>
+    <button onclick="setMode('long',this)">🌿 Long Break</button>
+  </div>
+</div>
+
+<div class="col-wrap">
+
+  <!-- LEFT: timer + controls -->
+  <div class="leftcolumn">
+    <div class="container">
+
+      <div class="ring-wrap">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <circle class="ring-track"    cx="110" cy="110" r="95"/>
+          <circle class="ring-progress" id="ring" cx="110" cy="110" r="95"/>
+        </svg>
+        <div class="ring-inner">
+          <div class="mode-label" id="modeLabel">Focus</div>
+          <div class="timer-digits" id="timerDisplay">25:00</div>
+          <div class="session-dots">
+            <div class="dot current" id="d0"></div>
+            <div class="dot" id="d1"></div>
+            <div class="dot" id="d2"></div>
+            <div class="dot" id="d3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="ctrl" onclick="resetTimer()">↺ Reset</button>
+        <button class="ctrl big" id="playBtn" onclick="togglePlay()">▶ Start</button>
+        <button class="ctrl" onclick="skipSession()">Skip ▷▷</button>
+      </div>
+
+      <div class="music-bar">
+        <div class="eq paused" id="eq">
+          <div class="eq-b"></div><div class="eq-b"></div><div class="eq-b"></div>
+          <div class="eq-b"></div><div class="eq-b"></div>
+        </div>
+        <div class="music-info">
+          <div class="music-name" id="musicName">lofi hip hop radio ☁️</div>
+          <div class="music-status" id="musicStatus">press start to play ✿</div>
+        </div>
+        <div class="vol-row">
+          <span class="vol-lbl">vol</span>
+          <input type="range" class="vol" min="0" max="100" value="75" oninput="setVol(this.value)">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: stream + info -->
+  <div class="rightcolumn">
+
+    <div class="section-title">🎧 Stream</div>
+    <button class="stream-btn active" onclick="switchStream(0,this)">☁️ Lofi Hip Hop</button>
+    <button class="stream-btn" onclick="switchStream(1,this)">🌸 Plaza Lofi</button>
+    <button class="stream-btn" onclick="switchStream(2,this)">🎸 Retrowave</button>
+    <button class="stream-btn" onclick="switchStream(3,this)">🌊 Chillout</button>
+
+    <div class="section-title">📊 Session</div>
+    <div class="info-row"><span>Mode</span><span id="infoMode">Focus</span></div>
+    <div class="info-row"><span>Completed</span><span id="infoCompleted">0 sessions</span></div>
+    <div class="info-row"><span>Until long break</span><span id="infoUntilLong">4 left</span></div>
+
+    <div class="section-title">⏱ Timings</div>
+    <div class="info-row"><span>Focus</span><span>25 min</span></div>
+    <div class="info-row"><span>Short break</span><span>5 min</span></div>
+    <div class="info-row"><span>Long break</span><span>15 min</span></div>
+
+  </div>
+</div>
+
+<footer>made with ✿ &nbsp;—&nbsp; save and open as .html in chrome / firefox for audio</footer>
+
+<script>
+const STREAMS = [
+  { name:'lofi hip hop radio ☁️', url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
+  { name:'plaza lofi 🌸',          url:'https://radio.plaza.one/mp3' },
+  { name:'retrowave 🎸',           url:'https://streams.ilovemusic.de/iloveradio21.mp3' },
+  { name:'chillout 🌊',            url:'https://streams.ilovemusic.de/iloveradio2.mp3' },
+];
+let streamIdx = 0;
+
+const MODES = {
+  focus: { label:'Focus',       duration:25*60 },
+  short: { label:'Short Break', duration:5*60  },
+  long:  { label:'Long Break',  duration:15*60 },
+};
+let currentMode='focus', timeLeft=25*60, totalTime=25*60;
+let running=false, intervalId=null, completedFocus=0;
+let audio=null, vol=0.75, dark=false;
+
+// ── audio ─────────────────────────────────────
+function getAudio() {
+  if (!audio) {
+    audio = new Audio();
+    audio.volume = vol;
+    audio.onerror = () => { streamIdx=(streamIdx+1)%STREAMS.length; setTimeout(tryPlay,1000); };
+  }
+  return audio;
+}
+function tryPlay() {
+  const a = getAudio();
+  a.src = STREAMS[streamIdx].url; a.load();
+  setStatus('connecting…');
+  a.play().then(()=>setMusicUI(true)).catch(()=>{
+    setMusicUI(false); setStatus('blocked — open file locally ✿');
+  });
+}
+function pauseAudio() { if(audio) audio.pause(); setMusicUI(false); }
+function setMusicUI(on) {
+  document.getElementById('eq').classList.toggle('paused',!on);
+  setStatus(on ? 'now playing ✦' : (running ? 'connecting…' : 'paused ☁️'));
+}
+function setStatus(s) { document.getElementById('musicStatus').textContent=s; }
+function setVol(v) { vol=v/100; if(audio) audio.volume=vol; }
+function switchStream(idx,el) {
+  streamIdx=idx;
+  document.querySelectorAll('.stream-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('musicName').textContent=STREAMS[idx].name;
+  if(running){ if(audio){audio.pause();audio=null;} tryPlay(); }
+}
+
+// ── dark mode ──────────────────────────────────
+function toggleDark() {
+  dark=!dark;
+  document.body.classList.toggle('darkmode',dark);
+  document.getElementById('change-darkmode').textContent=dark?'☀️':'🌙';
+  updateRing();
+}
+
+// ── ring ───────────────────────────────────────
+const CIRC=2*Math.PI*95;
+const ring=document.getElementById('ring');
+ring.style.strokeDasharray=CIRC;
+
+function updateRing() {
+  ring.style.strokeDashoffset=CIRC*(1-timeLeft/totalTime);
+  ring.style.stroke=dark?'#f78af2':'#f6c14e';
+}
+
+// ── display ────────────────────────────────────
+function renderDisplay() {
+  const m=Math.floor(timeLeft/60), s=timeLeft%60;
+  document.getElementById('timerDisplay').textContent=
+    String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  updateRing(); renderDots(); renderInfo();
+}
+function renderDots() {
+  const cur=completedFocus%4;
+  [0,1,2,3].forEach(i=>{
+    const d=document.getElementById('d'+i);
+    d.classList.remove('done','current');
+    if(i<cur) d.classList.add('done');
+    else if(i===cur && currentMode==='focus') d.classList.add('current');
+  });
+}
+function renderInfo() {
+  const left=4-(completedFocus%4);
+  document.getElementById('infoMode').textContent=MODES[currentMode].label;
+  document.getElementById('infoCompleted').textContent=completedFocus+(completedFocus===1?' session':' sessions');
+  document.getElementById('infoUntilLong').textContent=left+' left';
+}
+
+// ── timer ──────────────────────────────────────
+function togglePlay() {
+  if(running){
+    running=false; clearInterval(intervalId); pauseAudio();
+    document.getElementById('playBtn').textContent='▶ Start';
+  } else {
+    running=true; tryPlay();
+    document.getElementById('playBtn').textContent='⏸ Pause';
+    intervalId=setInterval(tick,1000);
+  }
+}
+function tick() {
+  if(timeLeft<=0){
+    clearInterval(intervalId); running=false;
+    document.getElementById('playBtn').textContent='▶ Start';
+    handleEnd(); return;
+  }
+  timeLeft--; renderDisplay();
+}
+function handleEnd() {
+  pauseAudio();
+  if(currentMode==='focus'){
+    completedFocus++;
+    const isLong=completedFocus%4===0;
+    showToast(isLong?'🌿 Long break time!':'☕ Short break time!');
+    setTimeout(()=>applyMode(isLong?'long':'short'),600);
+  } else {
+    showToast('🍅 Back to focus!');
+    setTimeout(()=>applyMode('focus'),600);
+  }
+}
+function applyMode(mode) {
+  currentMode=mode; timeLeft=MODES[mode].duration; totalTime=MODES[mode].duration;
+  document.getElementById('modeLabel').textContent=MODES[mode].label;
+  renderDisplay();
+}
+function setMode(mode,el) {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  pauseAudio(); currentMode=mode;
+  timeLeft=MODES[mode].duration; totalTime=MODES[mode].duration;
+  document.getElementById('modeLabel').textContent=MODES[mode].label;
+  document.querySelectorAll('#navigation .links button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); renderDisplay();
+}
+function resetTimer() {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  pauseAudio(); timeLeft=totalTime; renderDisplay();
+}
+function skipSession() {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  handleEnd();
+}
+
+// ── toast ──────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+updateRing(); renderDisplay();
+</script>
+</body>
+</html>
