@@ -1,11 +1,296 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.13/html-to-image.min.js" integrity="sha512-iZ2ORl595Wx6miw+GuadDet4WQbdSWS3JLMoNfY8cRGoEFy6oT3G9IbcrBeL6AfkgpA51ETt/faX6yLV+/gFJg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      (function() {
+        const originalConsole = window.console;
+        window.console = {
+          log: (...args) => {
+            originalConsole.log(...args);
+            window.parent.postMessage({ type: 'console', message: args.join(' ') }, '*');
+          },
+          error: (...args) => {
+            originalConsole.error(...args);
+            window.parent.postMessage({ type: 'console', message: 'Error: ' + args.join(' ') }, '*');
+          },
+          warn: (...args) => {
+            originalConsole.warn(...args);
+            window.parent.postMessage({ type: 'console', message: 'Warning: ' + args.join(' ') }, '*');
+          }
+        };
+
+        let requestId = 0;
+        let callbacksMap = new Map();
+        let streamControllers = new Map();
+        
+        window.claude = {
+          complete: (prompt) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'claudeComplete', id, prompt }, '*');
+            });
+          }
+        };
+
+        window.storage = {
+          get: (key, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageGet', id, key, shared }, '*');
+            });
+          },
+          set: (key, value, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageSet', id, key, value, shared }, '*');
+            });
+          },
+          delete: (key, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageDelete', id, key, shared }, '*');
+            });
+          },
+          list: (prefix, shared = false) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageList', id, prefix, shared }, '*');
+            });
+          }
+        };
+
+        let pendingBlobs = new Map();
+        URL.createObjectURL = (blob) => {
+          // Store the blob and create an ID and URL for it
+          const blobId = `blob-${Date.now()}-${Math.random()}`;
+          pendingBlobs.set(blobId, blob);
+          return `blob-request://${blobId}`;
+        };
+
+        URL.revokeObjectURL = (url) => {
+          // Remove the blob from our store
+          const blobId = url.replace("blob-request://", "");
+          pendingBlobs.delete(blobId);
+        };
+
+        const getBlobFromURL = (url) => {
+          const blobId = url.replace("blob-request://", "");
+          return pendingBlobs.get(blobId);
+        };
+
+        // Override global fetch with streaming support
+        window.fetch = (url, init = {}) => {
+          return new Promise((resolve, reject) => {
+            const id = requestId++;
+            const channelId = `fetch-${id}-${Date.now()}`;
+            
+            callbacksMap.set(id, { 
+              resolve: (response) => {
+                // Create a ReadableStream for the response body
+                const stream = new ReadableStream({
+                  start(controller) {
+                    streamControllers.set(channelId, controller);
+                  },
+                  cancel() {
+                    streamControllers.delete(channelId);
+                  }
+                });
+                
+                // Create and return the Response with the stream
+                resolve(new Response(stream, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers
+                }));
+              },
+              reject,
+              channelId
+            });
+            
+            window.parent.postMessage({
+              type: 'proxyFetch',
+              id,
+              url,
+              init,
+              channelId
+            }, '*');
+          });
+        };
+
+        window.addEventListener('message', async (event) => {
+          if (event.data.type === 'takeScreenshot') {
+            const rootElement = document.getElementById('artifacts-component-root-html');
+            if (!rootElement) {
+              window.parent.postMessage({
+                type: 'screenshotError',
+                error: new Error('Root element not found'),
+              }, '*');
+            }
+            const screenshot = await htmlToImage.toPng(rootElement, {
+              imagePlaceholder:
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjePDgwX8ACOQDoNsk0PMAAAAASUVORK5CYII=",
+            });
+            window.parent.postMessage({
+              type: 'screenshotData',
+              data: screenshot,
+            }, '*');
+          } else if (event.data.type === 'claudeComplete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.completion);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'proxyFetchResponse') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+              callbacksMap.delete(event.data.id);
+            } else {
+              // Initial response with headers, status, etc.
+              callback.resolve({
+                status: event.data.status,
+                statusText: event.data.statusText,
+                headers: event.data.headers
+              });
+              // Don't delete the callback yet if streaming
+              if (!event.data.body) {
+                callbacksMap.delete(event.data.id);
+              }
+            }
+          } else if (event.data.type === 'proxyFetchStream') {
+            // Handle streaming data chunks
+            const controller = streamControllers.get(event.data.channelId);
+            if (controller) {
+              if (event.data.error) {
+                controller.error(new Error(event.data.error));
+                streamControllers.delete(event.data.channelId);
+              } else if (event.data.done) {
+                controller.close();
+                streamControllers.delete(event.data.channelId);
+                // Clean up the callback
+                const callback = Array.from(callbacksMap.entries()).find(
+                  ([_, value]) => value.channelId === event.data.channelId
+                );
+                if (callback) {
+                  callbacksMap.delete(callback[0]);
+                }
+              } else if (event.data.chunk) {
+                controller.enqueue(new Uint8Array(event.data.chunk));
+              }
+            }
+          } else if (event.data.type === 'storageGet') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageSet') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageDelete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageList') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          }
+        });
+
+        window.addEventListener('click', (event) => {
+          const isEl = event.target instanceof HTMLElement;
+          if (!isEl) return;
+    
+          // find ancestor links
+          const linkEl = event.target.closest("a");
+          if (!linkEl || !linkEl.href) return;
+    
+          event.preventDefault();
+          event.stopImmediatePropagation();
+    
+          if (linkEl.href.startsWith("blob-request:")) {
+            const blob = getBlobFromURL(linkEl.href);
+            if (!blob) return;
+            void blob.arrayBuffer().then((data) => {
+              window.parent.postMessage({
+                type: "downloadFile",
+                filename: linkEl.download,
+                data,
+                mimeType: blob.type || "application/octet-stream",
+              });
+            });
+          } else if (linkEl.href.startsWith("data:")) {
+            const [header, base64Data] = linkEl.href.split(",");
+            const mimeMatch = header.match(/data:([^;]+)/);
+            const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+            const binaryString = atob(base64Data);
+            const data = Uint8Array.from(binaryString, (c) =>
+              c.charCodeAt(0),
+            ).buffer;
+            window.parent.postMessage({
+              type: "downloadFile",
+              filename: linkEl.download,
+              data,
+              mimeType,
+            });
+          } else {
+            let linkUrl;
+            try {
+              linkUrl = new URL(linkEl.href);
+            } catch (error) {
+              return;
+            }
+    
+            if (linkUrl.hostname === window.location.hostname) return;
+      
+            window.parent.postMessage({
+              type: 'openExternal',
+              href: linkEl.href,
+            }, '*');
+          }
+      });
+
+        const originalOpen = window.open;
+        window.open = function (url) {
+          window.parent.postMessage({
+            type: "openExternal",
+            href: url,
+          }, "*");
+        };
+
+        window.addEventListener('error', (event) => {
+          window.parent.postMessage({ type: 'console', message: 'Uncaught Error: ' + event.message }, '*');
+        });
+      })();
+    </script>
+  
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>lofi pomodoro ✿</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&amp;display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -41,7 +326,7 @@ body {
 
 a, p, h1, h2, h3 { color: var(--text); font-family: "Sour Gummy", sans-serif; }
 
-/* dark mode toggle */
+/* ── fixed top-right buttons ── */
 #change-darkmode {
   height: 50px; width: 50px; padding: 0;
   border-radius: 50%;
@@ -54,7 +339,21 @@ a, p, h1, h2, h3 { color: var(--text); font-family: "Sour Gummy", sans-serif; }
 }
 #change-darkmode:hover { background: var(--btn-bg); }
 
-/* header */
+/* ── account button top-left ── */
+#acct-btn {
+  height: 50px; padding: 0 16px;
+  border-radius: 25px;
+  display: flex; justify-content: center; align-items: center; gap: 7px;
+  background: var(--btn-bg);
+  border: 3px solid var(--border);
+  position: fixed; top: 20px; left: 20px;
+  cursor: pointer; font-size: 15px; font-weight: 700;
+  transition: all 0.3s; z-index: 100;
+  font-family: "Sour Gummy", sans-serif; color: var(--btn-text);
+}
+#acct-btn:hover { background: var(--bg); color: var(--text); }
+
+/* ── header ── */
 header {
   background-color: var(--bg);
   padding: 10px 0 6px;
@@ -64,17 +363,16 @@ header {
   font-family: "Sour Gummy", sans-serif;
 }
 
-/* navigation */
+/* ── navigation ── */
 #navigation {
   width: 100%;
   background-color: var(--bg);
   text-align: center;
-  margin-bottom: 0;
   padding: 8px 0;
 }
 .links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
 
-/* universal button */
+/* ── universal button ── */
 button, .links button, .stream-btn {
   font-family: "Sour Gummy", sans-serif;
   font-size: 16px;
@@ -97,23 +395,26 @@ button:hover, .links button:hover, .stream-btn:hover {
   border-color: var(--primary);
 }
 
-/* columns */
+/* ── columns — always side by side ── */
 .col-wrap {
   display: flex;
+  flex-direction: row;        /* force horizontal always */
   gap: 16px;
-  max-width: 860px;
+  max-width: 960px;
   margin: 0 auto;
   align-items: flex-start;
 }
 .leftcolumn {
-  float: none; flex: 1;
+  flex: 1;
   border: 1px solid var(--accent);
   background-color: var(--bg-soft);
   padding: 20px;
   margin-top: 20px;
+  min-width: 0;
 }
 .rightcolumn {
-  float: none; width: 260px; flex-shrink: 0;
+  width: 220px;
+  flex-shrink: 0;
   border: 1px solid var(--accent);
   background-color: var(--bg-soft);
   padding: 16px;
@@ -122,7 +423,7 @@ button:hover, .links button:hover, .stream-btn:hover {
 
 .container { text-align: center; padding: 10px 0; }
 
-/* ring timer */
+/* ── ring timer ── */
 .ring-wrap {
   position: relative;
   width: 220px; height: 220px;
@@ -161,17 +462,18 @@ button:hover, .links button:hover, .stream-btn:hover {
 }
 @keyframes dpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
 
-/* control buttons */
+/* ── control buttons ── */
 .btn-row { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
 .ctrl { font-size:16px; padding:10px 20px; display:flex; align-items:center; gap:6px; }
 .ctrl.big { font-size:20px; font-weight:700; padding:12px 32px; }
 
-/* music bar */
+/* ── music bar ── */
 .music-bar {
   display:flex; align-items:center; gap:10px;
   border: 1px solid var(--accent);
   background: var(--bg);
   padding: 10px 14px;
+  margin-bottom: 10px;
 }
 .eq { display:flex; align-items:flex-end; gap:3px; height:18px; flex-shrink:0; }
 .eq-b {
@@ -203,7 +505,34 @@ input[type=range].vol::-webkit-slider-thumb {
   background:var(--primary); border:3px solid var(--border); cursor:pointer;
 }
 
-/* right column content */
+/* ── bell toggle row ── */
+.bell-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid var(--accent);
+  padding: 8px 14px; font-size: 13px; font-weight: 700;
+}
+/* toggle switch */
+.toggle-wrap { display:flex; align-items:center; gap:8px; }
+.toggle {
+  position:relative; width:40px; height:22px; flex-shrink:0;
+}
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider {
+  position:absolute; inset:0;
+  background: var(--accent); border-radius:22px;
+  cursor:pointer; transition:background 0.25s;
+  border: 2px solid var(--border);
+}
+.toggle-slider:before {
+  content:''; position:absolute;
+  width:14px; height:14px; border-radius:50%;
+  background:white; left:2px; top:2px;
+  transition:transform 0.25s;
+}
+.toggle input:checked + .toggle-slider { background: var(--primary); }
+.toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
+
+/* ── right column content ── */
 .section-title {
   font-size:12px; font-weight:700;
   text-transform:uppercase; letter-spacing:0.1em;
@@ -232,7 +561,7 @@ input[type=range].vol::-webkit-slider-thumb {
 .info-row span:first-child { opacity:0.6; }
 .info-row span:last-child  { font-weight:700; }
 
-/* footer */
+/* ── footer ── */
 footer {
   background-color: var(--bg);
   color: var(--text);
@@ -241,7 +570,7 @@ footer {
   font-size: 13px; opacity: 0.65; clear: both;
 }
 
-/* toast */
+/* ── toast ── */
 .toast {
   position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
   background: var(--primary); color: var(--btn-text);
@@ -254,7 +583,7 @@ footer {
 }
 .toast.show { opacity:1; bottom:36px; }
 
-/* ── auth modal ─────────────────────────────── */
+/* ── auth modal ── */
 .modal-overlay {
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.45);
@@ -271,40 +600,34 @@ footer {
   position: relative;
   font-family: "Sour Gummy", sans-serif;
 }
-.modal-box h2 {
-  font-size: 22px; font-weight: 900;
-  margin-bottom: 18px; text-align: center;
-}
+.modal-box h2 { font-size:22px; font-weight:900; margin-bottom:18px; text-align:center; }
 .modal-close {
   position:absolute; top:12px; right:14px;
   background:none; border:none; font-size:20px;
-  cursor:pointer; color:var(--text); padding:0;
-  line-height:1;
+  cursor:pointer; color:var(--text); padding:0; line-height:1;
 }
-.modal-close:hover { color: var(--primary); background:none; }
+.modal-close:hover { color:var(--primary); background:none; }
 
-.auth-tabs {
-  display:flex; gap:8px; margin-bottom:18px;
-}
+.auth-tabs { display:flex; gap:8px; margin-bottom:18px; }
 .auth-tab {
   flex:1; font-size:14px; font-weight:700;
   padding:7px 0; border-radius:8px;
-  border: 3px solid var(--border);
-  background: var(--btn-bg); color: var(--btn-text);
+  border:3px solid var(--border);
+  background:var(--btn-bg); color:var(--btn-text);
   cursor:pointer; transition:all 0.2s;
 }
-.auth-tab:hover   { background:var(--bg); color:var(--text); }
-.auth-tab.active  { background:var(--bg); color:var(--text); border-color:var(--primary); font-weight:900; }
+.auth-tab:hover  { background:var(--bg); color:var(--text); }
+.auth-tab.active { background:var(--bg); color:var(--text); border-color:var(--primary); font-weight:900; }
 
 .auth-form { display:flex; flex-direction:column; gap:10px; }
 .auth-form input {
   font-family:"Sour Gummy",sans-serif; font-size:14px;
   padding:9px 12px; border-radius:8px;
-  border: 3px solid var(--border);
-  background: var(--bg); color: var(--text);
+  border:3px solid var(--border);
+  background:var(--bg); color:var(--text);
   outline:none; transition:border-color 0.2s;
 }
-.auth-form input:focus { border-color: var(--primary); }
+.auth-form input:focus { border-color:var(--primary); }
 .auth-form input::placeholder { opacity:0.5; }
 
 .auth-submit {
@@ -324,36 +647,65 @@ footer {
 }
 .auth-link:hover { opacity:1; background:none; color:var(--text); }
 
-.auth-msg {
-  font-size:12px; text-align:center; min-height:16px;
-  margin-top:2px; font-weight:700;
-}
+.auth-msg { font-size:12px; text-align:center; min-height:16px; margin-top:2px; font-weight:700; }
 .auth-msg.ok  { color:#2a7a2a; }
 .auth-msg.err { color:#c0392b; }
 
-/* account button top-left */
-#acct-btn {
-  height:50px; padding:0 16px;
-  border-radius:25px;
-  display:flex; justify-content:center; align-items:center; gap:7px;
-  background:var(--bg); border:3px solid var(--border);
-  position:fixed; top:20px; left:20px;
-  cursor:pointer; font-size:15px; font-weight:700;
-  transition:all 0.3s; z-index:100;
-  font-family:"Sour Gummy",sans-serif; color:var(--btn-text);
-  background:var(--btn-bg);
+.supabase-note {
+  font-size:11px; opacity:0.5; text-align:center;
+  margin-top:10px; padding-top:10px;
+  border-top:1px solid var(--accent);
+  line-height:1.5;
 }
-#acct-btn:hover { background:var(--bg); color:var(--text); }
 
-  .col-wrap { flex-direction:column; }
-  .rightcolumn { width:100%; }
-  .timer-digits { font-size:50px; }
-  .links { gap:6px; }
-  .links button { font-size:13px; padding:6px 12px; }
+/* ── code modal ── */
+.code-modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:600; align-items:center; justify-content:center;
+}
+.code-modal-overlay.open { display:flex; }
+.code-modal-box {
+  background:var(--bg-soft);
+  border:3px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  width:90vw; max-width:760px;
+  max-height:80vh;
+  display:flex; flex-direction:column;
+  position:relative;
+  font-family:"Sour Gummy",sans-serif;
+}
+.code-modal-box h2 { font-size:18px; font-weight:900; margin-bottom:12px; }
+.code-area {
+  flex:1; overflow:auto;
+  background:var(--bg); border:2px solid var(--accent);
+  border-radius:8px; padding:12px;
+  font-family:monospace; font-size:11px; line-height:1.5;
+  color:var(--text); white-space:pre; tab-size:2;
+  min-height:0;
+}
+.code-btns { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.code-btn {
+  font-family:"Sour Gummy",sans-serif; font-size:14px; font-weight:700;
+  padding:8px 18px; border-radius:8px;
+  border:3px solid var(--border);
+  background:var(--btn-bg); color:var(--btn-text);
+  cursor:pointer; transition:all 0.3s;
+}
+.code-btn:hover { background:var(--bg); color:var(--text); }
+.code-btn.copied { background:var(--bg); color:var(--text); }
+
+@media (max-width:620px) {
+  .col-wrap { flex-direction: column; }
+  .rightcolumn { width: 100%; }
+  .timer-digits { font-size: 50px; }
+  .links { gap: 6px; }
+  .links button { font-size: 13px; padding: 6px 12px; }
 }
 </style>
 </head>
-<body>
+<body id="artifacts-component-root-html">
 
 <button id="acct-btn" onclick="openAuth()">👤 <span id="acct-label">Sign In</span></button>
 <button id="change-darkmode" onclick="toggleDark()">🌙</button>
@@ -363,44 +715,1246 @@ footer {
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeAuth()">✕</button>
-    <h2 id="authTitle">✿ Sign In</h2>
+    <h2 id="authTitle">✿ Sign Up</h2>
 
-    <!-- tabs (sign in / sign up) -->
-    <div class="auth-tabs" id="authTabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Sign In</button>
-      <button class="auth-tab" onclick="switchAuthTab('signup',this)">Sign Up</button>
+    <div class="auth-tabs" id="authTabs" style="display: flex;">
+      <button class="auth-tab" onclick="switchAuthTab('login',this)">Sign In</button>
+      <button class="auth-tab active" onclick="switchAuthTab('signup',this)">Sign Up</button>
     </div>
 
-    <!-- login form -->
-    <div class="auth-form" id="formLogin">
-      <input type="email" id="liEmail" placeholder="Email">
+    <!-- login: username + password -->
+    <div class="auth-form" id="formLogin" style="display: none;">
+      <input type="text" id="liUser" placeholder="Username">
       <input type="password" id="liPass" placeholder="Password">
       <button class="auth-submit" onclick="doLogin()">Sign In</button>
       <button class="auth-link" onclick="switchAuthTab('forgot')">Forgot password?</button>
       <div class="auth-msg" id="liMsg"></div>
     </div>
 
-    <!-- signup form -->
-    <div class="auth-form" id="formSignup" style="display:none">
-      <input type="text"     id="suUser" placeholder="Username">
-      <input type="email"    id="suEmail" placeholder="Email">
+    <!-- signup: username + email + password -->
+    <div class="auth-form" id="formSignup" style="display: flex;">
+      <input type="text" id="suUser" placeholder="Username">
+      <input type="email" id="suEmail" placeholder="Email">
       <input type="password" id="suPass" placeholder="Password (min 6 chars)">
       <button class="auth-submit" onclick="doSignup()">Create Account</button>
       <div class="auth-msg" id="suMsg"></div>
+      <div class="supabase-note">🔗 Cross-device sync coming soon via Supabase</div>
     </div>
 
-    <!-- forgot password form -->
+    <!-- forgot: email-based reset -->
     <div class="auth-form" id="formForgot" style="display:none">
       <input type="email" id="fpEmail" placeholder="Your account email">
-      <button class="auth-submit" onclick="doForgot()">Send Reset Link</button>
+      <button class="auth-submit" onclick="doForgot()">Generate Reset Code</button>
       <button class="auth-link" onclick="switchAuthTab('login')">← Back to Sign In</button>
       <div class="auth-msg" id="fpMsg"></div>
     </div>
 
     <!-- logged-in panel -->
     <div id="panelLoggedIn" style="display:none; text-align:center;">
-      <p style="font-size:15px; margin-bottom:14px;">Signed in as<br><strong id="liUsername"></strong></p>
+      <p style="font-size:15px; margin-bottom:6px;">Signed in as</p>
+      <p style="font-size:18px; font-weight:900; margin-bottom:4px;" id="liUsername"></p>
+      <p style="font-size:12px; opacity:0.55; margin-bottom:16px;" id="liUserEmail"></p>
       <button class="auth-submit" onclick="doLogout()">Sign Out</button>
+      <div class="supabase-note">🔗 Cross-device sync coming soon via Supabase</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── code viewer modal ── -->
+<div class="code-modal-overlay open" id="codeModal">
+  <div class="code-modal-box">
+    <button class="modal-close" onclick="closeCode()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);">✕</button>
+    <h2>📋 Full Source Code</h2>
+    <div class="code-area" id="codeArea">&lt;html lang="en"&gt;&lt;head&gt;
+    &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.13/html-to-image.min.js" integrity="sha512-iZ2ORl595Wx6miw+GuadDet4WQbdSWS3JLMoNfY8cRGoEFy6oT3G9IbcrBeL6AfkgpA51ETt/faX6yLV+/gFJg==" crossorigin="anonymous" referrerpolicy="no-referrer"&gt;&lt;/script&gt;
+    &lt;script&gt;
+      (function() {
+        const originalConsole = window.console;
+        window.console = {
+          log: (...args) =&gt; {
+            originalConsole.log(...args);
+            window.parent.postMessage({ type: 'console', message: args.join(' ') }, '*');
+          },
+          error: (...args) =&gt; {
+            originalConsole.error(...args);
+            window.parent.postMessage({ type: 'console', message: 'Error: ' + args.join(' ') }, '*');
+          },
+          warn: (...args) =&gt; {
+            originalConsole.warn(...args);
+            window.parent.postMessage({ type: 'console', message: 'Warning: ' + args.join(' ') }, '*');
+          }
+        };
+
+        let requestId = 0;
+        let callbacksMap = new Map();
+        let streamControllers = new Map();
+        
+        window.claude = {
+          complete: (prompt) =&gt; {
+            return new Promise((resolve, reject) =&gt; {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'claudeComplete', id, prompt }, '*');
+            });
+          }
+        };
+
+        window.storage = {
+          get: (key, shared = false) =&gt; {
+            return new Promise((resolve, reject) =&gt; {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageGet', id, key, shared }, '*');
+            });
+          },
+          set: (key, value, shared = false) =&gt; {
+            return new Promise((resolve, reject) =&gt; {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageSet', id, key, value, shared }, '*');
+            });
+          },
+          delete: (key, shared = false) =&gt; {
+            return new Promise((resolve, reject) =&gt; {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageDelete', id, key, shared }, '*');
+            });
+          },
+          list: (prefix, shared = false) =&gt; {
+            return new Promise((resolve, reject) =&gt; {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'storageList', id, prefix, shared }, '*');
+            });
+          }
+        };
+
+        let pendingBlobs = new Map();
+        URL.createObjectURL = (blob) =&gt; {
+          // Store the blob and create an ID and URL for it
+          const blobId = `blob-${Date.now()}-${Math.random()}`;
+          pendingBlobs.set(blobId, blob);
+          return `blob-request://${blobId}`;
+        };
+
+        URL.revokeObjectURL = (url) =&gt; {
+          // Remove the blob from our store
+          const blobId = url.replace("blob-request://", "");
+          pendingBlobs.delete(blobId);
+        };
+
+        const getBlobFromURL = (url) =&gt; {
+          const blobId = url.replace("blob-request://", "");
+          return pendingBlobs.get(blobId);
+        };
+
+        // Override global fetch with streaming support
+        window.fetch = (url, init = {}) =&gt; {
+          return new Promise((resolve, reject) =&gt; {
+            const id = requestId++;
+            const channelId = `fetch-${id}-${Date.now()}`;
+            
+            callbacksMap.set(id, { 
+              resolve: (response) =&gt; {
+                // Create a ReadableStream for the response body
+                const stream = new ReadableStream({
+                  start(controller) {
+                    streamControllers.set(channelId, controller);
+                  },
+                  cancel() {
+                    streamControllers.delete(channelId);
+                  }
+                });
+                
+                // Create and return the Response with the stream
+                resolve(new Response(stream, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers
+                }));
+              },
+              reject,
+              channelId
+            });
+            
+            window.parent.postMessage({
+              type: 'proxyFetch',
+              id,
+              url,
+              init,
+              channelId
+            }, '*');
+          });
+        };
+
+        window.addEventListener('message', async (event) =&gt; {
+          if (event.data.type === 'takeScreenshot') {
+            const rootElement = document.getElementById('artifacts-component-root-html');
+            if (!rootElement) {
+              window.parent.postMessage({
+                type: 'screenshotError',
+                error: new Error('Root element not found'),
+              }, '*');
+            }
+            const screenshot = await htmlToImage.toPng(rootElement, {
+              imagePlaceholder:
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjePDgwX8ACOQDoNsk0PMAAAAASUVORK5CYII=",
+            });
+            window.parent.postMessage({
+              type: 'screenshotData',
+              data: screenshot,
+            }, '*');
+          } else if (event.data.type === 'claudeComplete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.completion);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'proxyFetchResponse') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+              callbacksMap.delete(event.data.id);
+            } else {
+              // Initial response with headers, status, etc.
+              callback.resolve({
+                status: event.data.status,
+                statusText: event.data.statusText,
+                headers: event.data.headers
+              });
+              // Don't delete the callback yet if streaming
+              if (!event.data.body) {
+                callbacksMap.delete(event.data.id);
+              }
+            }
+          } else if (event.data.type === 'proxyFetchStream') {
+            // Handle streaming data chunks
+            const controller = streamControllers.get(event.data.channelId);
+            if (controller) {
+              if (event.data.error) {
+                controller.error(new Error(event.data.error));
+                streamControllers.delete(event.data.channelId);
+              } else if (event.data.done) {
+                controller.close();
+                streamControllers.delete(event.data.channelId);
+                // Clean up the callback
+                const callback = Array.from(callbacksMap.entries()).find(
+                  ([_, value]) =&gt; value.channelId === event.data.channelId
+                );
+                if (callback) {
+                  callbacksMap.delete(callback[0]);
+                }
+              } else if (event.data.chunk) {
+                controller.enqueue(new Uint8Array(event.data.chunk));
+              }
+            }
+          } else if (event.data.type === 'storageGet') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageSet') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageDelete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'storageList') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.result);
+            }
+            callbacksMap.delete(event.data.id);
+          }
+        });
+
+        window.addEventListener('click', (event) =&gt; {
+          const isEl = event.target instanceof HTMLElement;
+          if (!isEl) return;
+    
+          // find ancestor links
+          const linkEl = event.target.closest("a");
+          if (!linkEl || !linkEl.href) return;
+    
+          event.preventDefault();
+          event.stopImmediatePropagation();
+    
+          if (linkEl.href.startsWith("blob-request:")) {
+            const blob = getBlobFromURL(linkEl.href);
+            if (!blob) return;
+            void blob.arrayBuffer().then((data) =&gt; {
+              window.parent.postMessage({
+                type: "downloadFile",
+                filename: linkEl.download,
+                data,
+                mimeType: blob.type || "application/octet-stream",
+              });
+            });
+          } else if (linkEl.href.startsWith("data:")) {
+            const [header, base64Data] = linkEl.href.split(",");
+            const mimeMatch = header.match(/data:([^;]+)/);
+            const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+            const binaryString = atob(base64Data);
+            const data = Uint8Array.from(binaryString, (c) =&gt;
+              c.charCodeAt(0),
+            ).buffer;
+            window.parent.postMessage({
+              type: "downloadFile",
+              filename: linkEl.download,
+              data,
+              mimeType,
+            });
+          } else {
+            let linkUrl;
+            try {
+              linkUrl = new URL(linkEl.href);
+            } catch (error) {
+              return;
+            }
+    
+            if (linkUrl.hostname === window.location.hostname) return;
+      
+            window.parent.postMessage({
+              type: 'openExternal',
+              href: linkEl.href,
+            }, '*');
+          }
+      });
+
+        const originalOpen = window.open;
+        window.open = function (url) {
+          window.parent.postMessage({
+            type: "openExternal",
+            href: url,
+          }, "*");
+        };
+
+        window.addEventListener('error', (event) =&gt; {
+          window.parent.postMessage({ type: 'console', message: 'Uncaught Error: ' + event.message }, '*');
+        });
+      })();
+    &lt;/script&gt;
+  
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;title&gt;lofi pomodoro ✿&lt;/title&gt;
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&amp;amp;display=swap" rel="stylesheet"&gt;
+&lt;style&gt;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #aac0c9;
+  --bg-soft: #c7eafb;
+  --text:    #000000;
+  --primary: #f6c14e;
+  --border:  #ffffff;
+  --accent:  #aac6d3;
+  --btn-bg:  #f6c14e;
+  --btn-text:#000000;
+}
+body.darkmode {
+  --bg:      #121212;
+  --bg-soft: #1e1e1e;
+  --text:    #ffffff;
+  --primary: #f78af2;
+  --border:  #333333;
+  --accent:  #2a2a2a;
+  --btn-bg:  #f78af2;
+  --btn-text:#000000;
+}
+
+body {
+  font-family: "Sour Gummy", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 10px;
+  transition: background 0.3s, color 0.3s;
+}
+
+a, p, h1, h2, h3 { color: var(--text); font-family: "Sour Gummy", sans-serif; }
+
+/* ── fixed top-right buttons ── */
+#change-darkmode {
+  height: 50px; width: 50px; padding: 0;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  position: fixed; top: 20px; right: 20px;
+  cursor: pointer; font-size: 20px;
+  transition: all 0.3s; z-index: 100;
+}
+#change-darkmode:hover { background: var(--btn-bg); }
+
+/* ── account button top-left ── */
+#acct-btn {
+  height: 50px; padding: 0 16px;
+  border-radius: 25px;
+  display: flex; justify-content: center; align-items: center; gap: 7px;
+  background: var(--btn-bg);
+  border: 3px solid var(--border);
+  position: fixed; top: 20px; left: 20px;
+  cursor: pointer; font-size: 15px; font-weight: 700;
+  transition: all 0.3s; z-index: 100;
+  font-family: "Sour Gummy", sans-serif; color: var(--btn-text);
+}
+#acct-btn:hover { background: var(--bg); color: var(--text); }
+
+/* ── header ── */
+header {
+  background-color: var(--bg);
+  padding: 10px 0 6px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 900;
+  font-family: "Sour Gummy", sans-serif;
+}
+
+/* ── navigation ── */
+#navigation {
+  width: 100%;
+  background-color: var(--bg);
+  text-align: center;
+  padding: 8px 0;
+}
+.links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* ── universal button ── */
+button, .links button, .stream-btn {
+  font-family: "Sour Gummy", sans-serif;
+  font-size: 16px;
+  color: var(--btn-text);
+  background-color: var(--btn-bg);
+  border: 3px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+button:hover, .links button:hover, .stream-btn:hover {
+  background-color: var(--bg);
+  color: var(--text);
+}
+.links button.active {
+  background-color: var(--bg);
+  color: var(--text);
+  font-weight: 700;
+  border-color: var(--primary);
+}
+
+/* ── columns — always side by side ── */
+.col-wrap {
+  display: flex;
+  flex-direction: row;        /* force horizontal always */
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+.leftcolumn {
+  flex: 1;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-soft);
+  padding: 20px;
+  margin-top: 20px;
+  min-width: 0;
+}
+.rightcolumn {
+  width: 220px;
+  flex-shrink: 0;
+  border: 1px solid var(--accent);
+  background-color: var(--bg-soft);
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.container { text-align: center; padding: 10px 0; }
+
+/* ── ring timer ── */
+.ring-wrap {
+  position: relative;
+  width: 220px; height: 220px;
+  margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ring-wrap svg { position: absolute; top:0; left:0; transform: rotate(-90deg); }
+.ring-track    { fill: none; stroke: var(--accent); stroke-width: 10; opacity: 0.45; }
+.ring-progress {
+  fill: none; stroke: var(--primary);
+  stroke-width: 10; stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke 0.4s;
+}
+.ring-inner { position: relative; z-index:1; text-align:center; }
+.mode-label {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  opacity: 0.55; margin-bottom: 4px;
+}
+.timer-digits {
+  font-family: "Sour Gummy", sans-serif;
+  font-size: 62px; font-weight: 900;
+  line-height: 1; letter-spacing: -2px;
+}
+.session-dots { display:flex; gap:8px; justify-content:center; margin-top:10px; }
+.dot {
+  width:11px; height:11px; border-radius:50%;
+  background: var(--accent); border: 2px solid var(--border);
+  transition: background 0.3s;
+}
+.dot.done    { background: var(--primary); }
+.dot.current {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--bg-soft), 0 0 0 5px var(--primary);
+  animation: dpulse 1.2s ease-in-out infinite;
+}
+@keyframes dpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+/* ── control buttons ── */
+.btn-row { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
+.ctrl { font-size:16px; padding:10px 20px; display:flex; align-items:center; gap:6px; }
+.ctrl.big { font-size:20px; font-weight:700; padding:12px 32px; }
+
+/* ── music bar ── */
+.music-bar {
+  display:flex; align-items:center; gap:10px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.eq { display:flex; align-items:flex-end; gap:3px; height:18px; flex-shrink:0; }
+.eq-b {
+  width:4px; border-radius:2px;
+  background: var(--primary); border: 1px solid var(--border);
+  animation: eqA 0.7s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+.eq-b:nth-child(1){height:7px;  animation-delay:0s;}
+.eq-b:nth-child(2){height:15px; animation-delay:.13s;}
+.eq-b:nth-child(3){height:10px; animation-delay:.26s;}
+.eq-b:nth-child(4){height:18px; animation-delay:.07s;}
+.eq-b:nth-child(5){height:6px;  animation-delay:.2s;}
+.eq.paused .eq-b { animation-play-state: paused; }
+@keyframes eqA { from{transform:scaleY(0.2)} to{transform:scaleY(1)} }
+
+.music-info { flex:1; min-width:0; }
+.music-name   { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.music-status { font-size:11px; opacity:0.55; margin-top:1px; }
+
+.vol-row { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.vol-lbl { font-size:11px; font-weight:700; }
+input[type=range].vol {
+  -webkit-appearance:none; width:64px; height:5px;
+  border-radius:4px; background:var(--accent); outline:none; border:none; cursor:pointer;
+}
+input[type=range].vol::-webkit-slider-thumb {
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:var(--primary); border:3px solid var(--border); cursor:pointer;
+}
+
+/* ── bell toggle row ── */
+.bell-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid var(--accent);
+  padding: 8px 14px; font-size: 13px; font-weight: 700;
+}
+/* toggle switch */
+.toggle-wrap { display:flex; align-items:center; gap:8px; }
+.toggle {
+  position:relative; width:40px; height:22px; flex-shrink:0;
+}
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider {
+  position:absolute; inset:0;
+  background: var(--accent); border-radius:22px;
+  cursor:pointer; transition:background 0.25s;
+  border: 2px solid var(--border);
+}
+.toggle-slider:before {
+  content:''; position:absolute;
+  width:14px; height:14px; border-radius:50%;
+  background:white; left:2px; top:2px;
+  transition:transform 0.25s;
+}
+.toggle input:checked + .toggle-slider { background: var(--primary); }
+.toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
+
+/* ── right column content ── */
+.section-title {
+  font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.1em;
+  opacity:0.55; margin-bottom:8px; margin-top:14px;
+}
+.section-title:first-child { margin-top:0; }
+
+.stream-btn {
+  display:block; width:100%;
+  text-align:left; font-size:14px;
+  padding:8px 12px; margin-bottom:7px;
+}
+.stream-btn.active {
+  background-color: var(--bg);
+  color: var(--text);
+  font-weight: 700;
+  border-color: var(--primary);
+}
+
+.info-row {
+  display:flex; justify-content:space-between;
+  font-size:13px; margin-bottom:6px;
+  border-bottom:1px solid var(--accent); padding-bottom:5px;
+}
+.info-row:last-child { border-bottom:none; margin-bottom:0; }
+.info-row span:first-child { opacity:0.6; }
+.info-row span:last-child  { font-weight:700; }
+
+/* ── footer ── */
+footer {
+  background-color: var(--bg);
+  color: var(--text);
+  text-align: center;
+  margin-top: 16px; padding: 10px;
+  font-size: 13px; opacity: 0.65; clear: both;
+}
+
+/* ── toast ── */
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background: var(--primary); color: var(--btn-text);
+  border: 3px solid var(--border); border-radius:8px;
+  padding:10px 24px;
+  font-family:"Sour Gummy",sans-serif; font-size:15px; font-weight:700;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s, bottom 0.3s;
+  z-index:200; white-space:nowrap;
+}
+.toast.show { opacity:1; bottom:36px; }
+
+/* ── auth modal ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.45);
+  z-index:500; align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+
+.modal-box {
+  background: var(--bg-soft);
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 28px 22px;
+  width: 100%; max-width: 360px;
+  position: relative;
+  font-family: "Sour Gummy", sans-serif;
+}
+.modal-box h2 { font-size:22px; font-weight:900; margin-bottom:18px; text-align:center; }
+.modal-close {
+  position:absolute; top:12px; right:14px;
+  background:none; border:none; font-size:20px;
+  cursor:pointer; color:var(--text); padding:0; line-height:1;
+}
+.modal-close:hover { color:var(--primary); background:none; }
+
+.auth-tabs { display:flex; gap:8px; margin-bottom:18px; }
+.auth-tab {
+  flex:1; font-size:14px; font-weight:700;
+  padding:7px 0; border-radius:8px;
+  border:3px solid var(--border);
+  background:var(--btn-bg); color:var(--btn-text);
+  cursor:pointer; transition:all 0.2s;
+}
+.auth-tab:hover  { background:var(--bg); color:var(--text); }
+.auth-tab.active { background:var(--bg); color:var(--text); border-color:var(--primary); font-weight:900; }
+
+.auth-form { display:flex; flex-direction:column; gap:10px; }
+.auth-form input {
+  font-family:"Sour Gummy",sans-serif; font-size:14px;
+  padding:9px 12px; border-radius:8px;
+  border:3px solid var(--border);
+  background:var(--bg); color:var(--text);
+  outline:none; transition:border-color 0.2s;
+}
+.auth-form input:focus { border-color:var(--primary); }
+.auth-form input::placeholder { opacity:0.5; }
+
+.auth-submit {
+  font-family:"Sour Gummy",sans-serif; font-size:16px; font-weight:700;
+  padding:10px; border-radius:8px;
+  border:3px solid var(--border);
+  background:var(--btn-bg); color:var(--btn-text);
+  cursor:pointer; transition:all 0.3s; margin-top:4px;
+}
+.auth-submit:hover { background:var(--bg); color:var(--text); }
+
+.auth-link {
+  background:none; border:none; padding:0;
+  font-family:"Sour Gummy",sans-serif; font-size:13px;
+  color:var(--text); opacity:0.65; cursor:pointer;
+  text-decoration:underline; text-align:center; margin-top:2px;
+}
+.auth-link:hover { opacity:1; background:none; color:var(--text); }
+
+.auth-msg { font-size:12px; text-align:center; min-height:16px; margin-top:2px; font-weight:700; }
+.auth-msg.ok  { color:#2a7a2a; }
+.auth-msg.err { color:#c0392b; }
+
+.supabase-note {
+  font-size:11px; opacity:0.5; text-align:center;
+  margin-top:10px; padding-top:10px;
+  border-top:1px solid var(--accent);
+  line-height:1.5;
+}
+
+/* ── code modal ── */
+.code-modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:600; align-items:center; justify-content:center;
+}
+.code-modal-overlay.open { display:flex; }
+.code-modal-box {
+  background:var(--bg-soft);
+  border:3px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  width:90vw; max-width:760px;
+  max-height:80vh;
+  display:flex; flex-direction:column;
+  position:relative;
+  font-family:"Sour Gummy",sans-serif;
+}
+.code-modal-box h2 { font-size:18px; font-weight:900; margin-bottom:12px; }
+.code-area {
+  flex:1; overflow:auto;
+  background:var(--bg); border:2px solid var(--accent);
+  border-radius:8px; padding:12px;
+  font-family:monospace; font-size:11px; line-height:1.5;
+  color:var(--text); white-space:pre; tab-size:2;
+  min-height:0;
+}
+.code-btns { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.code-btn {
+  font-family:"Sour Gummy",sans-serif; font-size:14px; font-weight:700;
+  padding:8px 18px; border-radius:8px;
+  border:3px solid var(--border);
+  background:var(--btn-bg); color:var(--btn-text);
+  cursor:pointer; transition:all 0.3s;
+}
+.code-btn:hover { background:var(--bg); color:var(--text); }
+.code-btn.copied { background:var(--bg); color:var(--text); }
+
+@media (max-width:620px) {
+  .col-wrap { flex-direction: column; }
+  .rightcolumn { width: 100%; }
+  .timer-digits { font-size: 50px; }
+  .links { gap: 6px; }
+  .links button { font-size: 13px; padding: 6px 12px; }
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body id="artifacts-component-root-html"&gt;
+
+&lt;button id="acct-btn" onclick="openAuth()"&gt;👤 &lt;span id="acct-label"&gt;Sign In&lt;/span&gt;&lt;/button&gt;
+&lt;button id="change-darkmode" onclick="toggleDark()"&gt;🌙&lt;/button&gt;
+&lt;div class="toast" id="toast"&gt;&lt;/div&gt;
+
+&lt;!-- ── auth modal ── --&gt;
+&lt;div class="modal-overlay" id="authModal"&gt;
+  &lt;div class="modal-box"&gt;
+    &lt;button class="modal-close" onclick="closeAuth()"&gt;✕&lt;/button&gt;
+    &lt;h2 id="authTitle"&gt;✿ Sign Up&lt;/h2&gt;
+
+    &lt;div class="auth-tabs" id="authTabs" style="display: flex;"&gt;
+      &lt;button class="auth-tab" onclick="switchAuthTab('login',this)"&gt;Sign In&lt;/button&gt;
+      &lt;button class="auth-tab active" onclick="switchAuthTab('signup',this)"&gt;Sign Up&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- login: username + password --&gt;
+    &lt;div class="auth-form" id="formLogin" style="display: none;"&gt;
+      &lt;input type="text" id="liUser" placeholder="Username"&gt;
+      &lt;input type="password" id="liPass" placeholder="Password"&gt;
+      &lt;button class="auth-submit" onclick="doLogin()"&gt;Sign In&lt;/button&gt;
+      &lt;button class="auth-link" onclick="switchAuthTab('forgot')"&gt;Forgot password?&lt;/button&gt;
+      &lt;div class="auth-msg" id="liMsg"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- signup: username + email + password --&gt;
+    &lt;div class="auth-form" id="formSignup" style="display: flex;"&gt;
+      &lt;input type="text" id="suUser" placeholder="Username"&gt;
+      &lt;input type="email" id="suEmail" placeholder="Email"&gt;
+      &lt;input type="password" id="suPass" placeholder="Password (min 6 chars)"&gt;
+      &lt;button class="auth-submit" onclick="doSignup()"&gt;Create Account&lt;/button&gt;
+      &lt;div class="auth-msg" id="suMsg"&gt;&lt;/div&gt;
+      &lt;div class="supabase-note"&gt;🔗 Cross-device sync coming soon via Supabase&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- forgot: email-based reset --&gt;
+    &lt;div class="auth-form" id="formForgot" style="display:none"&gt;
+      &lt;input type="email" id="fpEmail" placeholder="Your account email"&gt;
+      &lt;button class="auth-submit" onclick="doForgot()"&gt;Generate Reset Code&lt;/button&gt;
+      &lt;button class="auth-link" onclick="switchAuthTab('login')"&gt;← Back to Sign In&lt;/button&gt;
+      &lt;div class="auth-msg" id="fpMsg"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- logged-in panel --&gt;
+    &lt;div id="panelLoggedIn" style="display:none; text-align:center;"&gt;
+      &lt;p style="font-size:15px; margin-bottom:6px;"&gt;Signed in as&lt;/p&gt;
+      &lt;p style="font-size:18px; font-weight:900; margin-bottom:4px;" id="liUsername"&gt;&lt;/p&gt;
+      &lt;p style="font-size:12px; opacity:0.55; margin-bottom:16px;" id="liUserEmail"&gt;&lt;/p&gt;
+      &lt;button class="auth-submit" onclick="doLogout()"&gt;Sign Out&lt;/button&gt;
+      &lt;div class="supabase-note"&gt;🔗 Cross-device sync coming soon via Supabase&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- ── code viewer modal ── --&gt;
+&lt;div class="code-modal-overlay" id="codeModal"&gt;
+  &lt;div class="code-modal-box"&gt;
+    &lt;button class="modal-close" onclick="closeCode()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);"&gt;✕&lt;/button&gt;
+    &lt;h2&gt;📋 Full Source Code&lt;/h2&gt;
+    &lt;div class="code-area" id="codeArea"&gt;&lt;/div&gt;
+    &lt;div class="code-btns"&gt;
+      &lt;button class="code-btn" id="copyBtn" onclick="copyCode()"&gt;📋 Copy All&lt;/button&gt;
+      &lt;button class="code-btn" onclick="closeCode()"&gt;Close&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;header&gt;✿ lofi pomodoro ✿&lt;/header&gt;
+
+&lt;div id="navigation"&gt;
+  &lt;div class="links"&gt;
+    &lt;button class="active" onclick="setMode('focus',this)"&gt;🍅 Focus&lt;/button&gt;
+    &lt;button onclick="setMode('short',this)"&gt;☕ Short Break&lt;/button&gt;
+    &lt;button onclick="setMode('long',this)"&gt;🌿 Long Break&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="col-wrap"&gt;
+
+  &lt;!-- LEFT: timer + controls --&gt;
+  &lt;div class="leftcolumn"&gt;
+    &lt;div class="container"&gt;
+
+      &lt;div class="ring-wrap"&gt;
+        &lt;svg width="220" height="220" viewBox="0 0 220 220"&gt;
+          &lt;circle class="ring-track" cx="110" cy="110" r="95"&gt;&lt;/circle&gt;
+          &lt;circle class="ring-progress" id="ring" cx="110" cy="110" r="95" style="stroke-dasharray: 596.903px; stroke-dashoffset: 0px; stroke: rgb(246, 193, 78);"&gt;&lt;/circle&gt;
+        &lt;/svg&gt;
+        &lt;div class="ring-inner"&gt;
+          &lt;div class="mode-label" id="modeLabel"&gt;Focus&lt;/div&gt;
+          &lt;div class="timer-digits" id="timerDisplay"&gt;25:00&lt;/div&gt;
+          &lt;div class="session-dots"&gt;
+            &lt;div class="dot current" id="d0"&gt;&lt;/div&gt;
+            &lt;div class="dot" id="d1"&gt;&lt;/div&gt;
+            &lt;div class="dot" id="d2"&gt;&lt;/div&gt;
+            &lt;div class="dot" id="d3"&gt;&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class="btn-row"&gt;
+        &lt;button class="ctrl" onclick="resetTimer()"&gt;↺ Reset&lt;/button&gt;
+        &lt;button class="ctrl big" id="playBtn" onclick="togglePlay()"&gt;▶ Start&lt;/button&gt;
+        &lt;button class="ctrl" onclick="skipSession()"&gt;Skip ▷▷&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;div class="music-bar"&gt;
+        &lt;div class="eq paused" id="eq"&gt;
+          &lt;div class="eq-b"&gt;&lt;/div&gt;&lt;div class="eq-b"&gt;&lt;/div&gt;&lt;div class="eq-b"&gt;&lt;/div&gt;
+          &lt;div class="eq-b"&gt;&lt;/div&gt;&lt;div class="eq-b"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="music-info"&gt;
+          &lt;div class="music-name" id="musicName"&gt;lofi hip hop radio ☁️&lt;/div&gt;
+          &lt;div class="music-status" id="musicStatus"&gt;press start to play ✿&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="vol-row"&gt;
+          &lt;span class="vol-lbl"&gt;vol&lt;/span&gt;
+          &lt;input type="range" class="vol" min="0" max="100" value="75" oninput="setVol(this.value)"&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- bell toggle --&gt;
+      &lt;div class="bell-row"&gt;
+        &lt;span&gt;🔔 Timer bell&lt;/span&gt;
+        &lt;label class="toggle"&gt;
+          &lt;input type="checkbox" id="bellToggle" checked=""&gt;
+          &lt;span class="toggle-slider"&gt;&lt;/span&gt;
+        &lt;/label&gt;
+      &lt;/div&gt;
+
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- RIGHT: stream + session info --&gt;
+  &lt;div class="rightcolumn"&gt;
+
+    &lt;div class="section-title"&gt;🎧 Stream&lt;/div&gt;
+    &lt;button class="stream-btn active" onclick="switchStream(0,this)"&gt;☁️ Lofi Hip Hop&lt;/button&gt;
+    &lt;button class="stream-btn" onclick="switchStream(1,this)"&gt;🌸 Plaza Lofi&lt;/button&gt;
+    &lt;button class="stream-btn" onclick="switchStream(2,this)"&gt;🌃 Nightwave Plaza&lt;/button&gt;
+    &lt;button class="stream-btn" onclick="switchStream(3,this)"&gt;🌊 Chillout&lt;/button&gt;
+
+    &lt;div class="section-title"&gt;📊 Session&lt;/div&gt;
+    &lt;div class="info-row"&gt;&lt;span&gt;Mode&lt;/span&gt;&lt;span id="infoMode"&gt;Focus&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="info-row"&gt;&lt;span&gt;Completed&lt;/span&gt;&lt;span id="infoCompleted"&gt;0 sessions&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="info-row"&gt;&lt;span&gt;Until long break&lt;/span&gt;&lt;span id="infoUntilLong"&gt;4 left&lt;/span&gt;&lt;/div&gt;
+
+    &lt;div class="section-title"&gt;⏱ Timings&lt;/div&gt;
+    &lt;div class="info-row"&gt;&lt;span&gt;Focus&lt;/span&gt;&lt;span&gt;25 min&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="info-row"&gt;&lt;span&gt;Short break&lt;/span&gt;&lt;span&gt;5 min&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="info-row"&gt;&lt;span&gt;Long break&lt;/span&gt;&lt;span&gt;15 min&lt;/span&gt;&lt;/div&gt;
+
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;footer&gt;
+  made with ✿ &amp;nbsp;—&amp;nbsp; open as .html in chrome / firefox for audio &amp;nbsp;|&amp;nbsp;
+  &lt;button onclick="openCode()" style="background:none;border:none;font-family:'Sour Gummy',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline;color:var(--text);opacity:0.65;padding:0;"&gt;📋 view source&lt;/button&gt;
+&lt;/footer&gt;
+
+&lt;script&gt;
+// ── streams ───────────────────────────────────────────────
+const STREAMS = [
+  { name:'lofi hip hop radio ☁️', url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
+  { name:'plaza lofi 🌸',          url:'https://radio.plaza.one/mp3' },
+  { name:'nightwave plaza 🌃',      url:'https://plaza.one/radio.mp3' },
+  { name:'chillout 🌊',            url:'https://streams.ilovemusic.de/iloveradio2.mp3' },
+];
+let streamIdx = 0;
+
+// ── modes ─────────────────────────────────────────────────
+const MODES = {
+  focus: { label:'Focus',       duration:25*60 },
+  short: { label:'Short Break', duration:5*60  },
+  long:  { label:'Long Break',  duration:15*60 },
+};
+let currentMode='focus', timeLeft=25*60, totalTime=25*60;
+let running=false, intervalId=null, completedFocus=0;
+let audio=null, vol=0.75, dark=false;
+
+// ── audio ─────────────────────────────────────────────────
+function getAudio() {
+  if (!audio) {
+    audio = new Audio();
+    audio.volume = vol;
+    audio.onerror = () =&gt; { streamIdx=(streamIdx+1)%STREAMS.length; setTimeout(tryPlay,1000); };
+  }
+  return audio;
+}
+function tryPlay() {
+  const a = getAudio();
+  a.src = STREAMS[streamIdx].url; a.load();
+  setStatus('connecting…');
+  a.play().then(()=&gt;setMusicUI(true)).catch(()=&gt;{
+    setMusicUI(false); setStatus('blocked — open file locally ✿');
+  });
+}
+function pauseAudio() { if(audio) audio.pause(); setMusicUI(false); }
+function setMusicUI(on) {
+  document.getElementById('eq').classList.toggle('paused',!on);
+  setStatus(on ? 'now playing ✦' : (running ? 'connecting…' : 'paused ☁️'));
+}
+function setStatus(s) { document.getElementById('musicStatus').textContent=s; }
+function setVol(v) { vol=v/100; if(audio) audio.volume=vol; }
+function switchStream(idx,el) {
+  streamIdx=idx;
+  document.querySelectorAll('.stream-btn').forEach(b=&gt;b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('musicName').textContent=STREAMS[idx].name;
+  if(running){ if(audio){audio.pause();audio=null;} tryPlay(); }
+}
+
+// ── dark mode ─────────────────────────────────────────────
+function toggleDark() {
+  dark=!dark;
+  document.body.classList.toggle('darkmode',dark);
+  document.getElementById('change-darkmode').textContent=dark?'☀️':'🌙';
+  updateRing();
+}
+
+// ── ring ──────────────────────────────────────────────────
+const CIRC=2*Math.PI*95;
+const ring=document.getElementById('ring');
+ring.style.strokeDasharray=CIRC;
+
+function updateRing() {
+  ring.style.strokeDashoffset=CIRC*(1-timeLeft/totalTime);
+  ring.style.stroke=dark?'#f78af2':'#f6c14e';
+}
+
+// ── display ───────────────────────────────────────────────
+function renderDisplay() {
+  const m=Math.floor(timeLeft/60), s=timeLeft%60;
+  document.getElementById('timerDisplay').textContent=
+    String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  updateRing(); renderDots(); renderInfo();
+}
+function renderDots() {
+  const cur=completedFocus%4;
+  [0,1,2,3].forEach(i=&gt;{
+    const d=document.getElementById('d'+i);
+    d.classList.remove('done','current');
+    if(i&lt;cur) d.classList.add('done');
+    else if(i===cur &amp;&amp; currentMode==='focus') d.classList.add('current');
+  });
+}
+function renderInfo() {
+  const left=4-(completedFocus%4);
+  document.getElementById('infoMode').textContent=MODES[currentMode].label;
+  document.getElementById('infoCompleted').textContent=completedFocus+(completedFocus===1?' session':' sessions');
+  document.getElementById('infoUntilLong').textContent=left+' left';
+}
+
+// ── timer ─────────────────────────────────────────────────
+function togglePlay() {
+  if(running){
+    running=false; clearInterval(intervalId); pauseAudio();
+    document.getElementById('playBtn').textContent='▶ Start';
+  } else {
+    running=true; tryPlay();
+    document.getElementById('playBtn').textContent='⏸ Pause';
+    intervalId=setInterval(tick,1000);
+  }
+}
+function tick() {
+  if(timeLeft&lt;=0){
+    clearInterval(intervalId); running=false;
+    document.getElementById('playBtn').textContent='▶ Start';
+    handleEnd(); return;
+  }
+  timeLeft--; renderDisplay();
+}
+function handleEnd() {
+  if(document.getElementById('bellToggle').checked) playBell();
+  pauseAudio();
+  if(currentMode==='focus'){
+    completedFocus++;
+    const isLong=completedFocus%4===0;
+    showToast(isLong?'🌿 Long break time!':'☕ Short break time!');
+    setTimeout(()=&gt;applyMode(isLong?'long':'short'),600);
+  } else {
+    showToast('🍅 Back to focus!');
+    setTimeout(()=&gt;applyMode('focus'),600);
+  }
+}
+function applyMode(mode) {
+  currentMode=mode; timeLeft=MODES[mode].duration; totalTime=MODES[mode].duration;
+  document.getElementById('modeLabel').textContent=MODES[mode].label;
+  renderDisplay();
+}
+function setMode(mode,el) {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  pauseAudio(); currentMode=mode;
+  timeLeft=MODES[mode].duration; totalTime=MODES[mode].duration;
+  document.getElementById('modeLabel').textContent=MODES[mode].label;
+  document.querySelectorAll('#navigation .links button').forEach(b=&gt;b.classList.remove('active'));
+  el.classList.add('active'); renderDisplay();
+}
+function resetTimer() {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  pauseAudio(); timeLeft=totalTime; renderDisplay();
+}
+function skipSession() {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  handleEnd();
+}
+
+// ── bell (Web Audio) ──────────────────────────────────────
+function playBell() {
+  try {
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,0.45,0.9].forEach(t=&gt;{
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(880,ctx.currentTime+t);
+      osc.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+t+0.4);
+      gain.gain.setValueAtTime(0.55,ctx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.55);
+      osc.start(ctx.currentTime+t); osc.stop(ctx.currentTime+t+0.6);
+    });
+  } catch(e){}
+}
+
+// ── toast ─────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=&gt;t.classList.remove('show'),2800);
+}
+
+// ── auth ──────────────────────────────────────────────────
+// Local storage auth. Supabase hooks noted below for future sync.
+// Users: lofi_users  = { username: { email, passwordHash } }
+// Session: lofi_session = { username, email }
+
+function hashPass(p) {
+  let h=5381;
+  for(let i=0;i&lt;p.length;i++) h=((h&lt;&lt;5)+h)^p.charCodeAt(i);
+  return (h&gt;&gt;&gt;0).toString(36);
+}
+function getUsers()    { return JSON.parse(localStorage.getItem('lofi_users')||'{}'); }
+function saveUsers(u)  { localStorage.setItem('lofi_users',JSON.stringify(u)); }
+function getSession()  { return JSON.parse(localStorage.getItem('lofi_session')||'null'); }
+function saveSession(s){ localStorage.setItem('lofi_session',JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem('lofi_session'); }
+
+function openAuth() {
+  const s=getSession();
+  if(s) {
+    showPanel('panelLoggedIn');
+    document.getElementById('liUsername').textContent=s.username;
+    document.getElementById('liUserEmail').textContent=s.email;
+    document.getElementById('authTabs').style.display='none';
+    document.getElementById('authTitle').textContent='✿ My Account';
+  } else {
+    showPanel('formLogin');
+    document.getElementById('authTabs').style.display='flex';
+    document.getElementById('authTitle').textContent='✿ Sign In';
+    document.querySelectorAll('.auth-tab')[0].classList.add('active');
+    document.querySelectorAll('.auth-tab')[1].classList.remove('active');
+  }
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
+
+function showPanel(id) {
+  ['formLogin','formSignup','formForgot','panelLoggedIn'].forEach(p=&gt;{
+    document.getElementById(p).style.display=p===id?'flex':'none';
+  });
+}
+function switchAuthTab(tab,el) {
+  document.querySelectorAll('.auth-tab').forEach(b=&gt;b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  clearMsgs();
+  if(tab==='login')  { showPanel('formLogin');  document.getElementById('authTitle').textContent='✿ Sign In'; document.getElementById('authTabs').style.display='flex'; }
+  if(tab==='signup') { showPanel('formSignup'); document.getElementById('authTitle').textContent='✿ Sign Up'; document.getElementById('authTabs').style.display='flex'; }
+  if(tab==='forgot') { showPanel('formForgot'); document.getElementById('authTitle').textContent='✿ Reset Password'; document.getElementById('authTabs').style.display='none'; }
+}
+function clearMsgs() {
+  ['liMsg','suMsg','fpMsg'].forEach(id=&gt;{const el=document.getElementById(id);el.textContent='';el.className='auth-msg';});
+}
+function setMsg(id,msg,type) {
+  const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+(type||'');
+}
+
+// Sign in by USERNAME + PASSWORD
+function doLogin() {
+  const username=document.getElementById('liUser').value.trim();
+  const pass=document.getElementById('liPass').value;
+  if(!username||!pass) return setMsg('liMsg','Please fill in all fields.','err');
+  const users=getUsers();
+  if(!users[username]) return setMsg('liMsg','No account found for that username.','err');
+  if(users[username].passwordHash!==hashPass(pass)) return setMsg('liMsg','Incorrect password.','err');
+  // TODO (Supabase): replace above with supabase.auth.signInWithPassword({ email: users[username].email, password: pass })
+  const s={username,email:users[username].email};
+  saveSession(s); updateAcctBtn(s);
+  setMsg('liMsg','Welcome back, '+username+'! ✿','ok');
+  setTimeout(closeAuth,1200);
+}
+
+// Sign up: username + email + password
+function doSignup() {
+  const username=document.getElementById('suUser').value.trim();
+  const email=document.getElementById('suEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('suPass').value;
+  if(!username||!email||!pass) return setMsg('suMsg','Please fill in all fields.','err');
+  if(pass.length&lt;6) return setMsg('suMsg','Password must be at least 6 characters.','err');
+  if(!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
+  const users=getUsers();
+  if(users[username]) return setMsg('suMsg','That username is already taken.','err');
+  // Check email not already used
+  const emailTaken=Object.values(users).some(u=&gt;u.email===email);
+  if(emailTaken) return setMsg('suMsg','An account with that email already exists.','err');
+  users[username]={email,passwordHash:hashPass(pass)};
+  saveUsers(users);
+  // TODO (Supabase): replace with supabase.auth.signUp({ email, password: pass, options:{ data:{ username } } })
+  const s={username,email}; saveSession(s); updateAcctBtn(s);
+  setMsg('suMsg','Account created! Welcome, '+username+' ✿','ok');
+  setTimeout(closeAuth,1400);
+}
+
+// Forgot password — generates a temp reset code (no server, so we surface it)
+function doForgot() {
+  const email=document.getElementById('fpEmail').value.trim().toLowerCase();
+  if(!email) return setMsg('fpMsg','Please enter your email.','err');
+  const users=getUsers();
+  const entry=Object.entries(users).find(([,v])=&gt;v.email===email);
+  if(!entry) return setMsg('fpMsg','No account found with that email.','err');
+  // TODO (Supabase): replace with supabase.auth.resetPasswordForEmail(email) — will send a real link
+  const tempPass='reset'+Math.random().toString(36).slice(2,8);
+  users[entry[0]].passwordHash=hashPass(tempPass);
+  saveUsers(users);
+  setMsg('fpMsg','Temp code: '+tempPass+'\nSign in with username "'+entry[0]+'" and this code, then update your password.','ok');
+}
+
+function doLogout() {
+  // TODO (Supabase): supabase.auth.signOut()
+  clearSession(); updateAcctBtn(null); closeAuth();
+  showToast('Signed out ✿');
+}
+
+function updateAcctBtn(s) {
+  const lbl=document.getElementById('acct-label');
+  lbl.textContent=s?s.username:'Sign In';
+}
+
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
+(function(){ const s=getSession(); if(s) updateAcctBtn(s); })();
+
+// ── code viewer ───────────────────────────────────────────
+function openCode() {
+  const src=document.documentElement.outerHTML;
+  document.getElementById('codeArea').textContent=src;
+  document.getElementById('codeModal').classList.add('open');
+}
+function closeCode() {
+  document.getElementById('codeModal').classList.remove('open');
+}
+function copyCode() {
+  const src=document.documentElement.outerHTML;
+  navigator.clipboard.writeText(src).then(()=&gt;{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='✅ Copied!'; btn.classList.add('copied');
+    setTimeout(()=&gt;{btn.textContent='📋 Copy All';btn.classList.remove('copied');},2000);
+  }).catch(()=&gt;{ showToast('Copy failed — select all text manually'); });
+}
+document.getElementById('codeModal').addEventListener('click',function(e){if(e.target===this)closeCode();});
+
+// ── init ──────────────────────────────────────────────────
+updateRing(); renderDisplay();
+&lt;/script&gt;
+
+
+&lt;/body&gt;&lt;/html&gt;</div>
+    <div class="code-btns">
+      <button class="code-btn" id="copyBtn" onclick="copyCode()">📋 Copy All</button>
+      <button class="code-btn" onclick="closeCode()">Close</button>
     </div>
   </div>
 </div>
@@ -423,8 +1977,8 @@ footer {
 
       <div class="ring-wrap">
         <svg width="220" height="220" viewBox="0 0 220 220">
-          <circle class="ring-track"    cx="110" cy="110" r="95"/>
-          <circle class="ring-progress" id="ring" cx="110" cy="110" r="95"/>
+          <circle class="ring-track" cx="110" cy="110" r="95"></circle>
+          <circle class="ring-progress" id="ring" cx="110" cy="110" r="95" style="stroke-dasharray: 596.903px; stroke-dashoffset: 0px; stroke: rgb(246, 193, 78);"></circle>
         </svg>
         <div class="ring-inner">
           <div class="mode-label" id="modeLabel">Focus</div>
@@ -459,10 +2013,19 @@ footer {
         </div>
       </div>
 
+      <!-- bell toggle -->
+      <div class="bell-row">
+        <span>🔔 Timer bell</span>
+        <label class="toggle">
+          <input type="checkbox" id="bellToggle" checked="">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
     </div>
   </div>
 
-  <!-- RIGHT: stream + info -->
+  <!-- RIGHT: stream + session info -->
   <div class="rightcolumn">
 
     <div class="section-title">🎧 Stream</div>
@@ -484,9 +2047,13 @@ footer {
   </div>
 </div>
 
-<footer>made with ✿ &nbsp;—&nbsp; save and open as .html in chrome / firefox for audio</footer>
+<footer>
+  made with ✿ &nbsp;—&nbsp; open as .html in chrome / firefox for audio &nbsp;|&nbsp;
+  <button onclick="openCode()" style="background:none;border:none;font-family:'Sour Gummy',sans-serif;font-size:13px;cursor:pointer;text-decoration:underline;color:var(--text);opacity:0.65;padding:0;">📋 view source</button>
+</footer>
 
 <script>
+// ── streams ───────────────────────────────────────────────
 const STREAMS = [
   { name:'lofi hip hop radio ☁️', url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
   { name:'plaza lofi 🌸',          url:'https://radio.plaza.one/mp3' },
@@ -495,6 +2062,7 @@ const STREAMS = [
 ];
 let streamIdx = 0;
 
+// ── modes ─────────────────────────────────────────────────
 const MODES = {
   focus: { label:'Focus',       duration:25*60 },
   short: { label:'Short Break', duration:5*60  },
@@ -504,7 +2072,7 @@ let currentMode='focus', timeLeft=25*60, totalTime=25*60;
 let running=false, intervalId=null, completedFocus=0;
 let audio=null, vol=0.75, dark=false;
 
-// ── audio ─────────────────────────────────────
+// ── audio ─────────────────────────────────────────────────
 function getAudio() {
   if (!audio) {
     audio = new Audio();
@@ -536,7 +2104,7 @@ function switchStream(idx,el) {
   if(running){ if(audio){audio.pause();audio=null;} tryPlay(); }
 }
 
-// ── dark mode ──────────────────────────────────
+// ── dark mode ─────────────────────────────────────────────
 function toggleDark() {
   dark=!dark;
   document.body.classList.toggle('darkmode',dark);
@@ -544,7 +2112,7 @@ function toggleDark() {
   updateRing();
 }
 
-// ── ring ───────────────────────────────────────
+// ── ring ──────────────────────────────────────────────────
 const CIRC=2*Math.PI*95;
 const ring=document.getElementById('ring');
 ring.style.strokeDasharray=CIRC;
@@ -554,7 +2122,7 @@ function updateRing() {
   ring.style.stroke=dark?'#f78af2':'#f6c14e';
 }
 
-// ── display ────────────────────────────────────
+// ── display ───────────────────────────────────────────────
 function renderDisplay() {
   const m=Math.floor(timeLeft/60), s=timeLeft%60;
   document.getElementById('timerDisplay').textContent=
@@ -577,7 +2145,7 @@ function renderInfo() {
   document.getElementById('infoUntilLong').textContent=left+' left';
 }
 
-// ── timer ──────────────────────────────────────
+// ── timer ─────────────────────────────────────────────────
 function togglePlay() {
   if(running){
     running=false; clearInterval(intervalId); pauseAudio();
@@ -597,7 +2165,7 @@ function tick() {
   timeLeft--; renderDisplay();
 }
 function handleEnd() {
-  playBell();
+  if(document.getElementById('bellToggle').checked) playBell();
   pauseAudio();
   if(currentMode==='focus'){
     completedFocus++;
@@ -634,27 +2202,24 @@ function skipSession() {
   handleEnd();
 }
 
-// ── bell ringtone ──────────────────────────────
+// ── bell (Web Audio) ──────────────────────────────────────
 function playBell() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const times = [0, 0.45, 0.9];
-    times.forEach(t => {
-      const osc  = ctx.createOscillator();
-      const gain = ctx.createGain();
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,0.45,0.9].forEach(t=>{
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, ctx.currentTime + t);
-      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + t + 0.4);
-      gain.gain.setValueAtTime(0.55, ctx.currentTime + t);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.55);
-      osc.start(ctx.currentTime + t);
-      osc.stop(ctx.currentTime + t + 0.6);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(880,ctx.currentTime+t);
+      osc.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+t+0.4);
+      gain.gain.setValueAtTime(0.55,ctx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.55);
+      osc.start(ctx.currentTime+t); osc.stop(ctx.currentTime+t+0.6);
     });
-  } catch(e) {}
+  } catch(e){}
 }
 
-
+// ── toast ─────────────────────────────────────────────────
 let toastTimer;
 function showToast(msg) {
   const t=document.getElementById('toast');
@@ -662,125 +2227,147 @@ function showToast(msg) {
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-
-// ── auth (localStorage-based) ──────────────────
-// Users stored as: lofi_users = { email: {username, passwordHash} }
-// Session stored as: lofi_session = { email, username }
+// ── auth ──────────────────────────────────────────────────
+// Local storage auth. Supabase hooks noted below for future sync.
+// Users: lofi_users  = { username: { email, passwordHash } }
+// Session: lofi_session = { username, email }
 
 function hashPass(p) {
-  // simple djb2 hash — good enough for a local demo
-  let h = 5381;
-  for (let i = 0; i < p.length; i++) h = ((h << 5) + h) ^ p.charCodeAt(i);
-  return (h >>> 0).toString(36);
+  let h=5381;
+  for(let i=0;i<p.length;i++) h=((h<<5)+h)^p.charCodeAt(i);
+  return (h>>>0).toString(36);
 }
-function getUsers()   { return JSON.parse(localStorage.getItem('lofi_users')  || '{}'); }
-function saveUsers(u) { localStorage.setItem('lofi_users', JSON.stringify(u)); }
-function getSession() { return JSON.parse(localStorage.getItem('lofi_session')|| 'null'); }
-function saveSession(s){ localStorage.setItem('lofi_session', JSON.stringify(s)); }
+function getUsers()    { return JSON.parse(localStorage.getItem('lofi_users')||'{}'); }
+function saveUsers(u)  { localStorage.setItem('lofi_users',JSON.stringify(u)); }
+function getSession()  { return JSON.parse(localStorage.getItem('lofi_session')||'null'); }
+function saveSession(s){ localStorage.setItem('lofi_session',JSON.stringify(s)); }
 function clearSession(){ localStorage.removeItem('lofi_session'); }
 
 function openAuth() {
-  const s = getSession();
-  if (s) {
+  const s=getSession();
+  if(s) {
     showPanel('panelLoggedIn');
-    document.getElementById('liUsername').textContent = s.username + ' (' + s.email + ')';
-    document.getElementById('authTabs').style.display = 'none';
-    document.getElementById('authTitle').textContent = '✿ My Account';
+    document.getElementById('liUsername').textContent=s.username;
+    document.getElementById('liUserEmail').textContent=s.email;
+    document.getElementById('authTabs').style.display='none';
+    document.getElementById('authTitle').textContent='✿ My Account';
   } else {
     showPanel('formLogin');
-    document.getElementById('authTabs').style.display = 'flex';
-    document.getElementById('authTitle').textContent = '✿ Sign In';
-    switchAuthTab('login', document.querySelector('.auth-tab'));
+    document.getElementById('authTabs').style.display='flex';
+    document.getElementById('authTitle').textContent='✿ Sign In';
+    document.querySelectorAll('.auth-tab')[0].classList.add('active');
+    document.querySelectorAll('.auth-tab')[1].classList.remove('active');
   }
   document.getElementById('authModal').classList.add('open');
 }
 function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
 
 function showPanel(id) {
-  ['formLogin','formSignup','formForgot','panelLoggedIn'].forEach(p => {
-    document.getElementById(p).style.display = p===id ? 'flex' : 'none';
+  ['formLogin','formSignup','formForgot','panelLoggedIn'].forEach(p=>{
+    document.getElementById(p).style.display=p===id?'flex':'none';
   });
 }
-
-function switchAuthTab(tab, el) {
+function switchAuthTab(tab,el) {
   document.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));
-  if (el) el.classList.add('active');
+  if(el) el.classList.add('active');
   clearMsgs();
-  if (tab==='login')  { showPanel('formLogin');  document.getElementById('authTitle').textContent='✿ Sign In'; }
-  if (tab==='signup') { showPanel('formSignup'); document.getElementById('authTitle').textContent='✿ Sign Up'; }
-  if (tab==='forgot') { showPanel('formForgot'); document.getElementById('authTitle').textContent='✿ Reset Password'; document.getElementById('authTabs').style.display='none'; }
+  if(tab==='login')  { showPanel('formLogin');  document.getElementById('authTitle').textContent='✿ Sign In'; document.getElementById('authTabs').style.display='flex'; }
+  if(tab==='signup') { showPanel('formSignup'); document.getElementById('authTitle').textContent='✿ Sign Up'; document.getElementById('authTabs').style.display='flex'; }
+  if(tab==='forgot') { showPanel('formForgot'); document.getElementById('authTitle').textContent='✿ Reset Password'; document.getElementById('authTabs').style.display='none'; }
 }
-
 function clearMsgs() {
-  ['liMsg','suMsg','fpMsg'].forEach(id => { const el=document.getElementById(id); el.textContent=''; el.className='auth-msg'; });
+  ['liMsg','suMsg','fpMsg'].forEach(id=>{const el=document.getElementById(id);el.textContent='';el.className='auth-msg';});
 }
-function setMsg(id, msg, type) {
-  const el=document.getElementById(id); el.textContent=msg; el.className='auth-msg '+(type||'');
+function setMsg(id,msg,type) {
+  const el=document.getElementById(id);el.textContent=msg;el.className='auth-msg '+(type||'');
 }
 
+// Sign in by USERNAME + PASSWORD
 function doLogin() {
-  const email=document.getElementById('liEmail').value.trim().toLowerCase();
+  const username=document.getElementById('liUser').value.trim();
   const pass=document.getElementById('liPass').value;
-  if (!email||!pass) return setMsg('liMsg','Please fill in all fields.','err');
+  if(!username||!pass) return setMsg('liMsg','Please fill in all fields.','err');
   const users=getUsers();
-  if (!users[email]) return setMsg('liMsg','No account found for that email.','err');
-  if (users[email].passwordHash !== hashPass(pass)) return setMsg('liMsg','Incorrect password.','err');
-  const s={email, username:users[email].username};
+  if(!users[username]) return setMsg('liMsg','No account found for that username.','err');
+  if(users[username].passwordHash!==hashPass(pass)) return setMsg('liMsg','Incorrect password.','err');
+  // TODO (Supabase): replace above with supabase.auth.signInWithPassword({ email: users[username].email, password: pass })
+  const s={username,email:users[username].email};
   saveSession(s); updateAcctBtn(s);
-  setMsg('liMsg','Welcome back, '+s.username+'! ✿','ok');
-  setTimeout(closeAuth, 1200);
+  setMsg('liMsg','Welcome back, '+username+'! ✿','ok');
+  setTimeout(closeAuth,1200);
 }
 
+// Sign up: username + email + password
 function doSignup() {
   const username=document.getElementById('suUser').value.trim();
   const email=document.getElementById('suEmail').value.trim().toLowerCase();
   const pass=document.getElementById('suPass').value;
-  if (!username||!email||!pass) return setMsg('suMsg','Please fill in all fields.','err');
-  if (pass.length<6) return setMsg('suMsg','Password must be at least 6 characters.','err');
-  if (!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
+  if(!username||!email||!pass) return setMsg('suMsg','Please fill in all fields.','err');
+  if(pass.length<6) return setMsg('suMsg','Password must be at least 6 characters.','err');
+  if(!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
   const users=getUsers();
-  if (users[email]) return setMsg('suMsg','An account with that email already exists.','err');
-  users[email]={username, passwordHash:hashPass(pass)};
+  if(users[username]) return setMsg('suMsg','That username is already taken.','err');
+  // Check email not already used
+  const emailTaken=Object.values(users).some(u=>u.email===email);
+  if(emailTaken) return setMsg('suMsg','An account with that email already exists.','err');
+  users[username]={email,passwordHash:hashPass(pass)};
   saveUsers(users);
-  const s={email,username}; saveSession(s); updateAcctBtn(s);
+  // TODO (Supabase): replace with supabase.auth.signUp({ email, password: pass, options:{ data:{ username } } })
+  const s={username,email}; saveSession(s); updateAcctBtn(s);
   setMsg('suMsg','Account created! Welcome, '+username+' ✿','ok');
   setTimeout(closeAuth,1400);
 }
 
+// Forgot password — generates a temp reset code (no server, so we surface it)
 function doForgot() {
   const email=document.getElementById('fpEmail').value.trim().toLowerCase();
-  if (!email) return setMsg('fpMsg','Please enter your email.','err');
+  if(!email) return setMsg('fpMsg','Please enter your email.','err');
   const users=getUsers();
-  // We can't actually send email from a local file, so we simulate it
-  if (!users[email]) return setMsg('fpMsg','No account found for that email.','err');
-  // Generate a temp password and show it (simulated reset)
+  const entry=Object.entries(users).find(([,v])=>v.email===email);
+  if(!entry) return setMsg('fpMsg','No account found with that email.','err');
+  // TODO (Supabase): replace with supabase.auth.resetPasswordForEmail(email) — will send a real link
   const tempPass='reset'+Math.random().toString(36).slice(2,8);
-  users[email].passwordHash=hashPass(tempPass);
+  users[entry[0]].passwordHash=hashPass(tempPass);
   saveUsers(users);
-  setMsg('fpMsg','Reset code: '+tempPass+' (use this to sign in, then change your password)','ok');
+  setMsg('fpMsg','Temp code: '+tempPass+'\nSign in with username "'+entry[0]+'" and this code, then update your password.','ok');
 }
 
 function doLogout() {
+  // TODO (Supabase): supabase.auth.signOut()
   clearSession(); updateAcctBtn(null); closeAuth();
   showToast('Signed out ✿');
 }
 
 function updateAcctBtn(s) {
-  const btn=document.getElementById('acct-btn');
   const lbl=document.getElementById('acct-label');
-  if (s) { lbl.textContent=s.username; btn.title='Signed in as '+s.email; }
-  else   { lbl.textContent='Sign In';  btn.title=''; }
+  lbl.textContent=s?s.username:'Sign In';
 }
 
-// close modal on backdrop click
-document.getElementById('authModal').addEventListener('click', function(e){
-  if(e.target===this) closeAuth();
-});
-
-// restore session on load
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
 (function(){ const s=getSession(); if(s) updateAcctBtn(s); })();
 
+// ── code viewer ───────────────────────────────────────────
+function openCode() {
+  const src=document.documentElement.outerHTML;
+  document.getElementById('codeArea').textContent=src;
+  document.getElementById('codeModal').classList.add('open');
+}
+function closeCode() {
+  document.getElementById('codeModal').classList.remove('open');
+}
+function copyCode() {
+  const src=document.documentElement.outerHTML;
+  navigator.clipboard.writeText(src).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='✅ Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copy All';btn.classList.remove('copied');},2000);
+  }).catch(()=>{ showToast('Copy failed — select all text manually'); });
+}
+document.getElementById('codeModal').addEventListener('click',function(e){if(e.target===this)closeCode();});
+
+// ── init ──────────────────────────────────────────────────
 updateRing(); renderDisplay();
 </script>
-</body>
-</html>
+
+
+</body></html>
