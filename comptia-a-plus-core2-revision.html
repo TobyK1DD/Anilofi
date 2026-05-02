@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CompTIA A+ Core 2 (220-1202) Revision</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===================== THEME VARIABLES ===================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #aac0c9;
+      --bg-soft: #c7eafb;
+      --text: #000000;
+      --primary: #f6c14e;
+      --border: #ffffff;
+      --accent: #aac6d3;
+      --btn-bg: var(--primary);
+      --btn-text: var(--text);
+      --correct: #4caf50;
+      --wrong: #e74c3c;
+      --explanation-bg: #e8f5e9;
+      --explanation-border: #a5d6a7;
+      --wrong-exp-bg: #fdecea;
+      --wrong-exp-border: #ef9a9a;
+    }
+
+    body.darkmode {
+      --bg: #121212;
+      --bg-soft: #1e1e1e;
+      --text: #ffffff;
+      --primary: #f78af2;
+      --border: #333333;
+      --accent: #2a2a2a;
+      --btn-bg: var(--primary);
+      --btn-text: #000000;
+      --correct: #388e3c;
+      --wrong: #c62828;
+      --explanation-bg: #1b2e1b;
+      --explanation-border: #388e3c;
+      --wrong-exp-bg: #2e1b1b;
+      --wrong-exp-border: #c62828;
+    }
+
+    /* ===================== BASE ===================== */
+    body {
+      font-family: "Sour Gummy", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 10px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    a, p, h1, h2, h3, ol {
+      color: var(--text);
+      font-family: "Sour Gummy", sans-serif;
+    }
+
+    /* ===================== DARK MODE BUTTON ===================== */
+    #change-darkmode {
+      height: 50px; width: 50px; padding: 0;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      background: var(--btn-bg);
+      border: 3px solid var(--border);
+      position: fixed; top: 20px; right: 20px;
+      cursor: pointer; font-size: 22px; z-index: 100;
+      transition: all 0.3s ease;
+    }
+    #change-darkmode:hover { background: var(--bg); }
+
+    /* ===================== HEADER ===================== */
+    header {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 10px 0;
+      text-align: center;
+      font-size: 2rem;
+      font-family: monospace;
+      margin: 0 auto 6px auto;
+    }
+    header small {
+      display: block;
+      font-size: 1rem;
+      font-family: "Sour Gummy", sans-serif;
+      margin-top: 4px;
+      color: var(--text);
+      opacity: 0.7;
+    }
+
+    /* ===================== NAVIGATION ===================== */
+    #navigation {
+      width: 100%; background-color: var(--bg);
+      text-align: center; padding: 6px 0;
+    }
+    .links {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+      padding: 6px 0;
+    }
+    .links a, button, .Button {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 16px;
+      color: var(--btn-text);
+      background-color: var(--btn-bg);
+      border: 3px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .links a:hover, button:hover, .Button:hover {
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    /* ===================== MAIN CONTENT ===================== */
+    main { background-color: var(--bg); }
+
+    .container { text-align: center; padding: 20px; }
+
+    /* ===================== QUIZ CARD ===================== */
+    .quiz-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--accent);
+      border-radius: 14px;
+      padding: 28px 24px;
+      max-width: 760px;
+      margin: 0 auto 20px auto;
+    }
+
+    .domain-badge {
+      display: inline-block;
+      background: var(--primary);
+      color: var(--btn-text);
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    /* ===================== OPTIONS ===================== */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 3px solid var(--border);
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-family: "Sour Gummy", sans-serif;
+      transition: all 0.25s ease;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.correct {
+      background: #4caf50 !important;
+      color: #fff !important;
+      border-color: #2e7d32 !important;
+    }
+    .option-btn.wrong {
+      background: #e74c3c !important;
+      color: #fff !important;
+      border-color: #b71c1c !important;
+    }
+    .option-btn.revealed {
+      background: #fff3cd !important;
+      color: #333 !important;
+      border-color: #f6c14e !important;
+    }
+
+    /* ===================== EXPLANATIONS ===================== */
+    .explanations {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .explanations.show { display: flex; }
+
+    .exp-item {
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+      border-left: 5px solid;
+    }
+    .exp-item.correct-exp {
+      background: var(--explanation-bg);
+      border-color: var(--explanation-border);
+    }
+    .exp-item.wrong-exp {
+      background: var(--wrong-exp-bg);
+      border-color: var(--wrong-exp-border);
+    }
+    .exp-item strong { display: block; margin-bottom: 4px; }
+
+    /* ===================== NEXT BUTTON ===================== */
+    #next-btn {
+      display: none;
+      margin: 18px auto 0 auto;
+    }
+    #next-btn.show { display: block; }
+
+    /* ===================== STATS BAR ===================== */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      background: var(--bg-soft);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px 20px;
+      max-width: 760px;
+      margin: 0 auto 18px auto;
+      font-size: 0.95rem;
+    }
+    .stat { text-align: center; }
+    .stat .val {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: block;
+    }
+    .stat .lbl { opacity: 0.7; font-size: 0.8rem; }
+
+    /* ===================== LOADING ===================== */
+    #loading {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 1.1rem;
+      opacity: 0.7;
+    }
+    .spinner {
+      display: inline-block;
+      width: 36px; height: 36px;
+      border: 4px solid var(--accent);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===================== FILTER CHIPS ===================== */
+    .domain-filters {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 8px; margin: 0 auto 14px auto;
+      max-width: 760px;
+    }
+    .chip {
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 2px solid var(--border);
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip.inactive {
+      background: var(--bg);
+      color: var(--text);
+      opacity: 0.55;
+    }
+    .chip:hover { opacity: 1; }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      background-color: var(--bg);
+      color: var(--text);
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      clear: both;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 600px) {
+      header { font-size: 1.3rem; }
+      .quiz-card { padding: 18px 14px; }
+      .question-text { font-size: 1rem; }
+      .option-btn { font-size: 0.92rem; padding: 10px 12px; }
+    }
+
+    /* ===================== RESULT FLASH ===================== */
+    .result-msg {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .result-msg.show { display: block; }
+    .result-msg.correct-msg { color: #2e7d32; background: #e8f5e9; }
+    .result-msg.wrong-msg { color: #b71c1c; background: #fdecea; }
+    body.darkmode .result-msg.correct-msg { color: #a5d6a7; background: #1b2e1b; }
+    body.darkmode .result-msg.wrong-msg { color: #ef9a9a; background: #2e1b1b; }
+
+    #progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.65;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dark Mode Toggle -->
+  <button id="change-darkmode" title="Toggle Dark/Light Mode">🌙</button>
+
+  <!-- Header -->
+  <header>
+    CompTIA A+ Core 2
+    <small>220-1202 V15 &mdash; Revision Tool</small>
+  </header>
+
+  <!-- Navigation -->
+  <div id="navigation">
+    <div class="links">
+      <a href="#" id="home-link">🏠 Home</a>
+      <a href="#" id="restart-link">🔄 Restart</a>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat">
+          <span class="val" id="stat-q">0</span>
+          <span class="lbl">Questions</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="stat-correct">0</span>
+          <span class="lbl">Correct ✅</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="stat-wrong">0</span>
+          <span class="lbl">Wrong ❌</span>
+        </div>
+        <div class="stat">
+          <span class="val" id="stat-pct">—</span>
+          <span class="lbl">Score %</span>
+        </div>
+      </div>
+
+      <!-- Domain Filters -->
+      <div class="domain-filters" id="domain-filters">
+        <span class="chip" data-domain="1" title="Operating Systems">1.0 OS</span>
+        <span class="chip" data-domain="2" title="Security">2.0 Security</span>
+        <span class="chip" data-domain="3" title="Software Troubleshooting">3.0 Troubleshoot</span>
+        <span class="chip" data-domain="4" title="Operational Procedures">4.0 Ops</span>
+      </div>
+
+      <div id="progress-text"></div>
+
+      <!-- Loading Spinner -->
+      <div id="loading">
+        <div class="spinner"></div>
+        <div>Generating question…</div>
+      </div>
+
+      <!-- Quiz Card -->
+      <div class="quiz-card" id="quiz-card" style="display:none;">
+        <div class="domain-badge" id="q-domain"></div>
+        <div class="question-text" id="q-text"></div>
+
+        <div class="options-grid" id="options"></div>
+
+        <div class="result-msg" id="result-msg"></div>
+
+        <div class="explanations" id="explanations"></div>
+
+        <button class="Button" id="next-btn">Next Question ➜</button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>CompTIA A+ Core 2 (220-1202) V15 &bull; Revision Tool &bull; Not affiliated with CompTIA</p>
+  </footer>
+
+  <script>
+  // ============================================================
+  //  QUESTION BANK  (large local bank + AI generation fallback)
+  // ============================================================
+
+  const DOMAINS = {
+    1: "1.0 Operating Systems",
+    2: "2.0 Security",
+    3: "3.0 Software Troubleshooting",
+    4: "4.0 Operational Procedures"
+  };
+
+  // Local question bank — covers all objectives
+  const LOCAL_QUESTIONS = [
+    // ---- DOMAIN 1: OPERATING SYSTEMS ----
+    {domain:1,q:"Which filesystem is used by default on modern Windows installations and supports file permissions, encryption, and compression?",opts:["FAT32","exFAT","NTFS","ReFS"],correct:2,exps:["FAT32 is an older filesystem that lacks support for permissions, encryption, or compression, and has a 4 GB file size limit.","exFAT is designed for flash drives and external media — it doesn't support NTFS features like permissions.","Correct! NTFS (New Technology File System) is the standard Windows filesystem and supports permissions, EFS encryption, compression, and large volumes.","ReFS (Resilient File System) is used in server/storage scenarios, not as the primary desktop installation filesystem."]},
+    {domain:1,q:"A technician needs to install Windows on a disk that will use a GUID Partition Table (GPT). Which firmware interface is required?",opts:["BIOS with MBR","UEFI","Legacy boot only","POST"],correct:1,exps:["BIOS with MBR is the legacy combination — BIOS cannot boot GPT disks natively.","Correct! UEFI (Unified Extensible Firmware Interface) is required to boot from GPT disks. Modern Windows installs on GPT require UEFI.","Legacy boot specifically refers to BIOS-based boot, which doesn't support GPT booting.","POST (Power-On Self-Test) is a startup diagnostic process, not a firmware interface type."]},
+    {domain:1,q:"Which Windows edition is required to use BitLocker full-disk encryption on a desktop?",opts:["Windows 10 Home","Windows 10 Pro","Windows 10 N","Any edition"],correct:1,exps:["Windows 10 Home does not include BitLocker — it only offers Device Encryption on compatible hardware.","Correct! BitLocker is available on Windows 10/11 Pro, Pro for Workstations, and Enterprise editions.","Windows N editions are regional versions that omit media features; BitLocker availability still depends on the base edition (Pro/Enterprise).","Not any edition — Home does not include full BitLocker support."]},
+    {domain:1,q:"What command-line tool is used to check and repair disk errors on a Windows volume?",opts:["diskpart","format","chkdsk","sfc"],correct:2,exps:["diskpart is a disk partitioning utility — it does not check or repair filesystem errors.","format prepares a volume by writing a new filesystem — it does not diagnose existing errors.","Correct! chkdsk (Check Disk) scans a volume for filesystem errors and bad sectors and can repair them.","sfc (System File Checker) verifies and repairs Windows system files, not disk/filesystem errors."]},
+    {domain:1,q:"A user wants to view all currently running processes and their CPU/memory usage. Which tool should they use?",opts:["msconfig","regedit","Task Manager","Event Viewer"],correct:2,exps:["msconfig (System Configuration) manages startup programs, services, and boot options — not real-time process monitoring.","regedit is the Registry Editor — it edits the Windows registry, not process monitoring.","Correct! Task Manager shows running processes, CPU and memory usage, startup items, users, and services.","Event Viewer logs system, security, and application events but doesn't show real-time resource usage."]},
+    {domain:1,q:"Which command displays the IP address configuration of a Windows machine?",opts:["ping","netstat","ipconfig","nslookup"],correct:2,exps:["ping tests connectivity between hosts — it doesn't display IP configuration.","netstat shows active network connections and port usage, not IP configuration details.","Correct! ipconfig displays the IP address, subnet mask, and default gateway for all network interfaces.","nslookup queries DNS to resolve hostnames — it doesn't show local IP configuration."]},
+    {domain:1,q:"What is the macOS utility used to manage disk partitions, format drives, and repair disk permissions?",opts:["Finder","Terminal","Disk Utility","Activity Monitor"],correct:2,exps:["Finder is the macOS file manager/browser — not a disk management tool.","Terminal provides command-line access but is not a dedicated disk management GUI tool.","Correct! Disk Utility is the macOS tool for formatting, partitioning, repairing, and managing disks.","Activity Monitor is macOS's equivalent of Task Manager — it shows processes and resource usage, not disk management."]},
+    {domain:1,q:"Which Linux command is used to change file permissions?",opts:["chown","chmod","grep","ls"],correct:1,exps:["chown changes the owner (user/group) of a file, not its permissions.","Correct! chmod (change mode) sets read, write, and execute permissions on files and directories.","grep searches for patterns within text files — it has nothing to do with permissions.","ls lists files and directories — it can display permissions but cannot change them."]},
+    {domain:1,q:"What Windows tool allows you to schedule tasks to run automatically at specified times?",opts:["Task Manager","Task Scheduler (taskschd.msc)","Resource Monitor","Services.msc"],correct:1,exps:["Task Manager monitors and manages running processes — it doesn't schedule future tasks.","Correct! Task Scheduler (taskschd.msc) lets you create and manage automated tasks triggered by time or system events.","Resource Monitor shows real-time CPU, memory, disk, and network usage — not scheduling.","Services.msc manages Windows services but does not schedule tasks."]},
+    {domain:1,q:"A technician performs a clean install of Windows on a laptop. What must be done first if upgrading from Windows 10 Home to Windows 10 Pro?",opts:["Purchase and enter a valid Pro license key","Download a third-party driver","Run System Restore","Use Recovery Console"],correct:0,exps:["Correct! To upgrade from Home to Pro, you must purchase a valid Windows 10 Pro license and enter the product key.","Third-party drivers may be needed post-install but are not required before upgrading the edition.","System Restore rolls back to a previous state — it cannot change Windows editions.","Recovery Console is used for repair scenarios, not for upgrading Windows editions."]},
+    {domain:1,q:"Which Windows 11 hardware requirement is NEW compared to Windows 10?",opts:["64-bit CPU","4 GB RAM","TPM 2.0","NTFS filesystem"],correct:2,exps:["64-bit CPU was already required by Windows 10 — this is not a new Windows 11 requirement.","4 GB RAM was also a minimum requirement for 64-bit Windows 10 — not new for Windows 11.","Correct! Windows 11 requires TPM 2.0 (Trusted Platform Module) and UEFI Secure Boot — these were not mandatory for Windows 10.","NTFS has been the standard filesystem for many Windows versions — not a new Windows 11 requirement."]},
+    {domain:1,q:"What Linux command lists the contents of a directory?",opts:["pwd","ls","cd","find"],correct:1,exps:["pwd (print working directory) displays the current directory path — it doesn't list contents.","Correct! ls lists the files and directories in the current or specified directory.","cd (change directory) navigates between directories — it doesn't list contents.","find searches for files/directories matching criteria — it's not the standard directory listing command."]},
+    {domain:1,q:"Which type of OS installation preserves existing files and settings while upgrading Windows?",opts:["Clean install","Image deployment","In-place upgrade","Zero-touch deployment"],correct:2,exps:["A clean install wipes the drive and installs fresh — existing files and settings are not preserved.","Image deployment pushes a pre-configured system image — typically used for mass deployment, not personal upgrades.","Correct! An in-place upgrade installs the new Windows version over the existing one, preserving files, settings, and applications.","Zero-touch deployment is an automated network-based install that typically does not preserve personal settings."]},
+    {domain:1,q:"Which macOS feature creates automatic backups of a Mac to a local or network drive?",opts:["iCloud Drive","FileVault","Time Machine","Spotlight"],correct:2,exps:["iCloud Drive is cloud-based storage sync — while it backs up some data, it's not a full system backup tool.","FileVault is macOS full-disk encryption — it protects data but does not create backups.","Correct! Time Machine is macOS's built-in backup solution that creates incremental backups to a local or network drive.","Spotlight is macOS's search feature — it indexes and searches files but doesn't create backups."]},
+    {domain:1,q:"A technician types 'winver' at the command prompt. What information is displayed?",opts:["Windows license key","Current Windows version and build number","Disk partition information","Active network connections"],correct:1,exps:["winver does not display the license key — that requires other tools.","Correct! winver (Windows Version) opens a dialog showing the Windows version, edition, and build number.","Disk partition information is shown by diskpart or Disk Management, not winver.","Active network connections are shown by netstat, not winver."]},
+
+    // ---- DOMAIN 2: SECURITY ----
+    {domain:2,q:"Which type of malware encrypts a victim's files and demands payment to restore access?",opts:["Rootkit","Keylogger","Ransomware","Spyware"],correct:2,exps:["A rootkit hides malicious software deep in the OS to maintain persistent, hidden access — it doesn't encrypt files for ransom.","A keylogger records keystrokes to steal credentials — it doesn't encrypt and ransom files.","Correct! Ransomware encrypts the victim's files or locks the system and demands payment (ransom) to restore access.","Spyware secretly collects user information and sends it to attackers — it doesn't encrypt files for payment."]},
+    {domain:2,q:"What social engineering attack involves an attacker calling victims while impersonating a legitimate organization?",opts:["Phishing","Smishing","Vishing","Whaling"],correct:2,exps:["Phishing is email-based deception — not a phone call attack.","Smishing is phishing via SMS text messages — not voice calls.","Correct! Vishing (Voice Phishing) uses phone calls where the attacker impersonates a trusted entity to steal information.","Whaling targets high-profile executives via email — it is not specifically a phone call attack."]},
+    {domain:2,q:"Which authentication method requires something you know AND something you have?",opts:["Single Sign-On (SSO)","Multifactor Authentication (MFA)","Biometric authentication only","Username and password only"],correct:1,exps:["SSO allows one set of credentials to access multiple systems — it is about convenience, not additional factors.","Correct! MFA (Multifactor Authentication) requires two or more factors: something you know (password), something you have (token/phone), or something you are (biometric).","Biometric-only authentication is a single factor (something you are) — not multifactor.","Username and password is a single-factor authentication (something you know)."]},
+    {domain:2,q:"A technician finds an infected workstation. Per SOHO malware removal procedures, what should be done FIRST?",opts:["Run antivirus","Reimage the system","Quarantine the infected system","Educate the user"],correct:2,exps:["Running antivirus is step 4+ in the procedure — first the system must be isolated.","Reimaging is a later remediation step — done after quarantine and investigation.","Correct! The first step in malware removal is to quarantine (isolate) the infected system to prevent the malware from spreading to other machines.","Educating the user is the final step — done after the issue is fully resolved."]},
+    {domain:2,q:"What does UAC (User Account Control) do in Windows?",opts:["Encrypts user files automatically","Prevents unauthorized changes by prompting for elevated permissions","Manages Active Directory users","Configures Windows Firewall rules"],correct:1,exps:["UAC does not encrypt files — that is the role of BitLocker or EFS.","Correct! UAC prompts the user for permission or admin credentials when an application attempts to make changes that require elevated privileges, helping prevent unauthorized modifications.","Active Directory user management is done through ADUC (Active Directory Users and Computers) — not UAC.","Windows Firewall rules are managed through the Windows Defender Firewall settings, not UAC."]},
+    {domain:2,q:"Which wireless security protocol provides the strongest encryption for modern Wi-Fi networks?",opts:["WEP","WPA","WPA2 with TKIP","WPA3"],correct:3,exps:["WEP (Wired Equivalent Privacy) is severely outdated and easily cracked — it should never be used.","WPA was an improvement over WEP but is no longer considered secure.","WPA2 with TKIP is better than WEP/WPA, but TKIP is a legacy protocol; WPA2 with AES is stronger, and WPA3 is stronger still.","Correct! WPA3 is the most current and strongest Wi-Fi security protocol, offering improved encryption and protection against brute-force attacks."]},
+    {domain:2,q:"A user reports their computer is very slow and shows high CPU usage, with no obvious cause. Which type of malware might be to blame?",opts:["Keylogger","Adware","Cryptominer","Rootkit"],correct:2,exps:["A keylogger records keystrokes and typically has minimal CPU impact.","Adware displays unwanted ads and can slow a browser but rarely causes extreme CPU usage.","Correct! A cryptominer secretly uses the victim's CPU/GPU to mine cryptocurrency, causing very high resource usage and slow performance.","A rootkit hides other malware — while it can cause instability, its primary purpose is concealment, not CPU-intensive mining."]},
+    {domain:2,q:"What is the principle of least privilege?",opts:["Users should have the strongest possible passwords","Users should only have the minimum access rights needed to perform their job","All users should share a single administrator account","Passwords should never expire"],correct:1,exps:["Password strength is important but is a separate security concept — not the principle of least privilege.","Correct! The principle of least privilege means users are granted only the minimum permissions necessary to perform their job functions, reducing the attack surface.","Sharing an admin account is a major security violation — it goes against least privilege and auditability.","Password expiration policies are a separate security control, not related to least privilege."]},
+    {domain:2,q:"Which data destruction method uses a strong magnetic field to erase data from magnetic storage media?",opts:["Drilling","Shredding","Degaussing","Low-level formatting"],correct:2,exps:["Drilling physically destroys the drive platters — it works but leaves physical remnants.","Shredding physically destroys the drive — effective but different from degaussing.","Correct! Degaussing uses a powerful magnetic field to erase all magnetic data on a hard drive or tape, rendering it unreadable.","Low-level formatting overwrites sectors with zeros — it's software-based and less certain than degaussing for sensitive data."]},
+    {domain:2,q:"What type of attack intercepts communication between two parties without their knowledge?",opts:["DDoS","SQL Injection","On-path (man-in-the-middle) attack","Brute-force attack"],correct:2,exps:["A DDoS (Distributed Denial of Service) attack overwhelms a server with traffic to make it unavailable — not an interception attack.","SQL Injection exploits database queries — it's a code injection attack, not a communication interception.","Correct! An on-path attack (formerly called man-in-the-middle) intercepts and potentially alters communication between two parties without their knowledge.","A brute-force attack tries all possible password combinations — it's a credential attack, not communication interception."]},
+    {domain:2,q:"A user leaves their desk and returns to find someone has been using their computer. Which workstation security practice would have prevented this?",opts:["Enable BitLocker","Use a screensaver lock / log off when not in use","Install antivirus","Change the administrator password"],correct:1,exps:["BitLocker protects data at rest when a drive is removed — it doesn't prevent unauthorized access to an already-booted, logged-in system.","Correct! Setting a screensaver lock (requiring password on wake) or logging off when away prevents unauthorized physical access to an unattended workstation.","Antivirus protects against malware — it does not prevent physical unauthorized access.","Changing the admin password improves security overall but doesn't directly prevent someone from using an already-logged-in, unattended machine."]},
+    {domain:2,q:"Which type of malware disguises itself as legitimate software to trick users into installing it?",opts:["Virus","Worm","Trojan","Rootkit"],correct:2,exps:["A virus attaches itself to files and requires user interaction to spread — it doesn't necessarily disguise itself as legitimate software.","A worm self-replicates across networks without needing to disguise itself as legitimate software.","Correct! A Trojan (Trojan horse) disguises itself as legitimate or desirable software but carries a malicious payload once installed.","A rootkit hides other malware and itself deep in the OS — it doesn't primarily disguise itself as legitimate software for initial infection."]},
+    {domain:2,q:"What does EFS (Encrypting File System) provide in Windows?",opts:["Full-disk encryption","Per-file/folder encryption tied to user accounts","VPN encryption","Wi-Fi encryption"],correct:1,exps:["Full-disk encryption is provided by BitLocker — EFS works at the file/folder level.","Correct! EFS (Encrypting File System) encrypts individual files and folders using the logged-in user's credentials — the files are automatically decrypted when accessed by the authorized user.","VPN encryption is handled by VPN protocols (e.g., IPsec, SSL/TLS) — not EFS.","Wi-Fi encryption is handled by WPA2/WPA3 protocols — not EFS."]},
+    {domain:2,q:"Which physical security control prevents vehicles from ramming into a building?",opts:["Badge reader","Magnetometer","Bollards","Access control vestibule"],correct:2,exps:["A badge reader controls who can enter via ID/key fob — it doesn't stop vehicles.","A magnetometer (metal detector) detects weapons on people — it doesn't stop vehicles.","Correct! Bollards are sturdy posts installed around building perimeters specifically designed to stop or redirect vehicles and prevent ram attacks.","An access control vestibule (mantrap) is a room between two doors that traps unauthorized people — it doesn't stop vehicles."]},
+    {domain:2,q:"What is tailgating in the context of physical security?",opts:["Monitoring network traffic","Following an authorized person through a secure door without credentials","Sending deceptive emails","Installing a keylogger"],correct:1,exps:["Monitoring network traffic is network analysis/sniffing — not a physical security attack.","Correct! Tailgating (also called piggybacking) is when an unauthorized person follows an authorized individual through a secured door without using their own credentials.","Sending deceptive emails is phishing — a digital social engineering attack.","Installing a keylogger is a malware-related attack, not a physical social engineering tactic."]},
+
+    // ---- DOMAIN 3: SOFTWARE TROUBLESHOOTING ----
+    {domain:3,q:"A Windows computer shows a Blue Screen of Death (BSOD). What is the most common cause?",opts:["Corrupt user profile","Hardware failure or incompatible driver","Slow internet connection","Outdated browser"],correct:1,exps:["A corrupt user profile causes a 'slow profile load' or profile errors — it may or may not cause a BSOD.","Correct! BSODs are most commonly caused by hardware failures (bad RAM, overheating), faulty or incompatible drivers, or corrupt system files.","Internet speed does not cause BSODs — the OS handles network as software.","An outdated browser causes web browsing issues, not BSODs."]},
+    {domain:3,q:"A user's mobile app crashes immediately upon launch. What should the technician try FIRST?",opts:["Factory reset the device","Reinstall the application","Check for OS and app updates","Replace the device battery"],correct:2,exps:["A factory reset is a last resort — it erases all data and settings.","Reinstalling is a reasonable step, but checking for updates first is less destructive and often resolves compatibility crashes.","Correct! Checking for OS and app updates is the least invasive first step — updates often include bug fixes that resolve crash issues.","Replacing the battery wouldn't fix a software crash issue."]},
+    {domain:3,q:"A user reports their Android phone is showing unexpected pop-up ads even when not using a browser. This is most likely caused by?",opts:["Low battery","Adware or a malicious application","Hardware failure","OS corruption"],correct:1,exps:["Low battery causes performance throttling and power warnings — not unexpected ads.","Correct! System-wide pop-up ads are a classic symptom of adware or a malicious application installed on the device, often from an unofficial app store.","Hardware failure would cause crashes, touchscreen issues, etc. — not pop-up ads.","OS corruption typically causes boot issues or system instability — not ad pop-ups."]},
+    {domain:3,q:"A technician notices that a Windows computer's clock is consistently wrong. What is the most likely cause?",opts:["Corrupt user profile","Outdated display driver","CMOS battery failure","Virus in the boot sector"],correct:2,exps:["A corrupt user profile causes login/profile loading issues, not clock inaccuracy.","Display drivers affect graphics output — they have no impact on system time.","Correct! The CMOS battery on the motherboard maintains BIOS settings including the system clock when the PC is powered off. A failing CMOS battery causes the clock to reset.","A boot sector virus can cause various issues, but persistent clock errors are most directly tied to the CMOS battery."]},
+    {domain:3,q:"A user says Windows takes a very long time to log in. Which is the most likely cause?",opts:["Failing hard drive","Slow profile load / corrupt profile","Low VRAM","BSOD"],correct:1,exps:["A failing hard drive causes general slowness and may cause other errors, but slow login specifically points to a profile issue.","Correct! A slow or corrupt user profile (e.g., a roaming profile that fails to load quickly, or a damaged local profile) is the most direct cause of slow login times in Windows.","Low VRAM affects graphics performance — it doesn't cause slow login.","BSOD is a crash, not a slow login symptom."]},
+    {domain:3,q:"A user's phone battery drains very quickly. Which is NOT a likely cause?",opts:["Screen brightness set to maximum","Too many background apps running","Outdated OS not receiving updates","Using a dark mode theme"],correct:3,exps:["Maximum screen brightness is a major battery drain — definitely a likely cause.","Background apps consuming CPU and data are a known cause of battery drain.","An outdated OS may miss battery optimization updates and can drain faster.","Correct! Dark mode on OLED screens can slightly reduce battery usage — it is the LEAST likely cause of battery drain of the options listed."]},
+    {domain:3,q:"A user reports they cannot access websites but can ping 8.8.8.8 successfully. What is the most likely issue?",opts:["NIC hardware failure","DNS resolution failure","Firewall blocking all traffic","Bad network cable"],correct:1,exps:["If the NIC were failing, the ping to 8.8.8.8 would also fail — the NIC is working.","Correct! Being able to ping an IP (8.8.8.8) but not browse websites means TCP/IP works but DNS name resolution is failing — websites can't be resolved to IP addresses.","If the firewall were blocking all traffic, the ping would also fail.","A bad network cable would prevent all network traffic, including the successful ping."]},
+    {domain:3,q:"Which symptom is most associated with a PC security infection?",opts:["Screen resolution changes","Files renamed or missing, and OS update failures","Battery draining fast","Blue screen every time Windows starts"],correct:1,exps:["Screen resolution changes are typically driver or display settings issues — not a typical infection symptom.","Correct! Renamed or missing files, inability to access files, and OS update failures are classic symptoms of malware infection.","Battery drain is a hardware/mobile issue, not a typical PC infection symptom.","Repeated BSODs on startup suggest hardware or driver issues — not directly a typical infection symptom (though some malware can cause instability)."]},
+    {domain:3,q:"A technician suspects ransomware on a workstation. What should they do IMMEDIATELY?",opts:["Pay the ransom","Investigate and quarantine the system first","Run Windows Update","Reinstall the OS immediately"],correct:1,exps:["Paying the ransom is strongly discouraged — it funds criminals and doesn't guarantee file recovery.","Correct! Per the malware removal procedure, immediately quarantine (isolate) the infected system from the network to prevent further spread before any other action.","Running Windows Update while infected could expose other systems and doesn't address the immediate threat.","Reimaging is a valid remediation step but comes after quarantine and investigation."]},
+
+    // ---- DOMAIN 4: OPERATIONAL PROCEDURES ----
+    {domain:4,q:"Which backup type copies only files that have changed since the LAST FULL backup, regardless of other incremental backups?",opts:["Incremental","Differential","Synthetic full","Mirror"],correct:1,exps:["An incremental backup copies only files changed since the LAST backup of any type (full or incremental) — making restores slower but backups faster.","Correct! A differential backup copies all files changed since the last FULL backup. Each differential gets larger but restores require only the full + latest differential.","A synthetic full backup combines a previous full and all subsequent incrementals to create a new full backup without re-backing up the source.","A mirror backup is an exact copy with no versioning — not one of the standard rotation types."]},
+    {domain:4,q:"What does the 3-2-1 backup rule specify?",opts:["3 backups, 2 on different media, 1 offsite","3 full backups daily, 2 incremental, 1 differential","3 copies on the same drive, 2 encrypted, 1 compressed","3 users with backup access, 2 admins, 1 offsite"],correct:0,exps:["Correct! The 3-2-1 rule: keep 3 copies of data, on 2 different storage media types, with 1 copy stored offsite. This ensures recovery from hardware failure, local disaster, or ransomware.","This description is not the 3-2-1 rule — it confuses backup types with the rule's intent.","Keeping multiple copies on the same drive defeats the purpose of geographic/media redundancy.","User counts are unrelated to the 3-2-1 backup rule."]},
+    {domain:4,q:"A technician is about to make a major change to a production server. What should be created BEFORE the change?",opts:["Incident report","Change request and rollback plan","SLA document","Malware scan"],correct:1,exps:["An incident report documents problems after they occur — not the right pre-change document.","Correct! Before any significant change, a change request documenting the purpose, scope, and a rollback plan must be prepared so the environment can be restored if something goes wrong.","An SLA (Service Level Agreement) defines service expectations — it is not created specifically before a change.","A malware scan is a security measure unrelated to change management pre-work."]},
+    {domain:4,q:"What does an ESD strap prevent?",opts:["Electric shock to the technician","Electrostatic discharge damage to components","Short circuits in power supplies","Overheating of CPUs"],correct:1,exps:["An ESD strap grounds the technician but its primary purpose is to protect components — not protect the technician from shock.","Correct! An ESD (Electrostatic Discharge) strap prevents static electricity built up on the technician's body from discharging into sensitive electronic components, which can permanently damage them.","Short circuits in power supplies are caused by electrical faults, not static discharge.","CPU overheating is a thermal management issue — ESD straps have nothing to do with it."]},
+    {domain:4,q:"Which regulatory concept requires maintaining records of who handled evidence during an investigation?",opts:["NDA","SLA","Chain of custody","Acceptable Use Policy (AUP)"],correct:2,exps:["An NDA (Non-Disclosure Agreement) protects confidential information — it's a legal agreement, not an evidence handling concept.","An SLA (Service Level Agreement) defines expected service levels — unrelated to evidence handling.","Correct! Chain of custody documents every person who handled evidence, when, and why — ensuring its integrity and admissibility in legal proceedings.","An Acceptable Use Policy defines how technology resources may be used — not an evidence handling concept."]},
+    {domain:4,q:"A user asks if they can install personal software on a company laptop. Which document addresses this?",opts:["SLA","Change management policy","Acceptable Use Policy (AUP)","Incident report"],correct:2,exps:["An SLA defines service expectations between a provider and customer — it doesn't govern employee software use.","A change management policy governs IT system changes — not personal software use by employees.","Correct! The Acceptable Use Policy (AUP) defines what employees can and cannot do with company technology resources, including personal software installation rules.","An incident report documents problems/events — it's not a policy document."]},
+    {domain:4,q:"Which remote access tool uses port 3389 for graphical remote desktop connections in Windows?",opts:["SSH","VNC","RDP","SPICE"],correct:2,exps:["SSH (Secure Shell) uses port 22 for secure command-line remote access — not a graphical desktop tool by default.","VNC (Virtual Network Computer) provides graphical remote access but typically uses port 5900 — not 3389.","Correct! RDP (Remote Desktop Protocol) is Windows' built-in graphical remote desktop protocol, running on TCP port 3389.","SPICE (Simple Protocol for Independent Computing Environments) is used for VM remote access — not the standard Windows RDP protocol."]},
+    {domain:4,q:"What type of license allows software to be freely used, modified, and distributed?",opts:["Perpetual license","Personal-use license","Corporate license","Open-source license"],correct:3,exps:["A perpetual license grants the right to use software indefinitely but typically prohibits redistribution and modification.","A personal-use license restricts software to one individual's non-commercial use — not freely distributable.","A corporate license allows organizational use under specific terms — it does not allow open modification and redistribution.","Correct! An open-source license (such as GPL or MIT) allows the software to be freely used, modified, and distributed, often with certain conditions depending on the license type."]},
+    {domain:4,q:"Which scripting file extension is associated with Python scripts?",opts:[".bat",".ps1",".vbs",".py"],correct:3,exps:[".bat files are Windows batch scripts used for command-line automation — not Python.",".ps1 files are PowerShell scripts — not Python.",".vbs files are VBScript files — not Python.","Correct! .py is the file extension for Python scripts. Python is widely used for automation, data processing, and general-purpose scripting."]},
+    {domain:4,q:"A technician is disposing of old hard drives containing sensitive data. Which method ensures data is completely unrecoverable?",opts:["Standard formatting","Erasing/wiping (software overwrite)","Physical destruction (shredding/drilling)","Recycling without any preparation"],correct:2,exps:["Standard formatting only removes the filesystem index — data can often be recovered with forensic tools.","Software wiping (overwriting with zeros or random data) is effective, but physical destruction is the most certain method for highly sensitive data.","Correct! Physical destruction — shredding, drilling through platters, or incineration — ensures data is completely unrecoverable, especially for drives containing highly sensitive or classified data.","Recycling without any data sanitization leaves all data accessible to the recipient — this is a serious data breach risk."]},
+    {domain:4,q:"What is the purpose of a UPS (Uninterruptible Power Supply)?",opts:["Increase internet speed","Provide backup power during outages and protect against power surges","Reduce electricity bills","Cool server hardware"],correct:1,exps:["A UPS has nothing to do with internet speed.","Correct! A UPS provides temporary battery backup power during power outages, giving time to save work and shut down properly. It also conditions power and protects against surges and brownouts.","A UPS doesn't reduce electricity bills — it consumes a small amount of power itself.","Cooling is handled by fans, heat sinks, and air conditioning — not a UPS."]},
+    {domain:4,q:"Which AI limitation describes a confident but factually incorrect response generated by an AI model?",opts:["Bias","Plagiarism","Hallucination","Data privacy"],correct:2,exps:["AI bias refers to unfair or skewed outputs based on biased training data — not the same as confident inaccuracy.","Plagiarism in AI context refers to reproducing copyrighted content — not fabricated facts.","Correct! A hallucination is when an AI model confidently produces false or nonsensical information that isn't grounded in facts — a key limitation of current AI systems.","Data privacy concerns relate to how AI handles sensitive input data — not the accuracy of outputs."]},
+  ];
+
+  // ============================================================
+  //  STATE
+  // ============================================================
+  let stats = { total: 0, correct: 0, wrong: 0 };
+  let activeDomains = new Set([1, 2, 3, 4]);
+  let recentQIds = []; // avoid repeats
+  let answered = false;
+  let currentQ = null;
+
+  // ============================================================
+  //  DOM REFS
+  // ============================================================
+  const loading     = document.getElementById('loading');
+  const quizCard    = document.getElementById('quiz-card');
+  const qDomain     = document.getElementById('q-domain');
+  const qText       = document.getElementById('q-text');
+  const optionsEl   = document.getElementById('options');
+  const expEl       = document.getElementById('explanations');
+  const nextBtn     = document.getElementById('next-btn');
+  const resultMsg   = document.getElementById('result-msg');
+  const statQ       = document.getElementById('stat-q');
+  const statCorrect = document.getElementById('stat-correct');
+  const statWrong   = document.getElementById('stat-wrong');
+  const statPct     = document.getElementById('stat-pct');
+  const progressTxt = document.getElementById('progress-text');
+
+  // ============================================================
+  //  DARK MODE
+  // ============================================================
+  const dmBtn = document.getElementById('change-darkmode');
+  dmBtn.addEventListener('click', () => {
+    document.body.classList.toggle('darkmode');
+    dmBtn.textContent = document.body.classList.contains('darkmode') ? '☀️' : '🌙';
+  });
+
+  // ============================================================
+  //  DOMAIN FILTER CHIPS
+  // ============================================================
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const d = parseInt(chip.dataset.domain);
+      if (activeDomains.has(d)) {
+        if (activeDomains.size > 1) {
+          activeDomains.delete(d);
+          chip.classList.add('inactive');
+        }
+      } else {
+        activeDomains.add(d);
+        chip.classList.remove('inactive');
+      }
+    });
+  });
+
+  // ============================================================
+  //  PICK A QUESTION  (local bank with AI fallback)
+  // ============================================================
+  function pickLocalQuestion() {
+    const pool = LOCAL_QUESTIONS.filter(q => activeDomains.has(q.domain));
+    if (!pool.length) return null;
+    // avoid recent repeats (up to half the pool)
+    const avoidCount = Math.min(recentQIds.length, Math.floor(pool.length / 2));
+    const recent = recentQIds.slice(-avoidCount);
+    let candidates = pool.filter((_, i) => !recent.includes(i));
+    if (!candidates.length) candidates = pool;
+    const idx = Math.floor(Math.random() * candidates.length);
+    const q = candidates[idx];
+    recentQIds.push(LOCAL_QUESTIONS.indexOf(q));
+    if (recentQIds.length > 30) recentQIds.shift();
+    return q;
+  }
+
+  async function fetchAIQuestion() {
+    const domainList = [...activeDomains].map(d => DOMAINS[d]).join(', ');
+    const prompt = `You are a CompTIA A+ Core 2 (220-1202) V15 exam question writer. Generate ONE unique multiple-choice question covering a topic from these domains: ${domainList}.
+
+Return ONLY valid JSON with no markdown, no extra text, exactly this structure:
+{
+  "domain": <domain number 1-4>,
+  "q": "<question text>",
+  "opts": ["<option A>", "<option B>", "<option C>", "<option D>"],
+  "correct": <index 0-3>,
+  "exps": ["<why A is right/wrong>", "<why B is right/wrong>", "<why C is right/wrong>", "<why D is right/wrong>"]
+}
+
+Rules:
+- Question must be realistic CompTIA A+ Core 2 style
+- Exactly 4 options (A-D)
+- Only one correct answer
+- Each explanation must clearly explain WHY that option is correct or incorrect
+- Do not repeat questions already generated in this session
+- The domain number must match: 1=Operating Systems, 2=Security, 3=Software Troubleshooting, 4=Operational Procedures`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      const text = data.content.map(c => c.text || '').join('');
+      const cleaned = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      // validate
+      if (!parsed.q || !Array.isArray(parsed.opts) || parsed.opts.length !== 4 ||
+          typeof parsed.correct !== 'number' || !Array.isArray(parsed.exps) || parsed.exps.length !== 4) {
+        throw new Error('Invalid structure');
+      }
+      return parsed;
+    } catch(e) {
+      console.warn('AI question failed, using local bank:', e);
+      return null;
+    }
+  }
+
+  async function loadNextQuestion() {
+    answered = false;
+    quizCard.style.display = 'none';
+    loading.style.display = 'block';
+    nextBtn.classList.remove('show');
+
+    // Try AI question ~40% of time after first 3 questions, otherwise use local bank
+    let q = null;
+    if (stats.total >= 3 && Math.random() < 0.4) {
+      q = await fetchAIQuestion();
+    }
+    if (!q) q = pickLocalQuestion();
+    if (!q) { loading.innerHTML = '<p>No domains selected. Please enable at least one domain above.</p>'; return; }
+
+    currentQ = q;
+    renderQuestion(q);
+  }
+
+  // ============================================================
+  //  RENDER QUESTION
+  // ============================================================
+  function renderQuestion(q) {
+    loading.style.display = 'none';
+    quizCard.style.display = 'block';
+
+    qDomain.textContent = DOMAINS[q.domain] || `Domain ${q.domain}`;
+    qText.textContent = q.q;
+
+    resultMsg.className = 'result-msg';
+    resultMsg.textContent = '';
+
+    optionsEl.innerHTML = '';
+    expEl.innerHTML = '';
+    expEl.classList.remove('show');
+
+    // Shuffle options while tracking correct index
+    const indices = [0, 1, 2, 3];
+    const shuffled = [...indices].sort(() => Math.random() - 0.5);
+    const newCorrectPos = shuffled.indexOf(q.correct);
+
+    shuffled.forEach((origIdx, pos) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = `${String.fromCharCode(65+pos)}. ${q.opts[origIdx]}`;
+      btn.dataset.orig = origIdx;
+      btn.dataset.pos = pos;
+      btn.addEventListener('click', () => handleAnswer(pos, newCorrectPos, shuffled, q));
+      optionsEl.appendChild(btn);
+    });
+
+    progressTxt.textContent = `Question ${stats.total + 1}`;
+  }
+
+  // ============================================================
+  //  HANDLE ANSWER
+  // ============================================================
+  function handleAnswer(chosenPos, correctPos, shuffled, q) {
+    if (answered) return;
+    answered = true;
+    stats.total++;
+
+    const allBtns = optionsEl.querySelectorAll('.option-btn');
+    const isCorrect = chosenPos === correctPos;
+
+    if (isCorrect) {
+      stats.correct++;
+    } else {
+      stats.wrong++;
+    }
+
+    // Style buttons
+    allBtns.forEach((btn, pos) => {
+      btn.disabled = true;
+      if (pos === correctPos) {
+        btn.classList.add('correct');
+      } else if (pos === parseInt(btn.dataset.pos) && pos === chosenPos && !isCorrect) {
+        btn.classList.add('wrong');
+      } else {
+        btn.classList.add('revealed');
+      }
+    });
+
+    // Result message
+    resultMsg.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect!';
+    resultMsg.className = 'result-msg show ' + (isCorrect ? 'correct-msg' : 'wrong-msg');
+
+    // Explanations — show in shuffled order
+    expEl.innerHTML = '';
+    shuffled.forEach((origIdx, pos) => {
+      const div = document.createElement('div');
+      const isCor = pos === correctPos;
+      div.className = `exp-item ${isCor ? 'correct-exp' : 'wrong-exp'}`;
+      div.innerHTML = `<strong>${String.fromCharCode(65+pos)}. ${q.opts[origIdx]} — ${isCor ? '✅ Correct' : '❌ Incorrect'}</strong>${q.exps[origIdx]}`;
+      expEl.appendChild(div);
+    });
+    expEl.classList.add('show');
+
+    nextBtn.classList.add('show');
+    updateStats();
+  }
+
+  // ============================================================
+  //  STATS
+  // ============================================================
+  function updateStats() {
+    statQ.textContent = stats.total;
+    statCorrect.textContent = stats.correct;
+    statWrong.textContent = stats.wrong;
+    const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+    statPct.textContent = stats.total > 0 ? `${pct}%` : '—';
+    statPct.style.color = pct >= 70 ? '#4caf50' : pct >= 50 ? '#f6c14e' : '#e74c3c';
+  }
+
+  // ============================================================
+  //  NEXT BUTTON
+  // ============================================================
+  nextBtn.addEventListener('click', loadNextQuestion);
+
+  // ============================================================
+  //  NAV LINKS
+  // ============================================================
+  document.getElementById('restart-link').addEventListener('click', e => {
+    e.preventDefault();
+    stats = { total: 0, correct: 0, wrong: 0 };
+    recentQIds = [];
+    updateStats();
+    loadNextQuestion();
+  });
+  document.getElementById('home-link').addEventListener('click', e => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ============================================================
+  //  INIT
+  // ============================================================
+  updateStats();
+  loadNextQuestion();
+  </script>
+</body>
+</html>
