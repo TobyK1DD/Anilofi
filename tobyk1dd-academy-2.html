@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TobyK1DD Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#aac0c9;--bgs:#c7eafb;--tx:#000;--yel:#f6c14e;
+  --brd:#fff;--acc:#aac6d3;--bbg:#f6c14e;--btx:#000;
+  --cd:#fff;--cd2:#e8f4fa;--sb:#8fb5c0;
+  --nh:54px;--ok:#4caf50;--bad:#e74c3c;--mu:#555;
+}
+body.dark{
+  --bg:#121212;--bgs:#1e1e1e;--tx:#fff;--yel:#f78af2;
+  --brd:#333;--acc:#2a2a2a;--bbg:#f78af2;--btx:#000;
+  --cd:#1e1e1e;--cd2:#252525;--sb:#1a1a1a;--mu:#aaa;
+}
+body{font-family:'Sour Gummy',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;transition:background .3s,color .3s}
+a{text-decoration:none;color:inherit}
+
+nav{background:var(--bg);border-bottom:3px solid var(--brd);padding:0 16px;height:var(--nh);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.brand{font-size:22px;font-weight:700;cursor:pointer}
+.navr{display:flex;align-items:center;gap:10px}
+.btn{font-family:'Sour Gummy',sans-serif;font-size:14px;font-weight:700;color:var(--btx);background:var(--bbg);border:2px solid var(--brd);padding:7px 18px;border-radius:8px;cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--bg);color:var(--tx)}
+.btng{background:transparent;color:var(--tx);border:2px solid var(--brd)}
+.btng:hover{background:var(--bbg);color:var(--btx)}
+.moonb{width:40px;height:40px;border-radius:50%;background:var(--bg);border:2px solid var(--brd);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+
+.shell{display:flex;height:calc(100vh - var(--nh))}
+.sidebar{width:252px;background:var(--sb);padding:10px 6px;overflow-y:auto;flex-shrink:0;border-right:2px solid var(--brd)}
+.main{flex:1;overflow:auto;padding:24px}
+
+.mlabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 10px 3px;color:var(--mu)}
+.lbtn{width:100%;text-align:left;background:none;border:none;font-family:'Sour Gummy',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--tx);display:flex;align-items:center;justify-content:space-between;transition:background .15s}
+.lbtn:hover,.lbtn.active{background:var(--bbg);color:var(--btx)}
+.pbwrap{margin:6px 10px 3px;font-size:11px;color:var(--mu)}
+.pb{height:6px;background:var(--acc);border-radius:4px;margin-top:4px}
+.pf{height:100%;background:var(--bbg);border-radius:4px;transition:width .4s}
+
+.hero{text-align:center;padding:40px 20px 26px;max-width:700px;margin:0 auto}
+.hero h1{font-size:40px;margin-bottom:12px}
+.hero p{font-size:16px;color:var(--mu);line-height:1.7;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(188px,1fr));gap:16px;max-width:880px;margin:0 auto}
+.ccard{background:var(--cd);border:2px solid var(--brd);border-radius:14px;padding:20px;cursor:pointer;transition:transform .2s,box-shadow .2s;text-align:center}
+.ccard:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.cicon{font-size:38px;margin-bottom:10px}
+.ccard h3{font-size:16px;margin-bottom:6px}
+.ccard p{font-size:13px;color:var(--mu)}
+.badge{display:inline-block;background:var(--bbg);color:var(--btx);font-size:11px;padding:2px 8px;border-radius:20px;margin-top:8px;font-weight:700}
+
+.lw{max-width:960px;margin:0 auto}
+.lw h2{font-size:28px;margin-bottom:4px}
+.crumb{font-size:12px;color:var(--mu);margin-bottom:14px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{font-family:'Sour Gummy',sans-serif;font-size:14px;font-weight:700;padding:8px 18px;border-radius:8px;border:2px solid var(--brd);background:var(--cd2);color:var(--tx);cursor:pointer;transition:all .2s}
+.tab.active{background:var(--bbg);color:var(--btx)}
+.tab:hover:not(.active){background:var(--bgs)}
+.panel{display:none}.panel.show{display:block}
+
+.tbox{background:var(--cd);border:2px solid var(--brd);border-radius:14px;padding:24px;margin-bottom:16px;line-height:1.8;font-size:15px}
+.tbox h3{font-size:18px;margin-bottom:12px}
+.tbox h3+*{margin-top:0}.tbox *+h3{margin-top:18px}
+.tbox ul,.tbox ol{margin-left:22px}.tbox li{margin-bottom:6px}
+.tbox code{background:#1e1e2e;color:#89b4fa;padding:2px 6px;border-radius:4px;font-family:'Fira Code',monospace;font-size:13px}
+.tip{background:var(--bgs);border-left:4px solid var(--bbg);border-radius:0 8px 8px 0;padding:13px 16px;margin:12px 0;font-size:14px}
+
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:420px}
+@media(max-width:720px){.egrid{grid-template-columns:1fr}}
+.epanel{background:#1e1e2e;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.ebar{background:#11111b;padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+.ebar span{font-family:'Fira Code',monospace;font-size:12px;color:#89b4fa}
+.eacts{display:flex;gap:6px}
+.runb{font-family:'Sour Gummy',sans-serif;font-size:12px;background:#4caf50;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-weight:700}
+.rstb{font-family:'Sour Gummy',sans-serif;font-size:12px;background:#2a2a3e;color:#cdd6f4;border:1px solid #444;padding:5px 12px;border-radius:6px;cursor:pointer}
+.codeta{flex:1;background:#1e1e2e;color:#cdd6f4;border:none;padding:14px;font-family:'Fira Code',monospace;font-size:13px;resize:none;line-height:1.6;outline:none;tab-size:2;min-height:350px}
+.ppanel{background:var(--cd);border-radius:12px;border:2px solid var(--brd);display:flex;flex-direction:column;overflow:hidden}
+.pbar{background:var(--cd2);padding:8px 12px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;border-bottom:1px solid var(--brd)}
+.pbar small{font-size:11px;color:var(--mu);font-weight:400}
+iframe.prev{flex:1;border:none;background:#fff;min-height:350px}
+
+.qbox{background:var(--cd);border:2px solid var(--brd);border-radius:14px;padding:24px;max-width:680px}
+.qq{font-size:16px;font-weight:700;margin-bottom:16px;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:var(--cd2);border:2px solid var(--brd);border-radius:10px;padding:12px 16px;cursor:pointer;font-family:'Sour Gummy',sans-serif;font-size:15px;text-align:left;transition:all .2s;color:var(--tx)}
+.opt:hover{background:var(--bbg);color:var(--btx);border-color:var(--bbg)}
+.opt.correct{background:#d4edda;border-color:#4caf50;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#e74c3c;color:#721c24}
+.opt:disabled{cursor:default}
+.qfb{margin-top:14px;padding:12px 16px;border-radius:10px;font-size:15px;display:none}
+.qfb.show{display:block}
+.qfb.ok{background:#d4edda;color:#155724;border:1px solid #4caf50}
+.qfb.bad{background:#f8d7da;color:#721c24;border:1px solid #e74c3c}
+.donem{margin-top:14px;font-size:17px;font-weight:700;color:var(--ok)}
+
+.pjbox{background:var(--cd);border:2px solid var(--brd);border-radius:14px;padding:24px}
+.pjbox h3{font-size:20px;margin-bottom:8px}
+.pjbox>p{font-size:14px;color:var(--mu);margin-bottom:16px;line-height:1.6}
+.cklist{list-style:none;margin-bottom:18px}
+.cklist li{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:15px;border-bottom:1px solid var(--acc)}
+.cklist li:last-child{border:none}
+.cklist input{width:18px;height:18px;cursor:pointer;accent-color:var(--bbg);flex-shrink:0}
+.compb{font-family:'Sour Gummy',sans-serif;font-size:15px;font-weight:700;background:var(--ok);color:#fff;border:none;padding:10px 26px;border-radius:10px;cursor:pointer}
+.compb:disabled{opacity:.45;cursor:not-allowed}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--cd);border:3px solid var(--brd);border-radius:18px;padding:30px;width:100%;max-width:378px;position:relative}
+.modal h2{font-size:24px;margin-bottom:20px;text-align:center}
+.mx{position:absolute;top:12px;right:14px;font-size:22px;cursor:pointer;background:none;border:none;color:var(--mu);font-family:sans-serif;line-height:1}
+.fg{margin-bottom:14px}
+.fg label{font-size:13px;font-weight:700;display:block;margin-bottom:5px;color:var(--mu)}
+.fg input{width:100%;padding:10px 14px;border:2px solid var(--brd);border-radius:10px;font-family:'Sour Gummy',sans-serif;font-size:15px;background:var(--cd2);color:var(--tx);outline:none;transition:border .2s}
+.fg input:focus{border-color:var(--bbg)}
+.fsub{width:100%;padding:12px;font-family:'Sour Gummy',sans-serif;font-size:16px;font-weight:700;background:var(--bbg);color:var(--btx);border:2px solid var(--brd);border-radius:10px;cursor:pointer;margin-top:6px}
+.fsub:hover{opacity:.85}
+.fsw{text-align:center;margin-top:12px;font-size:13px}
+.fsw a{color:var(--btx);background:var(--bbg);padding:2px 8px;border-radius:6px;cursor:pointer;font-weight:700}
+.forgotl{font-size:12px;text-align:right;margin-top:3px;cursor:pointer;color:var(--mu);text-decoration:underline}
+.errmsg{color:#e74c3c;font-size:13px;text-align:center;margin-top:6px;display:none}
+.okmsg{color:#4caf50;font-size:13px;text-align:center;margin-top:6px;display:none}
+
+.av{width:34px;height:34px;border-radius:50%;background:var(--bbg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border:2px solid var(--brd)}
+.ui{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.backb{font-family:'Sour Gummy',sans-serif;font-size:14px;font-weight:700;background:var(--cd2);color:var(--tx);border:2px solid var(--brd);padding:7px 16px;border-radius:8px;cursor:pointer;margin-bottom:14px}
+.backb:hover{background:var(--bbg);color:var(--btx)}
+.nextb{font-family:'Sour Gummy',sans-serif;font-size:15px;font-weight:700;background:var(--bbg);color:var(--btx);border:2px solid var(--brd);padding:10px 28px;border-radius:10px;cursor:pointer;margin-top:16px}
+.nextb:hover{opacity:.85}
+.lnrow{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand" onclick="goHome()">🎓 TobyK1DD Academy</div>
+  <div class="navr" id="navr">
+    <button class="btn btng" onclick="openModal('login')">Login</button>
+    <button class="btn" onclick="openModal('signup')">Sign Up</button>
+    <button class="moonb" onclick="toggleDark()">🌙</button>
+  </div>
+</nav>
+
+<div class="shell">
+  <div class="sidebar" id="sidebar">
+    <div class="pbwrap">Progress <span id="ppct">0%</span><div class="pb"><div class="pf" id="pf" style="width:0%"></div></div></div>
+    <div id="sbc"></div>
+  </div>
+  <div class="main" id="main">
+    <div id="vh"></div>
+    <div id="vl" style="display:none"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="mx" onclick="closeModal()">&#x2715;</button>
+    <div id="mb"></div>
+  </div>
+</div>
+
+<script>
+// ── LESSON CONTENT ─────────────────────────────────
+// Stored as plain JS objects with HTML strings.
+// NO nested template literals anywhere in this file.
+
+var LESSONS = {
+  "html-1": {
+    theory: "<h3>What is HTML?</h3><p>HTML (HyperText Markup Language) is the skeleton of every web page. It tells the browser <strong>what</strong> content to show.</p><p>HTML uses <strong>tags</strong> — keywords in angle brackets. Most tags come in pairs: opening and closing.</p><div class='tip'>&#128161; HTML is NOT a programming language &#8212; it describes <em>structure</em>, not behaviour.</div><h3>Basic Structure</h3><ul><li><code>&lt;!DOCTYPE html&gt;</code> &#8212; declares HTML5</li><li><code>&lt;html&gt;</code> &#8212; root element</li><li><code>&lt;head&gt;</code> &#8212; metadata, invisible to users</li><li><code>&lt;body&gt;</code> &#8212; visible content</li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n  <head>\n    <title>My First Page</title>\n  </head>\n  <body>\n    <h1>Hello, World! \ud83d\udc4b</h1>\n    <p>This is my first web page.</p>\n    <p>Change this text and click Run!</p>\n  </body>\n</html>",
+    quiz: {q:"What does HTML stand for?", opts:["Hyper Transfer Markup Language","HyperText Markup Language","Hyper Text Making Language","High Text Markup Language"], correct:1, explain:"HTML = HyperText Markup Language. It marks up text with structural tags for the browser to read."}
+  },
+  "html-2": {
+    theory: "<h3>Headings &amp; Paragraphs</h3><p>HTML has 6 heading levels &#8212; <code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code>. Use only <strong>one h1</strong> per page.</p><p><code>&lt;p&gt;</code> wraps a paragraph. Browsers add spacing automatically.</p><div class='tip'>&#10003; Use headings to describe sections, not to make text big. Search engines use them to understand your page.</div><h3>Text Formatting</h3><ul><li><code>&lt;strong&gt;</code> &#8212; bold</li><li><code>&lt;em&gt;</code> &#8212; italic</li><li><code>&lt;br&gt;</code> &#8212; line break (self-closing)</li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<body>\n  <h1>My Blog \ud83d\udcdd</h1>\n  <h2>About Me</h2>\n  <p>Hi! I'm learning HTML.</p>\n  <p>I'm <strong>really</strong> enjoying it!</p>\n\n  <h2>My Hobbies</h2>\n  <p>I love <em>coding</em> and building things.</p>\n</body>\n</html>",
+    quiz: {q:"How many h1 tags should a well-structured page have?", opts:["As many as you like","Two","Just one","Zero"], correct:2, explain:"Best practice: one h1 per page. It's the main title. Use h2, h3 etc. for sub-sections."}
+  },
+  "html-3": {
+    theory: "<h3>Links</h3><p>The <code>&lt;a&gt;</code> tag creates links. The <code>href</code> attribute sets the destination.</p><div class='tip'>&#128204; Use <code>target=\"_blank\"</code> to open in a new tab. Add <code>rel=\"noopener\"</code> for security.</div><h3>Images</h3><p><code>&lt;img&gt;</code> is a self-closing void element. Key attributes:</p><ul><li><code>src</code> &#8212; image URL or file path</li><li><code>alt</code> &#8212; description for accessibility</li><li><code>width</code> / <code>height</code> &#8212; size in pixels</li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<body>\n  <h1>Links &amp; Images</h1>\n\n  <p>Visit:\n    <a href=\"https://developer.mozilla.org\" target=\"_blank\" rel=\"noopener\">\n      MDN Web Docs\n    </a>\n  </p>\n\n  <h2>A Photo</h2>\n  <img src=\"https://picsum.photos/300/200\" alt=\"Random photo\" width=\"300\">\n\n  <!-- Try changing the image size! -->\n</body>\n</html>",
+    quiz: {q:"What attribute does the <a> tag use to set the link destination?", opts:["src","link","href","url"], correct:2, explain:"href (Hypertext REFerence) specifies where the link goes. src is used for images and scripts."}
+  },
+  "html-4": {
+    theory: "<h3>Lists</h3><p><strong>Unordered</strong> (<code>&lt;ul&gt;</code>) = bullets. <strong>Ordered</strong> (<code>&lt;ol&gt;</code>) = numbers. Both use <code>&lt;li&gt;</code> for items.</p><h3>Tables</h3><ul><li><code>&lt;table&gt;</code> &#8212; container</li><li><code>&lt;tr&gt;</code> &#8212; table row</li><li><code>&lt;th&gt;</code> &#8212; header cell</li><li><code>&lt;td&gt;</code> &#8212; data cell</li></ul><div class='tip'>&#9888; Never use tables for page layout! Use CSS Flexbox or Grid for layout.</div>",
+    code: "<!DOCTYPE html>\n<html>\n<body>\n  <h1>My Favourites</h1>\n\n  <ul>\n    <li>Pizza \ud83c\udf55</li>\n    <li>Coding \ud83d\udcbb</li>\n    <li>Music \ud83c\udfb5</li>\n  </ul>\n\n  <h2>Top 3 Films</h2>\n  <ol>\n    <li>Interstellar</li>\n    <li>The Matrix</li>\n    <li>Inception</li>\n  </ol>\n\n  <h2>Schedule</h2>\n  <table border=\"1\" cellpadding=\"6\">\n    <tr><th>Day</th><th>Activity</th></tr>\n    <tr><td>Monday</td><td>HTML practice</td></tr>\n    <tr><td>Tuesday</td><td>CSS styling</td></tr>\n  </table>\n</body>\n</html>",
+    quiz: {q:"Which tag creates an ordered (numbered) list?", opts:["<ul>","<li>","<ol>","<list>"], correct:2, explain:"<ol> = Ordered List (numbers). <ul> = Unordered List (bullets). Both use <li> for items."}
+  },
+  "html-5": {
+    theory: "<h3>HTML Forms</h3><p>Forms let users submit data. Common input types:</p><ul><li><code>&lt;input type=\"text\"&gt;</code> &#8212; text field</li><li><code>&lt;input type=\"email\"&gt;</code> &#8212; validates email format</li><li><code>&lt;input type=\"password\"&gt;</code> &#8212; hidden text</li><li><code>&lt;textarea&gt;</code> &#8212; multi-line text</li><li><code>&lt;button type=\"submit\"&gt;</code> &#8212; submits the form</li></ul><div class='tip'>&#128204; Always pair each input with a <code>&lt;label&gt;</code> for accessibility.</div>",
+    code: "<!DOCTYPE html>\n<html>\n<body>\n  <h1>Contact Me \ud83d\udcec</h1>\n\n  <form onsubmit=\"go(event)\">\n    <label for=\"nm\">Name:</label><br>\n    <input type=\"text\" id=\"nm\" placeholder=\"Your name\"><br><br>\n\n    <label for=\"em\">Email:</label><br>\n    <input type=\"email\" id=\"em\" placeholder=\"you@example.com\"><br><br>\n\n    <label for=\"ms\">Message:</label><br>\n    <textarea id=\"ms\" rows=\"3\" cols=\"40\"></textarea><br><br>\n\n    <button type=\"submit\">Send \ud83d\ude80</button>\n  </form>\n  <p id=\"r\"></p>\n\n  <script>\n    function go(e) {\n      e.preventDefault();\n      var n = document.getElementById('nm').value;\n      document.getElementById('r').textContent = 'Thanks, ' + n + '! \u2705';\n    }\n  <\/script>\n</body>\n</html>",
+    quiz: {q:"Which input type validates that the text looks like an email address?", opts:["type=\"text\"","type=\"mail\"","type=\"email\"","type=\"address\""], correct:2, explain:"type=\"email\" makes the browser check the input matches a valid email format before submitting."}
+  },
+  "html-p": {
+    theory: "<h3>Project: Build Your Personal Page!</h3><p>Use everything you have learned to build a real personal webpage. Add headings, paragraphs, lists, images, links, and a contact form. Make it yours!</p><div class='tip'>&#128161; Tick every item in the checklist, then click Mark as Complete to unlock CSS!</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n  <title>About Me</title>\n</head>\n<body>\n  <h1>Hi, I'm [Your Name]! \ud83d\udc4b</h1>\n\n  <h2>About Me</h2>\n  <p>Write something about yourself here...</p>\n\n  <h2>My Hobbies</h2>\n  <ul>\n    <li>Add your hobbies...</li>\n  </ul>\n\n  <h2>My Links</h2>\n  <a href=\"#\">Link 1</a> |\n  <a href=\"#\">Link 2</a>\n\n  <br><br>\n  <img src=\"https://picsum.photos/400/200?random=5\" alt=\"Banner\" width=\"400\">\n\n  <h2>Contact Me</h2>\n  <form>\n    <input type=\"email\" placeholder=\"Your email\"><br><br>\n    <textarea rows=\"3\" placeholder=\"Your message\"></textarea><br><br>\n    <button type=\"submit\">Send</button>\n  </form>\n\n  <hr>\n  <p>Made with \u2764\ufe0f by me</p>\n</body>\n</html>",
+    quiz: null,
+    isProject: true,
+    checklist: ["Use an h1 with your name","Add at least 2 h2 sections","Write a paragraph about yourself","Add an unordered list of hobbies","Include at least one link","Add an image","Include a contact form"]
+  },
+  "css-1": {
+    theory: "<h3>What is CSS?</h3><p>CSS (Cascading Style Sheets) controls how HTML looks &#8212; colours, fonts, spacing, layout. Without CSS every site would be plain black text on white.</p><p>Three ways to add CSS:</p><ul><li><strong>Inline</strong> &#8212; style attribute on one element</li><li><strong>Internal</strong> &#8212; &lt;style&gt; tag in the &lt;head&gt;</li><li><strong>External</strong> &#8212; separate .css file (best practice)</li></ul><div class='tip'>&#128204; A CSS rule = <strong>selector { property: value; }</strong><br>Example: <code>h1 { color: blue; font-size: 32px; }</code></div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body {\n    font-family: Arial, sans-serif;\n    background-color: #f0f8ff;\n    padding: 20px;\n  }\n\n  h1 {\n    color: #2c3e50;\n    font-size: 36px;\n  }\n\n  p {\n    color: #555;\n    line-height: 1.6;\n  }\n\n  /* Try changing the colours! */\n</style>\n</head>\n<body>\n  <h1>Styled Page \ud83c\udfa8</h1>\n  <p>This paragraph is styled with CSS!</p>\n  <p>Change the colors and see what happens.</p>\n</body>\n</html>",
+    quiz: {q:"In CSS, what separates a property from its value?", opts:["= (equals sign)","a colon :","a semicolon ;","a comma ,"], correct:1, explain:"CSS syntax: property: value; &#8212; a colon separates property from value. A semicolon ends each declaration."}
+  },
+  "css-2": {
+    theory: "<h3>CSS Selectors</h3><ul><li><strong>Tag</strong>: <code>p { }</code> &#8212; targets all &lt;p&gt; elements</li><li><strong>Class</strong>: <code>.card { }</code> &#8212; targets elements with class=\"card\"</li><li><strong>ID</strong>: <code>#hero { }</code> &#8212; targets the element with id=\"hero\"</li></ul><div class='tip'>&#10003; Use <strong>classes</strong> for most styling. IDs should be unique &#8212; use them mostly for JavaScript.</div><h3>Colours in CSS</h3><ul><li>Names: <code>red</code>, <code>blue</code>, <code>tomato</code></li><li>Hex: <code>#f6c14e</code></li><li>RGB: <code>rgb(246,193,78)</code></li><li>HSL: <code>hsl(42,90%,63%)</code></li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  .card {\n    background: #f6c14e;\n    padding: 20px;\n    border-radius: 12px;\n    margin: 10px 0;\n    max-width: 300px;\n  }\n  .card.blue { background: #aac0c9; }\n  .card.pink { background: #f78af2; }\n  #special {\n    border: 3px solid #333;\n    font-weight: bold;\n  }\n</style>\n</head>\n<body>\n  <div class=\"card\">Yellow Card \u2600\ufe0f</div>\n  <div class=\"card blue\">Blue Card \ud83d\udc99</div>\n  <div class=\"card pink\" id=\"special\">Pink Card \ud83d\udc9c</div>\n</body>\n</html>",
+    quiz: {q:"Which CSS selector targets an element with class=\"box\"?", opts:["#box","box",".box","*box"], correct:2, explain:"A dot (.) selects by class name. Hash (#) selects by ID. No prefix selects by tag name."}
+  },
+  "css-3": {
+    theory: "<h3>The CSS Box Model</h3><p>Every element is a rectangular box. From inside out:</p><ul><li><strong>Content</strong> &#8212; the actual text or image</li><li><strong>Padding</strong> &#8212; space inside the border</li><li><strong>Border</strong> &#8212; the line around the element</li><li><strong>Margin</strong> &#8212; space outside the border</li></ul><div class='tip'>&#128161; Always add <code>* { box-sizing: border-box; }</code> &#8212; it makes padding and borders not add extra size to elements. Much easier!</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  * { box-sizing: border-box; }\n  body { background: #eee; padding: 10px; }\n  .box {\n    background: #f6c14e;\n    width: 200px;\n    padding: 20px;\n    border: 4px solid #333;\n    margin: 20px;\n    border-radius: 8px;\n  }\n  .box2 {\n    background: #aac0c9;\n    width: 200px;\n    padding: 40px;\n    border: 4px solid #333;\n    margin: 20px;\n    border-radius: 8px;\n  }\n</style>\n</head>\n<body>\n  <div class=\"box\">Small Padding</div>\n  <div class=\"box2\">Big Padding</div>\n</body>\n</html>",
+    quiz: {q:"Which CSS property adds space INSIDE an element (between content and border)?", opts:["margin","spacing","padding","gap"], correct:2, explain:"Padding = inside the border. Margin = outside the border. Padding is the cushion inside the box."}
+  },
+  "css-4": {
+    theory: "<h3>CSS Flexbox</h3><p>Flexbox arranges items in a row or column. Add <code>display: flex</code> to the <strong>parent</strong> container.</p><p>Key parent properties:</p><ul><li><code>flex-direction</code>: row (default) or column</li><li><code>justify-content</code>: center, space-between, flex-start...</li><li><code>align-items</code>: center, stretch, flex-start...</li><li><code>gap</code>: space between items</li><li><code>flex-wrap: wrap</code>: let items wrap to a new line</li></ul><div class='tip'>&#10003; Flexbox is perfect for nav bars, card rows, and centring things on screen!</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body { font-family: Arial; padding: 20px; }\n  nav {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    background: #2c3e50;\n    padding: 12px 20px;\n    border-radius: 10px;\n    margin-bottom: 20px;\n  }\n  nav a { color: white; text-decoration: none; margin: 0 10px; }\n  .cards {\n    display: flex;\n    gap: 16px;\n    flex-wrap: wrap;\n  }\n  .card {\n    background: #f6c14e;\n    padding: 20px;\n    border-radius: 12px;\n    flex: 1;\n    min-width: 120px;\n    text-align: center;\n  }\n</style>\n</head>\n<body>\n  <nav>\n    <strong style=\"color:white\">MyApp</strong>\n    <div>\n      <a href=\"#\">Home</a>\n      <a href=\"#\">About</a>\n      <a href=\"#\">Contact</a>\n    </div>\n  </nav>\n  <div class=\"cards\">\n    <div class=\"card\">Card 1 \ud83c\udf1f</div>\n    <div class=\"card\">Card 2 \ud83c\udfa8</div>\n    <div class=\"card\">Card 3 \ud83d\ude80</div>\n  </div>\n</body>\n</html>",
+    quiz: {q:"Which CSS property do you set on the PARENT to make children flex?", opts:["flex: 1","flex-children: true","display: flex","align: flex"], correct:2, explain:"display: flex is set on the PARENT container. Its children automatically become flex items you can align and space."}
+  },
+  "css-p": {
+    theory: "<h3>Project: Style Your Portfolio!</h3><p>Take your HTML personal page and make it beautiful with CSS. Use colours, box model, flexbox, and hover effects.</p><div class='tip'>&#128161; Try giving your page a consistent colour scheme using 2-3 main colours throughout.</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body { font-family: Arial; background: #aac0c9; color: #000; }\n\n  header {\n    background: #f6c14e;\n    padding: 40px 20px;\n    text-align: center;\n  }\n\n  nav {\n    display: flex;\n    justify-content: center;\n    gap: 12px;\n    background: #8fb5c0;\n    padding: 12px;\n  }\n  nav a {\n    background: white;\n    padding: 8px 16px;\n    border-radius: 8px;\n    text-decoration: none;\n    color: black;\n    font-weight: bold;\n    transition: background 0.2s;\n  }\n  nav a:hover { background: #f6c14e; }\n\n  main {\n    max-width: 800px;\n    margin: 30px auto;\n    padding: 0 20px;\n  }\n  .card {\n    background: white;\n    border-radius: 14px;\n    padding: 20px;\n    margin: 20px 0;\n  }\n\n  /* ADD YOUR STYLES BELOW */\n\n</style>\n</head>\n<body>\n  <header>\n    <h1>My Portfolio \ud83c\udf1f</h1>\n    <p>Web Developer in Training</p>\n  </header>\n  <nav>\n    <a href=\"#\">About</a>\n    <a href=\"#\">Projects</a>\n    <a href=\"#\">Contact</a>\n  </nav>\n  <main>\n    <div class=\"card\">\n      <h2>About Me</h2>\n      <p>Customise this page to make it yours!</p>\n    </div>\n  </main>\n</body>\n</html>",
+    quiz: null,
+    isProject: true,
+    checklist: ["Add a styled navigation bar using flexbox","Use at least 3 different colours","Add padding and margin for good spacing","Style at least one element using a CSS class","Add hover effects to links or buttons"]
+  },
+  "js-1": {
+    theory: "<h3>Variables</h3><p>Variables store data. Use <code>var</code> in these examples (or <code>const</code>/<code>let</code> in modern JS).</p><div class='tip'>&#128683; Avoid <code>var</code> in real projects &#8212; use <code>const</code> if the value won't change, <code>let</code> if it will.</div><h3>Data Types</h3><ul><li><strong>String</strong>: text &#8212; <code>\"hello\"</code></li><li><strong>Number</strong>: <code>42</code> or <code>3.14</code></li><li><strong>Boolean</strong>: <code>true</code> or <code>false</code></li><li><strong>Array</strong>: ordered list &#8212; <code>[1, 2, 3]</code></li><li><strong>Object</strong>: key-value &#8212; <code>{ name: \"Toby\" }</code></li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<body>\n<script>\n  var name = 'Toby';\n  var age = 20;\n  var isLearning = true;\n  var hobbies = ['coding', 'music', 'gaming'];\n\n  document.body.innerHTML =\n    '<h1>Hello, ' + name + '!</h1>' +\n    '<p>Age: ' + age + '</p>' +\n    '<p>Learning: ' + isLearning + '</p>' +\n    '<p>Hobbies: ' + hobbies.join(', ') + '</p>';\n<\/script>\n</body>\n</html>",
+    quiz: {q:"Which keyword creates a variable that CANNOT be reassigned?", opts:["let","var","const","fixed"], correct:2, explain:"const = constant. Cannot be reassigned after set. let = can change. var = old style, avoid it."}
+  },
+  "js-2": {
+    theory: "<h3>Functions</h3><p>Functions are reusable blocks of code. Define once, call many times.</p><ul><li>Traditional: <code>function greet(name) { return 'Hello ' + name; }</code></li><li>Arrow: <code>const greet = (name) =&gt; 'Hello ' + name;</code></li></ul><div class='tip'>&#128161; Arrow functions are shorter and the modern preferred style.</div><h3>DOM Events</h3><ul><li><code>onclick=\"fn()\"</code> &#8212; inline click handler</li><li><code>document.getElementById('id')</code> &#8212; find an element</li><li><code>element.textContent = 'text'</code> &#8212; change text</li><li><code>element.innerHTML = '...'</code> &#8212; set HTML content</li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; text-align: center; }\n  button { padding: 12px 24px; font-size: 16px; cursor: pointer;\n           background: #f6c14e; border: 2px solid #333;\n           border-radius: 8px; margin: 5px; }\n  #out { font-size: 48px; margin: 20px; }\n</style>\n</head>\n<body>\n  <h1>Click Counter \ud83d\udd71\ufe0f</h1>\n  <div id=\"out\">0</div>\n  <button onclick=\"inc()\">+ Add</button>\n  <button onclick=\"dec()\">- Minus</button>\n  <button onclick=\"rst()\">Reset</button>\n<script>\n  var count = 0;\n  function upd() { document.getElementById('out').textContent = count; }\n  function inc() { count++; upd(); }\n  function dec() { count--; upd(); }\n  function rst() { count = 0; upd(); }\n<\/script>\n</body>\n</html>",
+    quiz: {q:"What does document.getElementById(\"out\") do?", opts:["Creates a new element","Finds the element with id=\"out\"","Deletes the element","Adds a click handler"], correct:1, explain:"getElementById searches the page for an element with that specific id and returns it so you can read or change it."}
+  },
+  "js-3": {
+    theory: "<h3>Arrays</h3><p>Arrays store ordered lists. Access items by index starting at 0.</p><ul><li><code>arr.push(item)</code> &#8212; add to end</li><li><code>arr.splice(i,1)</code> &#8212; remove item at index i</li><li><code>arr.map(fn)</code> &#8212; transform each item, returns new array</li><li><code>arr.filter(fn)</code> &#8212; keep only matching items</li></ul><div class='tip'>&#10003; Prefer <code>map()</code>, <code>filter()</code>, <code>forEach()</code> over classic for loops &#8212; they are more readable.</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; background: #f0f8ff; }\n  input { padding: 8px; font-size: 16px; border-radius: 6px; border: 2px solid #ccc; width: 58%; }\n  button { padding: 8px 14px; font-size: 15px; background: #f6c14e;\n           border: 2px solid #333; border-radius: 6px; cursor: pointer; }\n  li { padding: 6px 0; font-size: 16px; }\n  .d { background: #e74c3c; color: #fff; border-color: #e74c3c; font-size: 12px; padding: 3px 8px; }\n</style>\n</head>\n<body>\n  <h1>Todo List \u2705</h1>\n  <input type=\"text\" id=\"inp\" placeholder=\"Add a task...\">\n  <button onclick=\"add()\">Add</button>\n  <ul id=\"list\"></ul>\n<script>\n  var tasks = ['Learn HTML', 'Learn CSS'];\n\n  function render() {\n    var h = '';\n    for (var i = 0; i < tasks.length; i++) {\n      h += '<li>\ud83d\udccc ' + tasks[i] +\n           ' <button class=\"d\" onclick=\"del(' + i + ')\">x</button></li>';\n    }\n    document.getElementById('list').innerHTML = h;\n  }\n\n  function add() {\n    var v = document.getElementById('inp').value.trim();\n    if (v) { tasks.push(v); document.getElementById('inp').value = ''; render(); }\n  }\n\n  function del(i) { tasks.splice(i, 1); render(); }\n\n  render();\n<\/script>\n</body>\n</html>",
+    quiz: {q:"What does the array .map() method return?", opts:["It modifies the original array","A new array with each item transformed","Only the matching items","Nothing — it just loops"], correct:1, explain:".map() loops over each item, applies your function, and returns a BRAND NEW array. The original is unchanged."}
+  },
+  "js-p": {
+    theory: "<h3>Project: Notes App!</h3><p>Build a working notes app using HTML, CSS, and JavaScript. Add, display, and delete notes. Use localStorage so notes survive a page refresh!</p><div class='tip'>&#128161; <code>localStorage.setItem('key', JSON.stringify(arr))</code> saves an array. <code>JSON.parse(localStorage.getItem('key') || '[]')</code> reads it back.</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body { font-family: Arial; background: #aac0c9; min-height: 100vh; padding: 20px; }\n  .wrap { max-width: 600px; margin: 0 auto; }\n  h1 { text-align: center; margin-bottom: 16px; font-size: 30px; }\n  .add { background: white; border-radius: 14px; padding: 18px; margin-bottom: 16px; }\n  textarea { width: 100%; height: 70px; padding: 10px; font-size: 15px;\n             border: 2px solid #ccc; border-radius: 8px; resize: none; font-family: Arial; }\n  .ab { width: 100%; padding: 10px; background: #f6c14e; border: 2px solid #333;\n        border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; }\n  .note { background: white; border-radius: 12px; padding: 14px; margin: 8px 0;\n          display: flex; justify-content: space-between; align-items: flex-start; }\n  .note p { flex: 1; font-size: 15px; line-height: 1.5; }\n  .db { background: #e74c3c; color: white; border: none; border-radius: 6px;\n        padding: 5px 10px; cursor: pointer; margin-left: 8px; }\n  .empty { text-align: center; color: #555; padding: 24px; }\n</style>\n</head>\n<body>\n<div class=\"wrap\">\n  <h1>My Notes \ud83d\udcd2</h1>\n  <div class=\"add\">\n    <textarea id=\"txt\" placeholder=\"Write a note...\"></textarea>\n    <button class=\"ab\" onclick=\"addNote()\">+ Add Note</button>\n  </div>\n  <div id=\"notes\"></div>\n</div>\n<script>\n  var notes = JSON.parse(localStorage.getItem('notes') || '[]');\n\n  function save() { localStorage.setItem('notes', JSON.stringify(notes)); }\n\n  function render() {\n    var el = document.getElementById('notes');\n    if (notes.length === 0) {\n      el.innerHTML = \"<div class='empty'>No notes yet &#8212; add one!</div>\";\n      return;\n    }\n    var h = '';\n    for (var i = 0; i < notes.length; i++) {\n      h += \"<div class='note'><p>\" + notes[i] +\n           \"</p><button class='db' onclick='del(\" + i + \")'>Delete</button></div>\";\n    }\n    el.innerHTML = h;\n  }\n\n  function addNote() {\n    var v = document.getElementById('txt').value.trim();\n    if (!v) return;\n    notes.unshift(v);\n    save();\n    document.getElementById('txt').value = '';\n    render();\n  }\n\n  function del(i) { notes.splice(i, 1); save(); render(); }\n\n  render();\n<\/script>\n</body>\n</html>",
+    quiz: null,
+    isProject: true,
+    checklist: ["Can add a note by clicking Add","Notes are displayed on the page","Each note has a working Delete button","Notes survive a page refresh (localStorage)","Empty state shown when no notes exist"]
+  },
+  "git-1": {
+    theory: "<h3>What is Git?</h3><p>Git tracks every change to your code over time &#8212; like save points in a video game. If something breaks, roll back.</p><h3>Key Concepts</h3><ul><li><strong>Repository (repo)</strong> &#8212; a folder tracked by Git</li><li><strong>Commit</strong> &#8212; a saved snapshot</li><li><strong>Branch</strong> &#8212; a parallel version of your code</li><li><strong>Remote</strong> &#8212; a copy hosted online (e.g. GitHub)</li></ul><div class='tip'>&#128025; <strong>GitHub</strong> is a website that hosts Git repos. Git is the tool; GitHub is the platform &#8212; they are different things.</div><h3>Essential Commands</h3><ul><li><code>git init</code> &#8212; create a new repo</li><li><code>git add .</code> &#8212; stage all changes</li><li><code>git commit -m \"msg\"</code> &#8212; save a snapshot</li><li><code>git push</code> &#8212; upload to GitHub</li><li><code>git pull</code> &#8212; download latest changes</li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; background: #f0ffe8; }\n  .t { background: #1e1e2e; color: #cdd6f4; padding: 18px; border-radius: 12px;\n       font-family: monospace; font-size: 13px; line-height: 2; margin: 10px 0; }\n  .c{color:#89b4fa}.g{color:#6c7086}.o{color:#a6e3a1}\n</style>\n</head>\n<body>\n  <h1>Git Workflow \ud83d\udc19</h1>\n  <h2 style=\"margin:14px 0 6px\">Start a project:</h2>\n  <div class=\"t\">\n    <span class=\"g\"># Navigate to your folder</span><br>\n    <span class=\"c\">$ cd my-project</span><br><br>\n    <span class=\"g\"># Initialise Git</span><br>\n    <span class=\"c\">$ git init</span><br>\n    <span class=\"o\">Initialised empty Git repository</span><br><br>\n    <span class=\"c\">$ git add .</span><br>\n    <span class=\"c\">$ git commit -m \"Initial commit\"</span><br>\n    <span class=\"o\">[main] Initial commit</span>\n  </div>\n  <h2 style=\"margin:14px 0 6px\">Push to GitHub:</h2>\n  <div class=\"t\">\n    <span class=\"c\">$ git remote add origin https://github.com/you/repo.git</span><br>\n    <span class=\"c\">$ git push -u origin main</span><br>\n    <span class=\"o\">Branch set up to track origin/main</span>\n  </div>\n  <p style=\"margin-top:14px;color:#555;font-size:14px\">\n    Practice these in VS Code's integrated terminal!\n  </p>\n</body>\n</html>",
+    quiz: {q:"What does 'git commit' do?", opts:["Uploads code to GitHub","Saves a snapshot of your changes locally","Deletes a file","Creates a new branch"], correct:1, explain:"git commit saves a snapshot of staged changes to your LOCAL repo history. git push then uploads those commits to GitHub."}
+  },
+  "git-2": {
+    theory: "<h3>Branches</h3><p>Branches let you work on features without touching the main code. The default branch is <code>main</code>.</p><div class='tip'>&#10003; Best practice: never commit directly to <code>main</code>. Create a feature branch, work there, then merge via a Pull Request.</div><h3>Pull Requests</h3><p>A PR on GitHub requests merging your branch into <code>main</code>. It allows code review before merging.</p><h3>Branch Commands</h3><ul><li><code>git checkout -b feature-name</code> &#8212; create and switch to new branch</li><li><code>git checkout main</code> &#8212; switch back</li><li><code>git merge feature-name</code> &#8212; merge branch</li><li><code>git branch</code> &#8212; list all branches</li></ul>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; background: #f0ffe8; }\n  .flow { display: flex; gap: 8px; align-items: center; margin: 14px 0; flex-wrap: wrap; }\n  .step { background: white; border: 2px solid #4caf50; border-radius: 10px;\n          padding: 10px 14px; font-size: 13px; text-align: center; }\n  .arrow { font-size: 18px; color: #4caf50; }\n  .t { background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: 10px;\n       font-family: monospace; font-size: 13px; line-height: 1.9; margin: 12px 0; }\n  .c{color:#89b4fa}.o{color:#a6e3a1}\n</style>\n</head>\n<body>\n  <h1>Branching Workflow \ud83c\udf3f</h1>\n  <div class=\"flow\">\n    <div class=\"step\">\ud83c\udf31 main</div>\n    <div class=\"arrow\">\u2192</div>\n    <div class=\"step\">\ud83c\udf3f new branch</div>\n    <div class=\"arrow\">\u2192</div>\n    <div class=\"step\">\u270d\ufe0f commits</div>\n    <div class=\"arrow\">\u2192</div>\n    <div class=\"step\">\ud83d\udce4 push</div>\n    <div class=\"arrow\">\u2192</div>\n    <div class=\"step\">\ud83d\udd00 Pull Request</div>\n    <div class=\"arrow\">\u2192</div>\n    <div class=\"step\">\u2705 merge</div>\n  </div>\n  <div class=\"t\">\n    <span class=\"c\">$ git checkout -b add-contact-page</span><br>\n    <span class=\"o\">Switched to a new branch</span><br><br>\n    <span class=\"c\">$ git add .</span><br>\n    <span class=\"c\">$ git commit -m \"Add contact page\"</span><br><br>\n    <span class=\"c\">$ git push origin add-contact-page</span><br>\n    <span class=\"o\"># Now open a Pull Request on GitHub!</span>\n  </div>\n</body>\n</html>",
+    quiz: {q:"What is a Pull Request on GitHub?", opts:["Downloading code from GitHub","A request to merge your branch into main","A way to delete a branch","Cloning a repository"], correct:1, explain:"A Pull Request asks the maintainer to merge your branch into main. It enables code review before merging."}
+  },
+  "vercel-1": {
+    theory: "<h3>What is Vercel?</h3><p>Vercel is a hosting platform that makes deploying websites incredibly easy. Connect your GitHub repo and Vercel auto-deploys every time you push code.</p><h3>Why Vercel?</h3><ul><li>&#10003; Very generous free tier</li><li>&#10003; Auto-deploys on every git push</li><li>&#10003; Free HTTPS/SSL certificate</li><li>&#10003; Global CDN &#8212; fast everywhere</li><li>&#10003; Preview URLs for every PR</li></ul><div class='tip'>&#128640; Workflow: code locally &#8594; push to GitHub &#8594; Vercel auto-deploys &#8594; share your live URL!</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; max-width: 580px; margin: 0 auto; }\n  .step { background: #f8f8ff; border: 2px solid #ddd; border-radius: 12px;\n          padding: 16px; margin: 12px 0; display: flex; gap: 14px; align-items: flex-start; }\n  .num { background: #000; color: white; width: 32px; height: 32px; border-radius: 50%;\n         display: flex; align-items: center; justify-content: center;\n         font-weight: bold; flex-shrink: 0; }\n  .num + div h3 { margin-bottom: 4px; font-size: 15px; }\n  .num + div p  { font-size: 13px; color: #555; line-height: 1.5; }\n  .url { background: #000; color: #0df; padding: 10px 14px; border-radius: 8px;\n         font-family: monospace; font-size: 13px; margin-top: 8px; }\n</style>\n</head>\n<body>\n  <h1>\u25b2 Deploying to Vercel</h1>\n  <div class=\"step\"><div class=\"num\">1</div><div>\n    <h3>Push to GitHub</h3>\n    <p>Make sure your code is on GitHub with git push origin main</p>\n  </div></div>\n  <div class=\"step\"><div class=\"num\">2</div><div>\n    <h3>Import on Vercel</h3>\n    <p>vercel.com &rarr; New Project &rarr; Import your GitHub repo &rarr; Deploy</p>\n  </div></div>\n  <div class=\"step\"><div class=\"num\">3</div><div>\n    <h3>Your site is live! \ud83c\udf89</h3>\n    <div class=\"url\">https://my-portfolio-you.vercel.app</div>\n  </div></div>\n  <div class=\"step\"><div class=\"num\">4</div><div>\n    <h3>Auto-deploy forever</h3>\n    <p>Every git push rebuilds and redeploys automatically. Zero extra work.</p>\n  </div></div>\n</body>\n</html>",
+    quiz: {q:"What happens automatically when you push code to GitHub after connecting Vercel?", opts:["Nothing — click Deploy manually","Vercel automatically redeploys your site","Vercel deletes your old site","Your GitHub repo is deleted"], correct:1, explain:"Vercel watches your GitHub repo. Every git push triggers an automatic rebuild and live redeployment — zero manual steps."}
+  },
+  "supa-1": {
+    theory: "<h3>What is Supabase?</h3><p>Supabase is an open-source Backend as a Service. It gives you a real PostgreSQL database, authentication, file storage, and auto-generated APIs &#8212; without writing backend code.</p><h3>Core Features</h3><ul><li>&#128452; <strong>Database</strong> &#8212; PostgreSQL with a visual table editor</li><li>&#128272; <strong>Auth</strong> &#8212; email/password, magic links, Google, GitHub login</li><li>&#128193; <strong>Storage</strong> &#8212; file uploads with CDN</li><li>&#9889; <strong>Realtime</strong> &#8212; live data updates</li></ul><div class='tip'>&#128161; Think of Supabase as a complete backend in the cloud. Sign up free at supabase.com, create a project, and you have a real database in 2 minutes.</div>",
+    code: "<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial; padding: 20px; background: #e8fff8; }\n  .box { background: white; border-radius: 12px; padding: 18px; margin: 12px 0; }\n  .box h3 { margin-bottom: 8px; }\n  .t { background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 8px;\n       font-family: monospace; font-size: 12px; line-height: 1.9; }\n  .kw{color:#cba6f7}.st{color:#a6e3a1}.fn{color:#89b4fa}.cm{color:#6c7086}\n</style>\n</head>\n<body>\n  <h1>\ud83d\udd0b Supabase Quick Start</h1>\n  <div class=\"box\">\n    <h3>1. Create the client</h3>\n    <div class=\"t\">\n      <span class=\"kw\">import</span> { createClient } <span class=\"kw\">from</span>\n      <span class=\"st\">'@supabase/supabase-js'</span><br><br>\n      <span class=\"kw\">const</span> supabase = <span class=\"fn\">createClient</span>(<br>\n      &nbsp;&nbsp;<span class=\"st\">'https://your-project.supabase.co'</span>,<br>\n      &nbsp;&nbsp;<span class=\"st\">'your-anon-key'</span><br>\n      )\n    </div>\n  </div>\n  <div class=\"box\">\n    <h3>2. Fetch data</h3>\n    <div class=\"t\">\n      <span class=\"kw\">const</span> { data } = <span class=\"kw\">await</span> supabase<br>\n      &nbsp;&nbsp;.<span class=\"fn\">from</span>(<span class=\"st\">'notes'</span>).<span class=\"fn\">select</span>(<span class=\"st\">'*'</span>)<br>\n      <span class=\"cm\">// data = array of your rows</span>\n    </div>\n  </div>\n  <div class=\"box\">\n    <h3>3. Insert a row</h3>\n    <div class=\"t\">\n      <span class=\"kw\">await</span> supabase<br>\n      &nbsp;&nbsp;.<span class=\"fn\">from</span>(<span class=\"st\">'notes'</span>)<br>\n      &nbsp;&nbsp;.<span class=\"fn\">insert</span>([{ content: <span class=\"st\">'Hello!'</span> }])\n    </div>\n  </div>\n</body>\n</html>",
+    quiz: {q:"What database does Supabase use under the hood?", opts:["MySQL","MongoDB","PostgreSQL","SQLite"], correct:2, explain:"Supabase is built on PostgreSQL — a powerful open-source relational database. You get full SQL and all PostgreSQL features."}
+  }
+};
+
+// ── CURRICULUM STRUCTURE ────────────────────────────
+var C = [
+  {id:'html',title:'HTML',icon:'\ud83c\udf10',desc:'Build the structure of web pages',lessons:[
+    {id:'html-1',title:'What is HTML?'},
+    {id:'html-2',title:'Headings & Paragraphs'},
+    {id:'html-3',title:'Links & Images'},
+    {id:'html-4',title:'Lists & Tables'},
+    {id:'html-5',title:'Forms & Inputs'},
+    {id:'html-p',title:'\ud83c\udfd7\ufe0f Project: Personal Page'}
+  ]},
+  {id:'css',title:'CSS',icon:'\ud83c\udfa8',desc:'Style and design your pages',lessons:[
+    {id:'css-1',title:'Intro to CSS'},
+    {id:'css-2',title:'Selectors & Colours'},
+    {id:'css-3',title:'Box Model & Spacing'},
+    {id:'css-4',title:'Flexbox Layout'},
+    {id:'css-p',title:'\ud83c\udfa8 Project: Styled Portfolio'}
+  ]},
+  {id:'js',title:'JavaScript',icon:'\u26a1',desc:'Add interactivity and logic',lessons:[
+    {id:'js-1',title:'Variables & Data Types'},
+    {id:'js-2',title:'Functions & Events'},
+    {id:'js-3',title:'Arrays & Loops'},
+    {id:'js-p',title:'\ud83c\udfd7\ufe0f Project: Notes App'}
+  ]},
+  {id:'git',title:'Git & GitHub',icon:'\ud83d\udc19',desc:'Version control and collaboration',lessons:[
+    {id:'git-1',title:'What is Git?'},
+    {id:'git-2',title:'Branches & Pull Requests'}
+  ]},
+  {id:'vercel',title:'Vercel',icon:'\u25b2',desc:'Deploy your sites in seconds',lessons:[
+    {id:'vercel-1',title:'Deploy with Vercel'}
+  ]},
+  {id:'supa',title:'Supabase',icon:'\ud83d\udd0b',desc:'Database, auth, and backend',lessons:[
+    {id:'supa-1',title:'Intro to Supabase'}
+  ]}
+];
+
+function allL(){var r=[];for(var i=0;i<C.length;i++)for(var j=0;j<C[i].lessons.length;j++)r.push(C[i].lessons[j]);return r;}
+function findL(id){var a=allL();for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null;}
+function findM(id){for(var i=0;i<C.length;i++)for(var j=0;j<C[i].lessons.length;j++)if(C[i].lessons[j].id===id)return C[i];return null;}
+
+// ── STATE ───────────────────────────────────────────
+var S={user:null,dark:false,lesson:null,tab:'theory',done:[],qa:null};
+function ldS(){try{var s=JSON.parse(localStorage.getItem('acad3')||'{}');S.done=s.done||[];S.user=s.user||null;S.dark=s.dark||false;}catch(e){}}
+function svS(){localStorage.setItem('acad3',JSON.stringify({done:S.done,user:S.user,dark:S.dark}));}
+function gU(){try{return JSON.parse(localStorage.getItem('acad3u')||'[]');}catch(e){return[];}}
+function sU(u){localStorage.setItem('acad3u',JSON.stringify(u));}
+
+// ── DARK MODE ───────────────────────────────────────
+function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);svS();}
+
+// ── MODAL ───────────────────────────────────────────
+function openModal(t){document.getElementById('overlay').classList.add('open');dModal(t);}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function dModal(t){
+  var b=document.getElementById('mb');
+  if(t==='login'){
+    b.innerHTML='<h2>Welcome back \ud83d\udc4b</h2>'+
+      '<div class="fg"><label>Username</label><input type="text" id="mu" placeholder="your username"></div>'+
+      '<div class="fg"><label>Password</label><input type="password" id="mp" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">'+
+      '<div class="forgotl" onclick="dModal(\'forgot\')">Forgot password?</div></div>'+
+      '<div class="errmsg" id="me"></div>'+
+      '<button class="fsub" onclick="doLogin()">Login</button>'+
+      '<div class="fsw">No account? <a onclick="dModal(\'signup\')">Sign Up Free</a></div>';
+  } else if(t==='signup'){
+    b.innerHTML='<h2>Create Account \ud83c\udf93</h2>'+
+      '<div class="fg"><label>Email</label><input type="email" id="mEmail" placeholder="you@email.com"></div>'+
+      '<div class="fg"><label>Username</label><input type="text" id="mu" placeholder="choose a username"></div>'+
+      '<div class="fg"><label>Password</label><input type="password" id="mp" placeholder="min 6 characters"></div>'+
+      '<div class="errmsg" id="me"></div><div class="okmsg" id="mo"></div>'+
+      '<button class="fsub" onclick="doSignup()">Create Account</button>'+
+      '<div class="fsw">Have an account? <a onclick="dModal(\'login\')">Login</a></div>';
+  } else {
+    b.innerHTML='<h2>Reset Password \ud83d\udd11</h2>'+
+      '<p style="font-size:14px;color:var(--mu);margin-bottom:14px">Enter your email and we\'ll send a reset link.</p>'+
+      '<div class="fg"><label>Email</label><input type="email" id="mEmail" placeholder="you@email.com"></div>'+
+      '<div class="errmsg" id="me"></div><div class="okmsg" id="mo"></div>'+
+      '<button class="fsub" onclick="doReset()">Send Reset Link</button>'+
+      '<div class="fsw"><a onclick="dModal(\'login\')">\u2190 Back to Login</a></div>';
+  }
+}
+function gv(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+function merr(m){var e=document.getElementById('me');if(e){e.style.display='block';e.textContent=m;}}
+function mok(m){var e=document.getElementById('mo');if(e){e.style.display='block';e.textContent=m;}}
+
+function doLogin(){
+  var u=gv('mu'),p=gv('mp');
+  if(!u||!p){merr('Please fill in all fields');return;}
+  var found=null;var users=gU();
+  for(var i=0;i<users.length;i++)if(users[i].u===u&&users[i].p===p){found=users[i];break;}
+  if(!found){merr('Incorrect username or password');return;}
+  S.user={username:u,email:found.e};svS();closeModal();dNav();dSb();
+}
+function doSignup(){
+  var e=gv('mEmail'),u=gv('mu'),p=gv('mp');
+  if(!e||!u||!p){merr('Please fill in all fields');return;}
+  if(p.length<6){merr('Password must be at least 6 characters');return;}
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(e)){merr('Please enter a valid email');return;}
+  var users=gU();
+  for(var i=0;i<users.length;i++)if(users[i].u===u){merr('Username already taken');return;}
+  users.push({u:u,e:e,p:p});sU(users);
+  S.user={username:u,email:e};svS();closeModal();dNav();dSb();
+}
+function doReset(){
+  var e=gv('mEmail');if(!e){merr('Please enter your email');return;}
+  var users=gU(),found=false;
+  for(var i=0;i<users.length;i++)if(users[i].e===e){found=true;break;}
+  if(!found){merr('No account found with that email');return;}
+  mok('Reset link sent to '+e+' (simulated)');
+}
+function doLogout(){S.user=null;svS();dNav();dSb();}
+
+// ── NAV ─────────────────────────────────────────────
+function dNav(){
+  var nr=document.getElementById('navr');
+  if(S.user){
+    nr.innerHTML='<div class="ui"><div class="av">'+S.user.username[0].toUpperCase()+'</div><span>'+S.user.username+'</span></div>'+
+      '<button class="btn btng" onclick="doLogout()">Logout</button>'+
+      '<button class="moonb" onclick="toggleDark()">\ud83c\udf19</button>';
+  } else {
+    nr.innerHTML='<button class="btn btng" onclick="openModal(\'login\')">Login</button>'+
+      '<button class="btn" onclick="openModal(\'signup\')">Sign Up</button>'+
+      '<button class="moonb" onclick="toggleDark()">\ud83c\udf19</button>';
+  }
+}
+
+// ── SIDEBAR ─────────────────────────────────────────
+function dSb(){
+  var total=allL().length,done=S.done.length,pct=Math.round(done/total*100);
+  document.getElementById('ppct').textContent=pct+'%';
+  document.getElementById('pf').style.width=pct+'%';
+  var h='';
+  for(var i=0;i<C.length;i++){
+    var mod=C[i];
+    h+='<div class="mlabel">'+mod.icon+' '+mod.title+'</div>';
+    for(var j=0;j<mod.lessons.length;j++){
+      var l=mod.lessons[j];
+      var done2=S.done.indexOf(l.id)>-1;
+      var active=S.lesson&&S.lesson.id===l.id;
+      var locked=!S.user&&mod.id!=='html';
+      h+='<button class="lbtn'+(active?' active':'')+(done2?' done':'')+(locked?' locked':'')+'"'+
+        ' onclick="'+(locked?"openModal('login')":'openL("'+l.id+'")')+'">'+
+        '<span>'+l.title+'</span>'+
+        '<span>'+(locked?'\ud83d\udd12':done2?'\u2713':'')+'</span>'+
+        '</button>';
+    }
+  }
+  document.getElementById('sbc').innerHTML=h;
+}
+
+// ── HOME ────────────────────────────────────────────
+function goHome(){
+  S.lesson=null;
+  document.getElementById('vl').style.display='none';
+  document.getElementById('vh').style.display='block';
+  dHome();dSb();
+}
+function dHome(){
+  var done=S.done.length,total=allL().length;
+  var h='<div class="hero"><div style="font-size:56px;margin-bottom:12px">\ud83c\udf93</div>'+
+    '<h1>TobyK1DD Academy</h1>'+
+    '<p>Your complete path from zero to building and deploying real web apps.<br>'+
+    'Learn HTML, CSS, JavaScript, Git &amp; GitHub, Vercel, and Supabase.</p>';
+  if(S.user){
+    h+='<p style="color:var(--mu);font-size:15px;margin-bottom:20px">Welcome back, <strong>'+S.user.username+'</strong>! '+done+'/'+total+' lessons complete.</p>';
+  } else {
+    h+='<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">'+
+      '<button class="btn" onclick="openModal(\'signup\')">\ud83d\ude80 Start Learning Free</button>'+
+      '<button class="btn btng" onclick="openModal(\'login\')">Already have an account</button></div>';
+  }
+  h+='</div><div class="grid">';
+  for(var i=0;i<C.length;i++){
+    var mod=C[i],mdone=0;
+    for(var j=0;j<mod.lessons.length;j++)if(S.done.indexOf(mod.lessons[j].id)>-1)mdone++;
+    h+='<div class="ccard" onclick="openL(\''+mod.lessons[0].id+'\')">'+
+      '<div class="cicon">'+mod.icon+'</div>'+
+      '<h3>'+mod.title+'</h3><p>'+mod.desc+'</p>'+
+      '<div style="font-size:12px;color:var(--mu);margin-top:6px">'+mod.lessons.length+' lessons</div>'+
+      (mdone?'<div class="badge">'+mdone+'/'+mod.lessons.length+' done</div>':'')+
+      '</div>';
+  }
+  h+='</div>';
+  document.getElementById('vh').innerHTML=h;
+}
+
+// ── LESSON ──────────────────────────────────────────
+function openL(id){
+  var l=findL(id);if(!l)return;
+  var mod=findM(id);
+  if(!S.user&&mod.id!=='html'){openModal('login');return;}
+  S.lesson=l;S.tab='theory';S.qa=null;
+  document.getElementById('vh').style.display='none';
+  document.getElementById('vl').style.display='block';
+  dLesson();dSb();
+}
+
+function dLesson(){
+  var l=S.lesson;if(!l)return;
+  var ld=LESSONS[l.id];if(!ld)return;
+  var mod=findM(l.id);
+  var lessons=mod.lessons;
+  var idx=0;for(var i=0;i<lessons.length;i++)if(lessons[i].id===l.id){idx=i;break;}
+  var prev=idx>0?lessons[idx-1]:null;
+  var next=idx<lessons.length-1?lessons[idx+1]:null;
+  var mi=0;for(var m=0;m<C.length;m++)if(C[m].id===mod.id){mi=m;break;}
+  var nm=!next&&mi<C.length-1?C[mi+1].lessons[0]:null;
+  var isDone=S.done.indexOf(l.id)>-1;
+  var quiz=ld.quiz;
+  var hasQ=quiz&&quiz.q;
+  var isP=ld.isProject;
+
+  // tabs
+  var tabs='<button class="tab'+(S.tab==='theory'?' active':'')+'" onclick="swT(\'theory\')">\ud83d\udcd6 Learn</button>'+
+           '<button class="tab'+(S.tab==='editor'?' active':'')+'" onclick="swT(\'editor\')">\u270f\ufe0f Try It</button>';
+  if(hasQ) tabs+='<button class="tab'+(S.tab==='quiz'?' active':'')+'" onclick="swT(\'quiz\')">\ud83e\uddea Quiz</button>';
+  if(isP)  tabs+='<button class="tab'+(S.tab==='project'?' active':'')+'" onclick="swT(\'project\')">\ud83c\udfd7\ufe0f Project</button>';
+
+  // theory panel
+  var tPanel='<div class="tbox">'+ld.theory+'</div>'+
+    '<button class="nextb" onclick="swT(\'editor\')">Try it out \u2192</button>';
+
+  // editor panel
+  var ePanel='<div class="egrid">'+
+    '<div class="epanel"><div class="ebar"><span>index.html</span>'+
+    '<div class="eacts"><button class="runb" onclick="runCode()">\u25b6 Run</button>'+
+    '<button class="rstb" onclick="rstCode()">\u21ba Reset</button></div></div>'+
+    '<textarea class="codeta" id="cta" spellcheck="false"></textarea></div>'+
+    '<div class="ppanel"><div class="pbar"><span>Live Preview</span><small id="pst">Click Run</small></div>'+
+    '<iframe class="prev" id="pframe" sandbox="allow-scripts allow-same-origin"></iframe></div></div>';
+  if(hasQ) ePanel+='<button class="nextb" onclick="swT(\'quiz\')" style="margin-top:14px">Take the Quiz \u2192</button>';
+  if(isP)  ePanel+='<button class="nextb" onclick="swT(\'project\')" style="margin-top:14px">Go to Checklist \u2192</button>';
+
+  // quiz panel
+  var qPanel='';
+  if(hasQ){
+    qPanel='<div class="qbox"><div class="qq">'+quiz.q+'</div><div class="opts">';
+    for(var qi=0;qi<quiz.opts.length;qi++){
+      qPanel+='<button class="opt" id="qo'+qi+'" onclick="ansQ('+qi+')">'+quiz.opts[qi]+'</button>';
+    }
+    qPanel+='</div><div class="qfb" id="qfb"></div></div>';
+    if(isDone) qPanel+='<div class="donem">\u2705 Lesson complete!'+(next||nm?'':' \ud83c\udf89 Module done!')+'</div>';
+  }
+
+  // project panel
+  var pPanel='';
+  if(isP&&ld.checklist){
+    pPanel='<div class="pjbox"><h3>Project Checklist \u2705</h3>'+
+      '<p>Complete every item, then click Mark as Complete.</p>'+
+      '<ul class="cklist">';
+    for(var ci=0;ci<ld.checklist.length;ci++){
+      pPanel+='<li><input type="checkbox" id="pc'+ci+'" onchange="chkP()">'+
+        '<label for="pc'+ci+'">'+ld.checklist[ci]+'</label></li>';
+    }
+    pPanel+='</ul><button class="compb" id="compb" onclick="complP()" disabled>\u2705 Mark as Complete</button></div>';
+    if(isDone) pPanel+='<div class="donem" style="margin-top:14px">\u2705 Project complete!</div>';
+  }
+
+  // nav row
+  var nrow='<div class="lnrow">';
+  if(prev) nrow+='<button class="btn btng" onclick="openL(\''+prev.id+'\')">\u2190 '+prev.title+'</button>';
+  if(next) nrow+='<button class="btn" onclick="openL(\''+next.id+'\')">'+next.title+' \u2192</button>';
+  if(nm)   nrow+='<button class="btn" onclick="openL(\''+nm.id+'\')">Next: '+nm.title+' \u2192</button>';
+  nrow+='</div>';
+
+  document.getElementById('vl').innerHTML=
+    '<div class="lw">'+
+    '<button class="backb" onclick="goHome()">\u2190 Home</button>'+
+    '<div class="crumb">'+mod.icon+' '+mod.title+'</div>'+
+    '<h2>'+l.title+'</h2>'+
+    '<div class="tabs" style="margin-top:14px">'+tabs+'</div>'+
+    '<div class="panel'+(S.tab==='theory'?' show':'')+'">'+tPanel+'</div>'+
+    '<div class="panel'+(S.tab==='editor'?' show':'')+'">'+ePanel+'</div>'+
+    (hasQ?'<div class="panel'+(S.tab==='quiz'?' show':'')+'">'+qPanel+'</div>':'')+
+    (isP?'<div class="panel'+(S.tab==='project'?' show':'')+'">'+pPanel+'</div>':'')+
+    nrow+'</div>';
+
+  var ta=document.getElementById('cta');
+  if(ta){ta.value=ld.code;setTimeout(runCode,80);}
+  if(S.qa!==null&&hasQ)restoreQ(quiz);
+}
+
+function swT(t){S.tab=t;dLesson();}
+
+function runCode(){
+  var ta=document.getElementById('cta'),fr=document.getElementById('pframe'),st=document.getElementById('pst');
+  if(!ta||!fr)return;
+  fr.srcdoc=ta.value;
+  if(st)st.textContent='\u2705 Updated';
+}
+function rstCode(){
+  var ta=document.getElementById('cta'),ld=LESSONS[S.lesson.id];
+  if(ta&&ld){ta.value=ld.code;runCode();}
+}
+
+function ansQ(chosen){
+  if(S.qa!==null)return;
+  S.qa=chosen;
+  restoreQ(LESSONS[S.lesson.id].quiz);
+}
+function restoreQ(quiz){
+  var chosen=S.qa,correct=quiz.correct;
+  for(var i=0;i<quiz.opts.length;i++){
+    var btn=document.getElementById('qo'+i);
+    if(!btn)continue;
+    btn.disabled=true;
+    if(i===correct)btn.classList.add('correct');
+    if(i===chosen&&chosen!==correct)btn.classList.add('wrong');
+  }
+  var fb=document.getElementById('qfb');
+  if(!fb)return;
+  fb.classList.add('show');
+  if(chosen===correct){
+    fb.classList.add('ok');
+    fb.textContent='\u2705 Correct! '+quiz.explain;
+    markDone(S.lesson.id);
+  } else {
+    fb.classList.add('bad');
+    fb.textContent='\u274c Not quite. '+quiz.explain;
+  }
+  dSb();
+}
+function markDone(id){if(S.done.indexOf(id)===-1){S.done.push(id);svS();}}
+function chkP(){
+  var boxes=document.querySelectorAll('[id^="pc"]'),all=true;
+  for(var i=0;i<boxes.length;i++)if(!boxes[i].checked){all=false;break;}
+  var b=document.getElementById('compb');if(b)b.disabled=!all;
+}
+function complP(){markDone(S.lesson.id);dLesson();dSb();}
+
+// ── INIT ────────────────────────────────────────────
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+ldS();
+if(S.dark)document.body.classList.add('dark');
+dNav();dHome();dSb();
+</script>
+</body>
+</html>
