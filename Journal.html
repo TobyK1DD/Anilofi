@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TobyK1DD's Journal</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #aac0c9;
+      --bg-soft: #c7eafb;
+      --text: #000000;
+      --primary: #f6c14e;
+      --border: #ffffff;
+      --accent: #aac6d3;
+      --btn-bg: #f6c14e;
+      --btn-text: #000000;
+      --card: #daeef8;
+      --danger: #cc3333;
+      --muted: #445566;
+      --soft-border: #b0ccd8;
+    }
+    body.darkmode {
+      --bg: #121212;
+      --bg-soft: #1e1e1e;
+      --text: #ffffff;
+      --primary: #f78af2;
+      --border: #444444;
+      --accent: #2a2a2a;
+      --btn-bg: #f78af2;
+      --btn-text: #000000;
+      --card: #252525;
+      --danger: #ff6b6b;
+      --muted: #99aabb;
+      --soft-border: #333333;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: "Sour Gummy", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    #page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      background: var(--bg-soft);
+      border-bottom: 2.5px solid var(--border);
+    }
+    .nav-links a {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--btn-text);
+      background: var(--btn-bg);
+      border: 2.5px solid var(--border);
+      padding: 7px 16px;
+      border-radius: 9px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover { background: var(--bg); color: var(--text); border-color: var(--primary); }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: var(--bg);
+      border-bottom: 2.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .topbar-brand { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 900; }
+    .topbar-brand .icon { font-size: 24px; }
+    .topbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .user-badge {
+      font-size: 12px; color: var(--muted);
+      background: var(--card); border: 2px solid var(--soft-border);
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 14px; font-weight: 700;
+      color: var(--btn-text); background: var(--btn-bg);
+      border: 2.5px solid var(--border);
+      padding: 7px 16px; border-radius: 9px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn:hover { background: var(--bg); color: var(--text); border-color: var(--primary); }
+    .btn-sm { font-size: 12px; padding: 5px 12px; }
+    .btn-ghost { background: transparent; border: 2px solid var(--soft-border); color: var(--text); }
+    .btn-ghost:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+    .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .btn-danger:hover { opacity: 0.85; }
+    .btn-full { width: 100%; }
+
+    /* ── MAIN JOURNAL APP ── */
+    #journal-app {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      padding: 0 14px;
+      background: var(--bg-soft);
+      border-bottom: 2.5px solid var(--border);
+      flex-shrink: 0;
+    }
+    .tab {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 14px; font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 9px 9px 0 0;
+      border: 2px solid transparent;
+      border-bottom: none;
+      cursor: pointer; color: var(--muted);
+      transition: all 0.2s;
+      margin-bottom: -2.5px;
+    }
+    .tab.active { background: var(--primary); color: #000; border-color: var(--border); }
+    .tab:not(.active):hover { background: var(--bg); color: var(--text); }
+
+    /* ── CONTENT AREA ── */
+    .content-area {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── ENTRIES PANE ── */
+    #pane-entries {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      overflow: hidden;
+    }
+    .sidebar {
+      background: var(--bg-soft);
+      border-right: 2.5px solid var(--border);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .sidebar-hdr {
+      font-size: 11px; font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .search-bar {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 13px; padding: 8px 11px;
+      border-radius: 9px; border: 2px solid var(--soft-border);
+      background: var(--bg); color: var(--text); width: 100%;
+    }
+    .search-bar:focus { outline: none; border-color: var(--primary); }
+
+    .entry-list {
+      flex: 1; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .entry-list::-webkit-scrollbar { width: 4px; }
+    .entry-list::-webkit-scrollbar-thumb { background: var(--soft-border); border-radius: 4px; }
+
+    .month-lbl {
+      font-size: 10px; font-weight: 900;
+      color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin: 6px 0 3px; padding-left: 2px;
+    }
+    .entry-item {
+      background: var(--bg); border: 2px solid var(--soft-border);
+      border-radius: 10px; padding: 9px 11px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .entry-item:hover { border-color: var(--primary); }
+    .entry-item.sel { border-color: var(--primary); background: var(--card); }
+    .ei-title { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ei-meta { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 6px; }
+    .ei-prev { font-size: 11px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .guest-badge { font-size: 10px; background: var(--accent); border-radius: 5px; padding: 1px 6px; color: var(--muted); }
+
+    /* ── VIEW PANEL ── */
+    .view-wrap {
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .view-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; color: var(--muted);
+    }
+    .view-empty-icon { font-size: 48px; }
+    .view-panel {
+      flex: 1; padding: 22px 26px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+    }
+    .view-panel::-webkit-scrollbar { width: 4px; }
+    .view-panel::-webkit-scrollbar-thumb { background: var(--soft-border); border-radius: 4px; }
+    .view-title { font-size: 26px; font-weight: 900; line-height: 1.2; }
+    .view-mood { font-size: 28px; }
+    .view-meta { font-size: 12px; color: var(--muted); }
+    .view-body { font-size: 16px; line-height: 1.85; white-space: pre-wrap; flex: 1; }
+    .view-actions { display: flex; gap: 8px; padding-top: 10px; border-top: 2px solid var(--soft-border); }
+    .view-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* ── TAGS ── */
+    .tag {
+      background: var(--primary); color: #000;
+      border-radius: 7px; padding: 3px 11px;
+      font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .tag-x { cursor: pointer; }
+
+    /* ── WRITE PANE ── */
+    #pane-write {
+      flex: 1; display: none; flex-direction: column; overflow: hidden;
+    }
+    .editor-wrap {
+      flex: 1; padding: 18px 22px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 13px;
+    }
+    .editor-wrap::-webkit-scrollbar { width: 4px; }
+    .editor-wrap::-webkit-scrollbar-thumb { background: var(--soft-border); border-radius: 4px; }
+    .editor-title-input {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 22px; font-weight: 900;
+      background: transparent; border: none;
+      border-bottom: 2.5px solid var(--soft-border);
+      padding: 6px 2px; color: var(--text); width: 100%;
+    }
+    .editor-title-input:focus { outline: none; border-color: var(--primary); }
+    .editor-meta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .editor-date { font-size: 12px; color: var(--muted); }
+    .mood-picker { display: flex; gap: 5px; }
+    .mood-btn {
+      background: var(--bg); border: 2px solid var(--soft-border);
+      border-radius: 8px; padding: 4px 10px; font-size: 15px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .mood-btn:hover, .mood-btn.active { border-color: var(--primary); background: var(--card); }
+    .tag-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .tag-input {
+      font-family: "Sour Gummy", sans-serif; font-size: 13px;
+      padding: 5px 11px; border-radius: 8px;
+      border: 2px solid var(--soft-border);
+      background: var(--bg-soft); color: var(--text); width: 160px;
+    }
+    .tag-input:focus { outline: none; border-color: var(--primary); }
+    .editor-body {
+      font-family: "Sour Gummy", sans-serif; font-size: 16px;
+      padding: 14px; border-radius: 11px;
+      border: 2px solid var(--soft-border);
+      background: var(--bg-soft); color: var(--text);
+      width: 100%; min-height: 280px; resize: vertical; line-height: 1.8;
+    }
+    .editor-body:focus { outline: none; border-color: var(--primary); }
+    .editor-footer { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .char-count { font-size: 12px; color: var(--muted); }
+
+    /* ── STATS PANE ── */
+    #pane-stats {
+      flex: 1; display: none; overflow-y: auto; padding: 20px 22px;
+    }
+    #pane-stats::-webkit-scrollbar { width: 4px; }
+    #pane-stats::-webkit-scrollbar-thumb { background: var(--soft-border); border-radius: 4px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
+    .stat-card { background: var(--card); border: 2px solid var(--soft-border); border-radius: 13px; padding: 14px; text-align: center; }
+    .stat-num { font-size: 30px; font-weight: 900; }
+    .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: .8px; }
+    .stats-section { margin-bottom: 20px; }
+    .stats-section h3 { font-size: 11px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .mood-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mood-stat { background: var(--card); border: 2px solid var(--soft-border); border-radius: 11px; padding: 10px 14px; text-align: center; min-width: 64px; }
+    .mood-stat-emoji { font-size: 20px; }
+    .mood-stat-count { font-size: 13px; font-weight: 800; margin-top: 2px; }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--card);
+      border: 2.5px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 30px;
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 16px;
+      position: relative;
+    }
+    .modal-title { font-size: 22px; font-weight: 900; text-align: center; }
+    .modal-sub { font-size: 13px; color: var(--muted); text-align: center; }
+    .modal-close {
+      position: absolute; top: 12px; right: 14px;
+      background: none; border: none; font-size: 22px;
+      cursor: pointer; color: var(--muted); line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-tabs { display: flex; gap: 8px; justify-content: center; }
+
+    /* ── FORM FIELDS ── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 13px; font-weight: 800; color: var(--text); }
+    .field input {
+      font-family: "Sour Gummy", sans-serif; font-size: 15px;
+      padding: 10px 13px; border-radius: 9px;
+      border: 2px solid var(--soft-border);
+      background: var(--bg-soft); color: var(--text); width: 100%;
+    }
+    .field input:focus { outline: none; border-color: var(--primary); }
+    .err { color: var(--danger); font-size: 13px; text-align: center; min-height: 16px; }
+    .info-box {
+      background: var(--bg-soft); border: 2px solid var(--soft-border);
+      border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.6;
+    }
+    .reset-code-display {
+      font-family: monospace; font-size: 22px; font-weight: 900;
+      letter-spacing: 5px; background: var(--primary); color: #000;
+      border-radius: 9px; padding: 10px; text-align: center;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+      background: var(--primary); color: #000;
+      border-radius: 11px; padding: 10px 20px;
+      font-weight: 800; font-size: 14px;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 200;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; color: var(--muted); padding: 24px 10px; font-size: 14px; }
+
+    /* ── GUEST NOTICE ── */
+    .guest-notice {
+      background: var(--bg-soft);
+      border-bottom: 2px solid var(--soft-border);
+      padding: 8px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap; flex-shrink: 0;
+    }
+    .guest-notice span { font-size: 13px; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg-soft);
+      border-top: 2px solid var(--border);
+      text-align: center;
+      padding: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      #pane-entries { grid-template-columns: 1fr; }
+      .sidebar { max-height: 260px; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+<div id="page">
+
+  <!-- NAV -->
+  <nav class="nav-links">
+    <a href="Index.html">Home</a>
+    <a href="About Me.html">About Me</a>
+    <a href="Blog.html">Blog</a>
+    <a href="My Work.html">My Work</a>
+    <a href="Contact.html">Contact</a>
+    <a href="https://linktr.ee/tobyk1dd">Links</a>
+  </nav>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="icon">📔</span>
+      TobyK1DD's Journal
+    </div>
+    <div class="topbar-right">
+      <span class="user-badge" id="user-label">Guest Mode</span>
+      <button class="btn btn-sm" id="theme-btn">🌙/☀️</button>
+      <button class="btn btn-sm btn-ghost" id="account-btn" onclick="openModal('login')">🔑 Account</button>
+      <button class="btn btn-sm btn-ghost" id="logout-btn" style="display:none" onclick="doLogout()">Log Out</button>
+    </div>
+  </div>
+
+  <!-- GUEST NOTICE (shown when not logged in) -->
+  <div class="guest-notice" id="guest-notice">
+    <span>📝 You're in <strong>Guest Mode</strong> — entries save to this device only. Log in to sync across devices.</span>
+    <button class="btn btn-sm" onclick="openModal('login')">Log In / Sign Up</button>
+  </div>
+
+  <!-- JOURNAL APP -->
+  <div id="journal-app">
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <div class="tab active" id="tab-entries" onclick="showTab('entries')">Entries</div>
+      <div class="tab" id="tab-write" onclick="newEntry()">+ Write</div>
+      <div class="tab" id="tab-stats" onclick="showTab('stats')">Stats</div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ENTRIES PANE -->
+      <div id="pane-entries">
+        <div class="sidebar">
+          <div class="sidebar-hdr">Your Entries</div>
+          <input class="search-bar" id="search-input" placeholder="Search entries..." oninput="renderEntryList()">
+          <div class="entry-list" id="entry-list"></div>
+          <button class="btn btn-sm" onclick="newEntry()">+ New Entry</button>
+        </div>
+        <div class="view-wrap" id="view-wrap">
+          <div class="view-empty" id="view-empty">
+            <div class="view-empty-icon">📖</div>
+            <div>Select an entry or start writing</div>
+          </div>
+          <div class="view-panel" id="view-panel" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- WRITE PANE -->
+      <div id="pane-write">
+        <div class="editor-wrap">
+          <input class="editor-title-input" id="edit-title" placeholder="Entry title…" maxlength="100">
+          <div class="editor-meta-row">
+            <span class="editor-date" id="edit-date"></span>
+            <div class="mood-picker">
+              <button class="mood-btn" data-mood="😊" onclick="setMood(this)">😊</button>
+              <button class="mood-btn" data-mood="😔" onclick="setMood(this)">😔</button>
+              <button class="mood-btn" data-mood="😤" onclick="setMood(this)">😤</button>
+              <button class="mood-btn" data-mood="😌" onclick="setMood(this)">😌</button>
+              <button class="mood-btn" data-mood="🤩" onclick="setMood(this)">🤩</button>
+              <button class="mood-btn" data-mood="😰" onclick="setMood(this)">😰</button>
+            </div>
+          </div>
+          <div class="tag-row">
+            <input class="tag-input" id="tag-input" placeholder="Add tag, press Enter" onkeydown="handleTag(event)">
+            <div id="tags-display" class="view-tags"></div>
+          </div>
+          <textarea class="editor-body" id="edit-body" placeholder="What's on your mind today?" oninput="updateCount()"></textarea>
+          <div class="editor-footer">
+            <button class="btn" onclick="saveEntry()">💾 Save Entry</button>
+            <button class="btn btn-ghost btn-sm" onclick="showTab('entries')">Cancel</button>
+            <span class="char-count" id="char-count">0 words</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS PANE -->
+      <div id="pane-stats">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Entries</div></div>
+          <div class="stat-card"><div class="stat-num" id="st-streak">0</div><div class="stat-lbl">Day Streak</div></div>
+          <div class="stat-card"><div class="stat-num" id="st-words">0</div><div class="stat-lbl">Words</div></div>
+        </div>
+        <div class="stats-section"><h3>Mood Breakdown</h3><div class="mood-grid" id="mood-breakdown"></div></div>
+        <div class="stats-section"><h3>Top Tags</h3><div class="view-tags" id="top-tags"></div></div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /journal-app -->
+
+  <footer>TobyK1DD's Journal &mdash; <a href="https://tobyk1dd.github.io/TobyK1DD/" style="color:var(--primary);">Back to site</a></footer>
+</div><!-- /page -->
+
+<!-- ── ACCOUNT MODAL ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-title" id="modal-title">Account</div>
+    <p class="modal-sub" id="modal-sub"></p>
+
+    <div class="modal-tabs" id="modal-tabs">
+      <button class="btn btn-sm" id="mtab-login" onclick="openModal('login')">Log In</button>
+      <button class="btn btn-sm btn-ghost" id="mtab-signup" onclick="openModal('signup')">Sign Up</button>
+      <button class="btn btn-sm btn-ghost" id="mtab-forgot" onclick="openModal('forgot')">Forgot Password</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="modal-login" style="display:flex;flex-direction:column;gap:13px;">
+      <div class="field"><label>Username</label><input id="li-un" type="text" placeholder="your username" autocomplete="username"></div>
+      <div class="field"><label>Password</label><input id="li-pw" type="password" placeholder="your password" autocomplete="current-password"></div>
+      <button class="btn btn-full" onclick="doLogin()">Log In</button>
+      <p class="err" id="li-err"></p>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="modal-signup" style="display:none;flex-direction:column;gap:13px;">
+      <div class="field"><label>Username</label><input id="su-un" type="text" placeholder="choose a username" autocomplete="username"></div>
+      <div class="field"><label>Email address</label><input id="su-em" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field"><label>Password</label><input id="su-pw" type="password" placeholder="choose a password" autocomplete="new-password"></div>
+      <div class="field"><label>Confirm password</label><input id="su-pw2" type="password" placeholder="repeat password"></div>
+      <button class="btn btn-full" onclick="doSignup()">Create Account</button>
+      <p class="err" id="su-err"></p>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="modal-forgot" style="display:none;flex-direction:column;gap:13px;">
+      <div id="fp-step1" style="display:flex;flex-direction:column;gap:13px;">
+        <div class="field"><label>Username</label><input id="fp-un" type="text" placeholder="your username"></div>
+        <div class="field"><label>Email address</label><input id="fp-em" type="email" placeholder="email on your account"></div>
+        <button class="btn btn-full" onclick="sendResetCode()">Send Reset Code</button>
+        <p class="err" id="fp-err"></p>
+      </div>
+      <div id="fp-step2" style="display:none;flex-direction:column;gap:13px;">
+        <div class="info-box">Reset code generated. In a real deployment this would be emailed — copy it below:</div>
+        <div class="reset-code-display" id="reset-code-val">------</div>
+        <button class="btn btn-sm btn-ghost" onclick="copyResetCode()" style="align-self:center;">Copy Code</button>
+        <div class="field"><label>Enter the reset code</label><input id="fp-code" type="text" placeholder="6-digit code" maxlength="6"></div>
+        <div class="field"><label>New password</label><input id="fp-newpw" type="password" placeholder="new password"></div>
+        <div class="field"><label>Confirm new password</label><input id="fp-newpw2" type="password" placeholder="repeat new password"></div>
+        <button class="btn btn-full" onclick="doReset()">Reset Password</button>
+        <p class="err" id="fp-err2"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──
+let currentUser = null;   // null = guest
+let entries = [];
+let selectedId = null;
+let editingId = null;
+let curMood = "";
+let curTags = [];
+let resetCode = "";
+let resetUser = "";
+
+// ── STORAGE HELPERS ──
+const GUEST_KEY = "jnl_guest";
+const USERS_KEY = "jnl_users";
+
+function userKey(u) { return "jnl_" + u; }
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || "{}"); }
+  catch { return {}; }
+}
+function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+
+function loadEntries() {
+  const key = currentUser ? userKey(currentUser) : GUEST_KEY;
+  try { return JSON.parse(localStorage.getItem(key) || "[]"); }
+  catch { return []; }
+}
+function saveEntries() {
+  const key = currentUser ? userKey(currentUser) : GUEST_KEY;
+  localStorage.setItem(key, JSON.stringify(entries));
+}
+
+// ── TOAST ──
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+// ── THEME ──
+document.getElementById("theme-btn").onclick = () => document.body.classList.toggle("darkmode");
+
+// ── MODAL ──
+function openModal(tab) {
+  document.getElementById("modal-overlay").classList.add("open");
+  setModalTab(tab);
+}
+function closeModal() {
+  document.getElementById("modal-overlay").classList.remove("open");
+}
+function overlayClick(e) {
+  if (e.target === document.getElementById("modal-overlay")) closeModal();
+}
+function setModalTab(tab) {
+  const titles = { login: "Welcome back", signup: "Create account", forgot: "Reset password" };
+  const subs = { login: "Sign in to access your saved entries.", signup: "Sign up to save entries across devices.", forgot: "Verify your account to reset your password." };
+  document.getElementById("modal-title").textContent = titles[tab];
+  document.getElementById("modal-sub").textContent = subs[tab];
+  ["login","signup","forgot"].forEach(t => {
+    document.getElementById("modal-"+t).style.display = t === tab ? "flex" : "none";
+    document.getElementById("mtab-"+t).className = t === tab ? "btn btn-sm" : "btn btn-sm btn-ghost";
+  });
+  // Reset forgot steps
+  if (tab === "forgot") {
+    document.getElementById("fp-step1").style.display = "flex";
+    document.getElementById("fp-step2").style.display = "none";
+  }
+  ["li-err","su-err","fp-err","fp-err2"].forEach(id => { const el = document.getElementById(id); if(el) el.textContent=""; });
+}
+
+// ── AUTH ──
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function doLogin() {
+  const un = document.getElementById("li-un").value.trim().toLowerCase();
+  const pw = document.getElementById("li-pw").value;
+  const err = document.getElementById("li-err");
+  if (!un || !pw) { err.textContent = "Please fill in all fields."; return; }
+  const users = getUsers();
+  if (!users[un] || users[un].hash !== btoa(pw)) { err.textContent = "Incorrect username or password."; return; }
+  // Merge guest entries into account (append, don't overwrite)
+  const guestEntries = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]");
+  const accountEntries = JSON.parse(localStorage.getItem(userKey(un)) || "[]");
+  if (guestEntries.length > 0) {
+    const merged = [...guestEntries, ...accountEntries];
+    localStorage.setItem(userKey(un), JSON.stringify(merged));
+    localStorage.removeItem(GUEST_KEY);
+    toast("Merged " + guestEntries.length + " guest entries into your account!");
+  }
+  err.textContent = "";
+  loginSuccess(un);
+}
+
+function doSignup() {
+  const un = document.getElementById("su-un").value.trim().toLowerCase();
+  const em = document.getElementById("su-em").value.trim().toLowerCase();
+  const pw = document.getElementById("su-pw").value;
+  const pw2 = document.getElementById("su-pw2").value;
+  const err = document.getElementById("su-err");
+  if (!un || !em || !pw || !pw2) { err.textContent = "Please fill in all fields."; return; }
+  if (un.length < 3) { err.textContent = "Username must be 3+ characters."; return; }
+  if (!validEmail(em)) { err.textContent = "Please enter a valid email address."; return; }
+  if (pw.length < 6) { err.textContent = "Password must be 6+ characters."; return; }
+  if (pw !== pw2) { err.textContent = "Passwords don't match."; return; }
+  const users = getUsers();
+  if (users[un]) { err.textContent = "Username already taken."; return; }
+  if (Object.values(users).some(u => u.email === em)) { err.textContent = "Email already registered."; return; }
+  // Carry over guest entries
+  const guestEntries = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]");
+  users[un] = { hash: btoa(pw), email: em };
+  saveUsers(users);
+  if (guestEntries.length > 0) {
+    localStorage.setItem(userKey(un), JSON.stringify(guestEntries));
+    localStorage.removeItem(GUEST_KEY);
+  }
+  err.textContent = "";
+  loginSuccess(un);
+}
+
+function sendResetCode() {
+  const un = document.getElementById("fp-un").value.trim().toLowerCase();
+  const em = document.getElementById("fp-em").value.trim().toLowerCase();
+  const err = document.getElementById("fp-err");
+  if (!un || !em) { err.textContent = "Please fill in both fields."; return; }
+  const users = getUsers();
+  if (!users[un]) { err.textContent = "Username not found."; return; }
+  if (users[un].email !== em) { err.textContent = "Email doesn't match this account."; return; }
+  resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+  resetUser = un;
+  document.getElementById("reset-code-val").textContent = resetCode;
+  document.getElementById("fp-step1").style.display = "none";
+  document.getElementById("fp-step2").style.display = "flex";
+  err.textContent = "";
+}
+
+function copyResetCode() {
+  navigator.clipboard.writeText(resetCode).then(() => toast("Code copied!")).catch(() => {});
+}
+
+function doReset() {
+  const code = document.getElementById("fp-code").value.trim();
+  const pw = document.getElementById("fp-newpw").value;
+  const pw2 = document.getElementById("fp-newpw2").value;
+  const err = document.getElementById("fp-err2");
+  if (code !== resetCode) { err.textContent = "Incorrect reset code."; return; }
+  if (pw.length < 6) { err.textContent = "Password must be 6+ characters."; return; }
+  if (pw !== pw2) { err.textContent = "Passwords don't match."; return; }
+  const users = getUsers();
+  users[resetUser].hash = btoa(pw);
+  saveUsers(users);
+  toast("Password reset! Please log in.");
+  resetCode = ""; resetUser = "";
+  setModalTab("login");
+}
+
+function loginSuccess(un) {
+  currentUser = un;
+  entries = loadEntries();
+  closeModal();
+  document.getElementById("user-label").textContent = "@" + un;
+  document.getElementById("account-btn").style.display = "none";
+  document.getElementById("logout-btn").style.display = "inline-block";
+  document.getElementById("guest-notice").style.display = "none";
+  selectedId = null;
+  renderEntryList();
+  showTab("entries");
+  // Reset view
+  document.getElementById("view-empty").style.display = "flex";
+  document.getElementById("view-panel").style.display = "none";
+  toast("Welcome back, @" + un + "!");
+}
+
+function doLogout() {
+  currentUser = null;
+  entries = loadEntries(); // loads guest entries
+  selectedId = null;
+  document.getElementById("user-label").textContent = "Guest Mode";
+  document.getElementById("account-btn").style.display = "inline-block";
+  document.getElementById("logout-btn").style.display = "none";
+  document.getElementById("guest-notice").style.display = "flex";
+  document.getElementById("view-empty").style.display = "flex";
+  document.getElementById("view-panel").style.display = "none";
+  renderEntryList();
+  showTab("entries");
+  toast("Logged out. Back to guest mode.");
+}
+
+// ── TABS ──
+function showTab(tab) {
+  const panes = ["entries","write","stats"];
+  panes.forEach(t => {
+    const p = document.getElementById("pane-"+t);
+    if (t === "entries") p.style.display = t === tab ? "grid" : "none";
+    else if (t === "write") p.style.display = t === tab ? "flex" : "none";
+    else p.style.display = t === tab ? "block" : "none";
+    const tb = document.getElementById("tab-"+t);
+    if (tb) tb.className = t === tab ? "tab active" : "tab";
+  });
+  if (tab === "stats") renderStats();
+}
+
+// ── ENTRIES ──
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function newEntry() {
+  editingId = null; curMood = ""; curTags = [];
+  document.getElementById("edit-title").value = "";
+  document.getElementById("edit-body").value = "";
+  document.getElementById("edit-date").textContent = new Date().toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  renderMoodBtns(); renderTagsDisplay(); updateCount();
+  showTab("write");
+}
+
+function saveEntry() {
+  const title = document.getElementById("edit-title").value.trim() || "Untitled";
+  const body = document.getElementById("edit-body").value.trim();
+  if (!body) { toast("Write something first!"); return; }
+  const now = new Date();
+  const isGuest = !currentUser;
+  if (editingId) {
+    const e = entries.find(x => x.id === editingId);
+    if (e) { e.title=title; e.body=body; e.mood=curMood; e.tags=[...curTags]; e.updatedAt=now.toISOString(); e.guest=isGuest; }
+  } else {
+    entries.unshift({ id:genId(), title, body, mood:curMood, tags:[...curTags], createdAt:now.toISOString(), updatedAt:now.toISOString(), guest:isGuest });
+  }
+  saveEntries(); renderEntryList(); toast("Entry saved!"); showTab("entries");
+}
+
+function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  saveEntries(); selectedId = null; renderEntryList();
+  document.getElementById("view-empty").style.display = "flex";
+  document.getElementById("view-panel").style.display = "none";
+  toast("Entry deleted.");
+}
+
+function editEntry(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  editingId = id; curMood = e.mood||""; curTags = [...e.tags||[]];
+  document.getElementById("edit-title").value = e.title;
+  document.getElementById("edit-body").value = e.body;
+  document.getElementById("edit-date").textContent = new Date(e.createdAt).toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  renderMoodBtns(); renderTagsDisplay(); updateCount();
+  showTab("write");
+}
+
+function selectEntry(id) {
+  selectedId = id; renderEntryList();
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById("view-empty").style.display = "none";
+  const vp = document.getElementById("view-panel");
+  vp.style.display = "flex"; vp.style.flexDirection = "column"; vp.style.gap = "14px";
+  vp.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+      <div class="view-title">${esc(e.title)}</div>
+      <div class="view-mood">${e.mood||""}</div>
+    </div>
+    <div class="view-meta">
+      ${new Date(e.createdAt).toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}
+      ${e.guest ? ' &nbsp;<span style="font-size:11px;background:var(--accent);border-radius:5px;padding:2px 7px;color:var(--muted);">device only</span>' : ''}
+    </div>
+    ${e.tags&&e.tags.length ? `<div class="view-tags">${e.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
+    <div class="view-body">${esc(e.body)}</div>
+    <div class="view-actions">
+      <button class="btn btn-sm" onclick="editEntry('${e.id}')">✏️ Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteEntry('${e.id}')">🗑️ Delete</button>
+    </div>`;
+}
+
+function renderEntryList() {
+  const q = (document.getElementById("search-input").value || "").toLowerCase();
+  const list = document.getElementById("entry-list");
+  const filtered = entries.filter(e => !q || (e.title+e.body+(e.tags||[]).join(" ")).toLowerCase().includes(q));
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state">${q ? "No results found." : "No entries yet. Start writing!"}</div>`;
+    return;
+  }
+  const groups = {};
+  filtered.forEach(e => {
+    const m = new Date(e.createdAt).toLocaleDateString("en-GB",{year:"numeric",month:"long"});
+    if (!groups[m]) groups[m] = [];
+    groups[m].push(e);
+  });
+  list.innerHTML = Object.keys(groups).map(m => `
+    <div class="month-lbl">${m}</div>
+    ${groups[m].map(e => `
+      <div class="entry-item${selectedId===e.id?" sel":""}" onclick="selectEntry('${e.id}')">
+        <div class="ei-title">${e.mood?e.mood+" ":""}${esc(e.title)}</div>
+        <div class="ei-meta">
+          <span>${new Date(e.createdAt).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</span>
+          ${e.guest ? '<span class="guest-badge">device only</span>' : ''}
+        </div>
+        <div class="ei-prev">${esc(e.body).slice(0,55)}…</div>
+      </div>`).join("")}
+  `).join("");
+}
+
+// ── MOOD / TAGS ──
+function setMood(btn) { curMood = curMood===btn.dataset.mood ? "" : btn.dataset.mood; renderMoodBtns(); }
+function renderMoodBtns() { document.querySelectorAll(".mood-btn").forEach(b => b.classList.toggle("active", b.dataset.mood===curMood)); }
+function handleTag(e) {
+  if (e.key==="Enter") {
+    const v = document.getElementById("tag-input").value.trim().toLowerCase();
+    if (v && !curTags.includes(v) && curTags.length < 8) { curTags.push(v); renderTagsDisplay(); }
+    document.getElementById("tag-input").value = "";
+  }
+}
+function removeTag(t) { curTags = curTags.filter(x => x!==t); renderTagsDisplay(); }
+function renderTagsDisplay() {
+  document.getElementById("tags-display").innerHTML = curTags.map(t => `<span class="tag">${esc(t)} <span class="tag-x" onclick="removeTag('${esc(t)}')">&times;</span></span>`).join("");
+}
+function updateCount() {
+  const v = document.getElementById("edit-body").value;
+  document.getElementById("char-count").textContent = (v.trim() ? v.trim().split(/\s+/).length : 0) + " words · " + v.length + " chars";
+}
+
+// ── STATS ──
+function renderStats() {
+  const total = entries.length;
+  const words = entries.reduce((a,e) => a+(e.body.trim()?e.body.trim().split(/\s+/).length:0), 0);
+  document.getElementById("st-total").textContent = total;
+  document.getElementById("st-words").textContent = words.toLocaleString();
+  document.getElementById("st-streak").textContent = calcStreak();
+  const moods = {};
+  entries.forEach(e => { if(e.mood) moods[e.mood]=(moods[e.mood]||0)+1; });
+  document.getElementById("mood-breakdown").innerHTML = Object.entries(moods).sort((a,b)=>b[1]-a[1])
+    .map(([m,c]) => `<div class="mood-stat"><div class="mood-stat-emoji">${m}</div><div class="mood-stat-count">${c}x</div></div>`).join("")
+    || `<span style="color:var(--muted);font-size:14px;">No moods logged yet</span>`;
+  const tags = {};
+  entries.forEach(e => (e.tags||[]).forEach(t => { tags[t]=(tags[t]||0)+1; }));
+  document.getElementById("top-tags").innerHTML = Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,10)
+    .map(([t,c]) => `<span class="tag">${esc(t)} <span style="font-weight:400;opacity:.7;">(${c})</span></span>`).join("")
+    || `<span style="color:var(--muted);font-size:14px;">No tags yet</span>`;
+}
+
+function calcStreak() {
+  const dates = new Set(entries.map(e => new Date(e.createdAt).toDateString()));
+  let s=0, d=new Date();
+  while(dates.has(d.toDateString())) { s++; d.setDate(d.getDate()-1); }
+  return s;
+}
+
+// ── KEYBOARD SHORTCUTS ──
+document.getElementById("li-pw").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+document.getElementById("li-un").addEventListener("keydown", e => { if(e.key==="Enter") document.getElementById("li-pw").focus(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
+
+// ── INIT ──
+entries = loadEntries();
+renderEntryList();
+updateCount();
+document.getElementById("edit-date").textContent = new Date().toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+</script>
+</body>
+</html>
