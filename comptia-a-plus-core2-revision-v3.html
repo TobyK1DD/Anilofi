@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CompTIA A+ Core 2 (220-1202) Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#aac0c9;--bg-soft:#c7eafb;--text:#000;--primary:#f6c14e;
+  --border:#fff;--accent:#aac6d3;--btn-bg:var(--primary);--btn-text:var(--text);
+  --correct:#4caf50;--wrong:#e74c3c;--partial:#ff9800;
+  --exp-bg:#e8f5e9;--exp-border:#a5d6a7;
+  --wrexp-bg:#fdecea;--wrexp-border:#ef9a9a;
+  --card-shadow:0 4px 18px rgba(0,0,0,0.10);
+}
+body.darkmode{
+  --bg:#121212;--bg-soft:#1e1e1e;--text:#fff;--primary:#f78af2;
+  --border:#333;--accent:#2a2a2a;--btn-text:#000;
+  --exp-bg:#1b2e1b;--exp-border:#388e3c;
+  --wrexp-bg:#2e1b1b;--wrexp-border:#c62828;
+  --card-shadow:0 4px 18px rgba(0,0,0,0.4);
+}
+body{font-family:"Sour Gummy",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:10px;transition:background .3s,color .3s}
+a,p,h1,h2,h3,ol{color:var(--text);font-family:"Sour Gummy",sans-serif}
+
+/* ---- DARK MODE BTN ---- */
+#change-darkmode{height:50px;width:50px;padding:0;border-radius:50%;display:flex;justify-content:center;align-items:center;background:var(--btn-bg);border:3px solid var(--border);position:fixed;top:20px;right:20px;cursor:pointer;font-size:22px;z-index:200;transition:all .3s}
+#change-darkmode:hover{background:var(--bg)}
+
+/* ---- HEADER ---- */
+header{background:var(--bg);text-align:center;font-size:1.9rem;font-family:monospace;padding:10px 0 4px;margin-bottom:4px}
+header small{display:block;font-size:.95rem;font-family:"Sour Gummy",sans-serif;opacity:.7;margin-top:2px;color:var(--text)}
+
+/* ---- NAV ---- */
+#navigation{width:100%;background:var(--bg);text-align:center;padding:6px 0}
+.links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:4px 0}
+button,.links a,.Button,.chip-btn{font-family:"Sour Gummy",sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:8px 16px;border-radius:8px;text-decoration:none;cursor:pointer;transition:all .25s}
+button:hover,.links a:hover,.Button:hover{background:var(--bg);color:var(--text)}
+.chip-btn{font-size:13px;padding:5px 12px;border-radius:20px}
+.chip-btn.inactive{background:var(--bg);color:var(--text);opacity:.5}
+
+/* ---- AUTH SCREEN ---- */
+#auth-screen{max-width:420px;margin:30px auto;text-align:center}
+.auth-card{background:var(--bg-soft);border:2px solid var(--accent);border-radius:18px;padding:34px 28px;box-shadow:var(--card-shadow);transition:all .3s}
+.auth-logo{font-size:2.8rem;margin-bottom:6px}
+.auth-title{font-size:1.55rem;font-weight:700;margin-bottom:4px}
+.auth-subtitle{font-size:.88rem;opacity:.65;margin-bottom:22px}
+.auth-tabs{display:flex;gap:0;margin-bottom:22px;border-radius:10px;overflow:hidden;border:2px solid var(--accent)}
+.auth-tab{flex:1;padding:9px;font-family:"Sour Gummy",sans-serif;font-size:.92rem;cursor:pointer;border:none;background:var(--bg);color:var(--text);transition:all .2s;font-weight:600}
+.auth-tab.active{background:var(--primary);color:var(--btn-text)}
+.auth-panel{display:none}
+.auth-panel.active{display:block}
+.auth-field{width:100%;padding:11px 14px;border-radius:9px;border:2px solid var(--accent);background:var(--bg);color:var(--text);font-family:"Sour Gummy",sans-serif;font-size:.98rem;margin-bottom:12px;outline:none;transition:border-color .2s}
+.auth-field:focus{border-color:var(--primary)}
+.auth-field.error{border-color:var(--wrong)}
+.auth-btn{width:100%;padding:12px;font-size:1.05rem;border-radius:10px;margin-bottom:10px;cursor:pointer;border:3px solid var(--border);background:var(--primary);color:var(--btn-text);font-family:"Sour Gummy",sans-serif;font-weight:700;transition:all .2s}
+.auth-btn:hover{background:var(--bg);color:var(--text)}
+.auth-btn.secondary{background:var(--bg);color:var(--text);opacity:.85}
+.auth-btn.secondary:hover{opacity:1}
+.auth-btn.guest-btn{background:var(--accent);color:var(--text);border-style:dashed}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:.82rem;opacity:.5}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--accent)}
+.auth-msg{font-size:.85rem;padding:9px 12px;border-radius:8px;margin-bottom:12px;display:none}
+.auth-msg.error-msg{background:var(--wrexp-bg);border:1px solid var(--wrexp-border);color:#b71c1c;display:block}
+.auth-msg.success-msg{background:var(--exp-bg);border:1px solid var(--exp-border);color:#2e7d32;display:block}
+body.darkmode .auth-msg.error-msg{color:#ef9a9a}
+body.darkmode .auth-msg.success-msg{color:#a5d6a7}
+.forgot-link{font-size:.82rem;cursor:pointer;opacity:.7;text-decoration:underline;background:none;border:none;color:var(--text);font-family:"Sour Gummy",sans-serif;margin-bottom:14px;display:inline-block}
+.forgot-link:hover{opacity:1}
+.guest-info{font-size:.78rem;opacity:.6;margin-top:6px;line-height:1.4}
+
+/* ---- MODE SELECT ---- */
+#mode-screen{max-width:580px;margin:30px auto;text-align:center}
+#mode-screen h2{font-size:1.4rem;margin-bottom:20px}
+.mode-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.mode-card{background:var(--bg-soft);border:3px solid var(--border);border-radius:14px;padding:26px 22px;width:240px;cursor:pointer;transition:all .25s;box-shadow:var(--card-shadow)}
+.mode-card:hover{border-color:var(--primary);transform:translateY(-3px)}
+.mode-card .icon{font-size:2.6rem;margin-bottom:10px}
+.mode-card h3{font-size:1.1rem;margin-bottom:8px}
+.mode-card p{font-size:.82rem;opacity:.75;line-height:1.4}
+
+/* ---- STATS BAR ---- */
+.stats-bar{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;background:var(--bg-soft);border:1px solid var(--accent);border-radius:10px;padding:9px 16px;max-width:760px;margin:0 auto 14px}
+.stat{text-align:center}
+.stat .val{font-size:1.35rem;font-weight:700;display:block}
+.stat .lbl{opacity:.65;font-size:.75rem}
+
+/* ---- DOMAIN FILTERS ---- */
+.domain-filters{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;max-width:760px;margin:0 auto 10px}
+
+/* ---- PROGRESS ---- */
+#progress-wrap{max-width:760px;margin:0 auto 10px}
+#progress-bar-outer{background:var(--accent);border-radius:8px;height:10px;overflow:hidden}
+#progress-bar-inner{background:var(--primary);height:100%;width:0%;transition:width .4s ease;border-radius:8px}
+#progress-text{text-align:center;font-size:.82rem;opacity:.65;margin-top:3px}
+
+/* ---- QUIZ CARD ---- */
+.quiz-card{background:var(--bg-soft);border:1px solid var(--accent);border-radius:14px;padding:26px 22px;max-width:760px;margin:0 auto 20px;box-shadow:var(--card-shadow)}
+.domain-badge{display:inline-block;background:var(--primary);color:var(--btn-text);border:2px solid var(--border);border-radius:6px;padding:3px 12px;font-size:.78rem;font-weight:700;margin-bottom:12px}
+.multi-badge{display:inline-block;background:#e3f2fd;color:#1565c0;border:2px solid #90caf9;border-radius:6px;padding:3px 12px;font-size:.78rem;font-weight:700;margin-left:6px}
+body.darkmode .multi-badge{background:#1a2a3a;color:#90caf9;border-color:#1565c0}
+.question-text{font-size:1.1rem;font-weight:600;margin-bottom:18px;line-height:1.5}
+.q-number{font-size:.82rem;opacity:.6;margin-bottom:6px}
+
+/* ---- OPTIONS ---- */
+.options-grid{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.option-btn{width:100%;text-align:left;padding:12px 16px;font-size:.98rem;border-radius:10px;cursor:pointer;border:3px solid var(--border);background:var(--btn-bg);color:var(--btn-text);font-family:"Sour Gummy",sans-serif;transition:all .2s;display:flex;align-items:center;gap:10px}
+.option-btn .opt-check{width:20px;height:20px;border-radius:4px;border:2px solid var(--btn-text);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.option-btn.selected .opt-check{background:var(--btn-text);color:var(--btn-bg)}
+.option-btn:hover:not(:disabled):not(.correct):not(.wrong):not(.revealed){background:var(--bg);color:var(--text)}
+.option-btn:disabled{cursor:default}
+.option-btn.correct{background:#4caf50!important;color:#fff!important;border-color:#2e7d32!important}
+.option-btn.correct .opt-check{background:#fff;color:#4caf50}
+.option-btn.wrong{background:#e74c3c!important;color:#fff!important;border-color:#b71c1c!important}
+.option-btn.wrong .opt-check{background:#fff;color:#e74c3c}
+.option-btn.revealed{background:#fff3cd!important;color:#333!important;border-color:#f6c14e!important}
+.option-btn.missed{background:#ff9800!important;color:#fff!important;border-color:#e65100!important}
+
+.submit-multi-btn{display:none;width:100%;padding:11px;font-size:1rem;margin-top:4px;border-radius:10px}
+.submit-multi-btn.show{display:block}
+
+/* ---- RESULT / EXPLANATIONS ---- */
+.result-msg{text-align:center;font-size:1.05rem;font-weight:700;padding:8px;border-radius:8px;margin-bottom:10px;display:none}
+.result-msg.show{display:block}
+.result-msg.correct-msg{color:#2e7d32;background:#e8f5e9}
+.result-msg.wrong-msg{color:#b71c1c;background:#fdecea}
+.result-msg.partial-msg{color:#e65100;background:#fff3e0}
+body.darkmode .result-msg.correct-msg{color:#a5d6a7;background:#1b2e1b}
+body.darkmode .result-msg.wrong-msg{color:#ef9a9a;background:#2e1b1b}
+body.darkmode .result-msg.partial-msg{color:#ffcc80;background:#2a1800}
+.explanations{display:none;flex-direction:column;gap:8px;margin-top:12px}
+.explanations.show{display:flex}
+.exp-item{border-radius:8px;padding:9px 13px;font-size:.88rem;line-height:1.45;border-left:5px solid}
+.exp-item.correct-exp{background:var(--exp-bg);border-color:var(--exp-border)}
+.exp-item.wrong-exp{background:var(--wrexp-bg);border-color:var(--wrexp-border)}
+.exp-item strong{display:block;margin-bottom:3px}
+
+#next-btn{display:none;margin:16px auto 0}
+#next-btn.show{display:block}
+
+/* ---- LOADING ---- */
+#loading{text-align:center;padding:36px 20px;font-size:1rem;opacity:.75}
+.spinner{display:inline-block;width:34px;height:34px;border:4px solid var(--accent);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- RESULTS SCREEN ---- */
+#results-screen{max-width:760px;margin:0 auto 30px;display:none}
+#results-screen h2{text-align:center;font-size:1.5rem;margin-bottom:18px}
+.score-circle-wrap{text-align:center;margin-bottom:22px}
+.score-circle{display:inline-block;width:130px;height:130px;border-radius:50%;border:6px solid var(--primary);line-height:130px;font-size:2.2rem;font-weight:700;background:var(--bg-soft);box-shadow:var(--card-shadow)}
+.score-summary{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:var(--card-shadow)}
+.score-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--accent);font-size:.95rem}
+.score-row:last-child{border-bottom:none;font-weight:700}
+.improve-section{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:var(--card-shadow)}
+.improve-section h3{margin-bottom:12px;font-size:1.1rem}
+.improve-item{background:var(--wrexp-bg);border:1px solid var(--wrexp-border);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:.88rem}
+.improve-item strong{display:block;margin-bottom:4px}
+.improve-ok{background:var(--exp-bg);border:1px solid var(--exp-border)}
+.results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+
+/* ---- WEAK AREAS TRACKER ---- */
+.weak-banner{background:var(--wrexp-bg);border:1px solid var(--wrexp-border);border-radius:10px;padding:10px 14px;max-width:760px;margin:0 auto 10px;font-size:.85rem;display:none}
+.weak-banner.show{display:block}
+.weak-banner strong{display:block;margin-bottom:4px}
+
+/* ---- LIGHTNING MODE INDICATOR ---- */
+.mode-badge{display:inline-block;background:#ff9800;color:#fff;border-radius:6px;padding:2px 10px;font-size:.75rem;font-weight:700;margin-left:8px;vertical-align:middle}
+
+/* ---- FOOTER ---- */
+footer{background:var(--bg);color:var(--text);text-align:center;margin-top:20px;padding:10px;clear:both;font-size:.82rem;opacity:.65}
+
+/* ---- RESPONSIVE ---- */
+@media(max-width:600px){
+  header{font-size:1.25rem}
+  .quiz-card{padding:16px 12px}
+  .question-text{font-size:.98rem}
+  .option-btn{font-size:.9rem;padding:10px 11px}
+  .mode-cards{flex-direction:column;align-items:center}
+  .mode-card{width:90%}
+}
+</style>
+</head>
+<body>
+
+<button id="change-darkmode" title="Toggle Dark/Light Mode">🌙</button>
+
+<header>
+  CompTIA A+ Core 2
+  <small>220-1202 V15 &mdash; Revision Tool</small>
+</header>
+
+<div id="navigation">
+  <div class="links">
+    <a href="#" id="home-link">🏠 Home</a>
+    <a href="#" id="restart-link">🔄 Restart</a>
+    <a href="#" id="lightning-link">⚡ Lightning Round</a>
+    <a href="#" id="logout-link">👤 Switch User</a>
+  </div>
+</div>
+
+<main>
+<div class="container" style="padding:10px">
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">🖥️</div>
+      <div class="auth-title">A+ Core 2 Revision</div>
+      <div class="auth-subtitle">CompTIA 220-1202 &mdash; Sign in to track your progress</div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div class="auth-panel active" id="panel-login">
+        <div class="auth-msg" id="login-msg"></div>
+        <input class="auth-field" type="text" id="login-username" placeholder="Username" maxlength="30" autocomplete="username"/>
+        <input class="auth-field" type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
+        <button class="forgot-link" onclick="switchTab('forgot')">Forgot password?</button>
+        <button class="auth-btn" onclick="doLogin()">Sign In →</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-btn guest-btn" onclick="doGuest()">👤 Continue as Guest</button>
+        <div class="guest-info">Guest accounts are temporary — progress won't be saved between sessions.</div>
+      </div>
+
+      <!-- SIGN UP PANEL -->
+      <div class="auth-panel" id="panel-signup">
+        <div class="auth-msg" id="signup-msg"></div>
+        <input class="auth-field" type="email" id="signup-email" placeholder="Email address" autocomplete="email"/>
+        <input class="auth-field" type="text" id="signup-username" placeholder="Username (no spaces)" maxlength="30" autocomplete="username"/>
+        <input class="auth-field" type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password"/>
+        <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-btn guest-btn" onclick="doGuest()">👤 Continue as Guest</button>
+        <div class="guest-info">Guest accounts are temporary — progress won't be saved between sessions.</div>
+      </div>
+
+      <!-- FORGOT PASSWORD PANEL -->
+      <div class="auth-panel" id="panel-forgot">
+        <div class="auth-msg" id="forgot-msg"></div>
+        <p style="font-size:.9rem;opacity:.75;margin-bottom:14px;text-align:left">Enter your email address and we'll show you a hint to reset your password.</p>
+        <input class="auth-field" type="email" id="forgot-email" placeholder="Email address" autocomplete="email"/>
+        <button class="auth-btn" onclick="doForgot()">Send Reset Hint →</button>
+        <button class="auth-btn secondary" onclick="switchTab('login')">← Back to Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE SELECT SCREEN -->
+  <div id="mode-screen" style="display:none">
+    <h2 id="mode-welcome">Welcome! Choose your session type:</h2>
+    <div class="mode-cards">
+      <div class="mode-card" id="mode-30">
+        <div class="icon">📋</div>
+        <h3>30-Question Batch</h3>
+        <p>Answer 30 questions then get a full score, breakdown, and personalised improvement advice.</p>
+      </div>
+      <div class="mode-card" id="mode-lightning">
+        <div class="icon">⚡</div>
+        <h3>Lightning Round</h3>
+        <p>Infinite, continuous, non-repeating questions — no stops, no scores, just rapid-fire revision.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEAK AREAS BANNER -->
+  <div class="weak-banner" id="weak-banner">
+    <strong>📌 Focus Areas Based on Your History:</strong>
+    <span id="weak-areas-text"></span>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar" id="stats-bar" style="display:none">
+    <div class="stat"><span class="val" id="stat-q">0</span><span class="lbl">Answered</span></div>
+    <div class="stat"><span class="val" id="stat-correct">0</span><span class="lbl">Correct ✅</span></div>
+    <div class="stat"><span class="val" id="stat-wrong">0</span><span class="lbl">Wrong ❌</span></div>
+    <div class="stat"><span class="val" id="stat-pct">—</span><span class="lbl">Score %</span></div>
+  </div>
+
+  <!-- DOMAIN FILTERS -->
+  <div class="domain-filters" id="domain-filters" style="display:none">
+    <span class="chip-btn" data-domain="1">1.0 OS</span>
+    <span class="chip-btn" data-domain="2">2.0 Security</span>
+    <span class="chip-btn" data-domain="3">3.0 Troubleshoot</span>
+    <span class="chip-btn" data-domain="4">4.0 Ops</span>
+  </div>
+
+  <!-- PROGRESS BAR (batch mode only) -->
+  <div id="progress-wrap" style="display:none">
+    <div id="progress-bar-outer"><div id="progress-bar-inner"></div></div>
+    <div id="progress-text"></div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading" style="display:none"><div class="spinner"></div><div>Generating question…</div></div>
+
+  <!-- QUIZ CARD -->
+  <div class="quiz-card" id="quiz-card" style="display:none">
+    <div class="q-number" id="q-number"></div>
+    <div>
+      <span class="domain-badge" id="q-domain"></span>
+      <span class="multi-badge" id="multi-badge" style="display:none">Select all that apply</span>
+    </div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options-grid" id="options"></div>
+    <button class="Button submit-multi-btn" id="submit-multi">Submit Answer</button>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="explanations" id="explanations"></div>
+    <button class="Button" id="next-btn">Next Question ➜</button>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen">
+    <h2>📊 Batch Results</h2>
+    <div class="score-circle-wrap">
+      <div class="score-circle" id="result-circle">—</div>
+    </div>
+    <div class="score-summary" id="score-summary"></div>
+    <div class="improve-section" id="improve-section">
+      <h3>📌 Areas for Improvement</h3>
+      <div id="improve-content"></div>
+    </div>
+    <div class="results-btns">
+      <button class="Button" id="new-batch-btn">🔄 New Batch</button>
+      <button class="Button" id="results-lightning-btn">⚡ Lightning Round</button>
+      <button class="Button" id="results-home-btn">🏠 Home</button>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<footer><p>CompTIA A+ Core 2 (220-1202) V15 &bull; Revision Tool &bull; Not affiliated with CompTIA</p></footer>
+
+<script>
+// =====================================================================
+//  QUESTION BANK
+// =====================================================================
+const DOMAINS = {1:"1.0 Operating Systems",2:"2.0 Security",3:"3.0 Software Troubleshooting",4:"4.0 Operational Procedures"};
+
+// Objectives map for granular weak-area tracking
+const OBJECTIVES = {
+  "1.1":"OS Types & Filesystems","1.2":"OS Installations & Upgrades","1.3":"Windows Editions",
+  "1.4":"Windows Features & Tools","1.5":"Windows Command-Line","1.6":"Windows Settings",
+  "1.7":"Windows Networking","1.8":"macOS","1.9":"Linux","1.10":"App Installation",
+  "2.1":"Security Measures","2.2":"Windows OS Security","2.3":"Wireless Security",
+  "2.4":"Malware & Detection","2.5":"Social Engineering","2.6":"Malware Removal",
+  "2.7":"Workstation Hardening","2.8":"Mobile Security","2.9":"Data Destruction",
+  "2.10":"SOHO Network Security","2.11":"Browser Security",
+  "3.1":"Windows OS Troubleshooting","3.2":"Mobile OS Issues","3.3":"Mobile Security Issues","3.4":"PC Security Issues",
+  "4.1":"Documentation","4.2":"Change Management","4.3":"Backup & Recovery",
+  "4.4":"Safety Procedures","4.5":"Environmental Controls","4.6":"Privacy & Licensing",
+  "4.7":"Communication & Professionalism","4.8":"Scripting","4.9":"Remote Access","4.10":"AI Concepts"
+};
+
+// multi: true  = "select all that apply" (correct is array of indices, user must pick all)
+const LOCAL_QUESTIONS = [
+  // ---- 1.0 OS ----
+  {id:"q001",domain:1,obj:"1.1",q:"Which filesystem is standard on modern Windows installations and supports permissions, encryption, and large files?",opts:["FAT32","exFAT","NTFS","ReFS"],correct:2,exps:["FAT32 lacks permissions and has a 4 GB file size limit.","exFAT is designed for flash media — no permissions or encryption.","Correct! NTFS supports permissions, EFS encryption, compression, and large volumes.","ReFS is for server/storage — not the default desktop filesystem."]},
+  {id:"q002",domain:1,obj:"1.2",q:"A technician installs Windows on a GPT disk. Which firmware interface is required?",opts:["Legacy BIOS","UEFI","POST","CSM only"],correct:1,exps:["Legacy BIOS cannot boot GPT disks natively.","Correct! UEFI is required to boot GPT disks. Windows 11 mandates UEFI + Secure Boot.","POST is the startup self-test, not a firmware interface.","CSM (Compatibility Support Module) emulates BIOS — it does not natively boot GPT."]},
+  {id:"q003",domain:1,obj:"1.3",q:"Which Windows edition is required to use the Group Policy Editor (gpedit.msc)?",opts:["Windows 10 Home","Windows 10 Pro","Windows 10 N","Any edition"],correct:1,exps:["Windows 10 Home does not include gpedit.msc.","Correct! gpedit.msc is available on Pro, Pro for Workstations, and Enterprise editions.","N editions are regional variants that omit media features; gpedit availability depends on the base tier (Pro/Enterprise).","Not every edition — Home omits gpedit.msc."]},
+  {id:"q004",domain:1,obj:"1.5",q:"Which command checks and repairs filesystem errors on a Windows volume?",opts:["diskpart","format","chkdsk","sfc"],correct:2,exps:["diskpart manages partitions — it doesn't diagnose filesystem errors.","format writes a new filesystem — it does not repair existing errors.","Correct! chkdsk scans for filesystem errors and bad sectors and can repair them.","sfc repairs Windows system files — not the disk filesystem itself."]},
+  {id:"q005",domain:1,obj:"1.4",q:"A user wants to see real-time CPU and memory usage for all running processes. Which tool should they use?",opts:["msconfig","regedit","Task Manager","Event Viewer"],correct:2,exps:["msconfig manages startup/boot options — not real-time process monitoring.","regedit edits the Windows registry — not process monitoring.","Correct! Task Manager shows running processes and their CPU, memory, and network usage.","Event Viewer logs system events — it does not show real-time resource usage."]},
+  {id:"q006",domain:1,obj:"1.5",q:"Which Windows command displays the local IP address, subnet mask, and default gateway?",opts:["ping","netstat","ipconfig","nslookup"],correct:2,exps:["ping tests host connectivity — it doesn't display IP configuration.","netstat shows active connections and open ports — not IP configuration.","Correct! ipconfig displays IP address, subnet mask, and gateway for all network interfaces.","nslookup queries DNS servers — it doesn't show local IP configuration."]},
+  {id:"q007",domain:1,obj:"1.8",q:"Which macOS utility manages disk partitions, formats drives, and repairs disks?",opts:["Finder","Terminal","Disk Utility","Activity Monitor"],correct:2,exps:["Finder is the macOS file manager — not a disk management tool.","Terminal provides CLI access but is not the dedicated GUI disk tool.","Correct! Disk Utility handles formatting, partitioning, repairing, and imaging disks on macOS.","Activity Monitor is macOS's Task Manager equivalent — process and resource usage, not disk management."]},
+  {id:"q008",domain:1,obj:"1.9",q:"Which Linux command changes file permissions?",opts:["chown","chmod","grep","ls"],correct:1,exps:["chown changes file ownership (user/group) — not permissions.","Correct! chmod (change mode) sets read, write, and execute permissions on files and directories.","grep searches text for patterns — unrelated to permissions.","ls lists directory contents; it can display permissions but cannot change them."]},
+  {id:"q009",domain:1,obj:"1.4",q:"What Windows MMC snap-in is used to schedule automated tasks?",opts:["Task Manager","Task Scheduler (taskschd.msc)","Resource Monitor","services.msc"],correct:1,exps:["Task Manager monitors running processes — it does not schedule future tasks.","Correct! Task Scheduler (taskschd.msc) creates and manages automated tasks triggered by time or system events.","Resource Monitor shows real-time CPU, memory, disk, and network use — not scheduling.","services.msc manages Windows services — it does not schedule tasks."]},
+  {id:"q010",domain:1,obj:"1.3",q:"Which Windows 11 requirement is NEW compared to Windows 10?",opts:["64-bit processor","At least 4 GB RAM","TPM 2.0 and UEFI Secure Boot","NTFS filesystem"],correct:2,exps:["64-bit CPUs were already required for 64-bit Windows 10.","4 GB RAM was a minimum for 64-bit Windows 10 as well.","Correct! Windows 11 mandates TPM 2.0 and UEFI Secure Boot — not required by Windows 10.","NTFS has been standard across many Windows versions — not a new Windows 11 requirement."]},
+  {id:"q011",domain:1,obj:"1.9",q:"A Linux administrator needs to list all files including hidden ones in a directory. Which command is correct?",opts:["ls -a","ls -l","ls -r","ls -h"],correct:0,exps:["Correct! ls -a lists ALL files including hidden ones (those starting with a dot).","ls -l gives a long-format listing with permissions and sizes — hidden files are not shown unless combined with -a.","ls -r lists files in reverse order — not hidden files.","ls -h shows human-readable file sizes — not hidden files."]},
+  {id:"q012",domain:1,obj:"1.2",q:"A technician wants to upgrade a user's PC from Windows 10 Home to Windows 10 Pro without losing files. What is the correct method?",opts:["Clean install","In-place upgrade","Image deployment","Recovery partition restore"],correct:1,exps:["A clean install wipes the drive — files and settings are lost.","Correct! An in-place upgrade installs the new edition over the current one, preserving files, settings, and applications.","Image deployment pushes a preconfigured image — personal files are not preserved.","A recovery partition restores the factory image — personal files are erased."]},
+  {id:"q013",domain:1,obj:"1.8",q:"Which macOS feature creates automatic incremental backups to an external or network drive?",opts:["iCloud Drive","FileVault","Time Machine","Spotlight"],correct:2,exps:["iCloud Drive provides cloud sync — not a full local system backup.","FileVault is macOS disk encryption — it protects data but does not create backups.","Correct! Time Machine creates automatic incremental backups to a local or network drive.","Spotlight is macOS's search indexing system — not a backup tool."]},
+  {id:"q014",domain:1,obj:"1.1",q:"Which filesystem is used by Apple devices running modern versions of macOS and iOS?",opts:["NTFS","exFAT","ext4","APFS"],correct:3,exps:["NTFS is Microsoft's filesystem — not used natively on Apple devices.","exFAT is cross-platform for removable media — not the native Apple system filesystem.","ext4 is the primary Linux filesystem — not used by Apple.","Correct! APFS (Apple File System) is Apple's modern filesystem used on macOS, iOS, iPadOS, and other Apple platforms."]},
+  {id:"q015",domain:1,obj:"1.5",q:"A technician types 'winver' at the command prompt. What is displayed?",opts:["Windows license key","Windows version and build number","Disk partition info","Active network connections"],correct:1,exps:["winver does not display the license key.","Correct! winver opens a dialog showing the Windows edition, version number, and build number.","Disk info is shown via diskpart or Disk Management — not winver.","netstat shows active connections — not winver."]},
+  {id:"q016",domain:1,obj:"1.5",q:"Which command traces the route packets take from the local machine to a remote host on Windows?",opts:["ipconfig","ping","tracert","pathping"],correct:2,exps:["ipconfig shows IP settings — not routing paths.","ping tests basic connectivity to one host — it doesn't trace the route.","Correct! tracert (Trace Route) shows every hop between the local machine and a remote host, including latency at each step.","pathping combines ping and tracert data but tracert is the primary route-tracing tool."]},
+  {id:"q017",domain:1,obj:"1.6",q:"A Windows laptop lid is closed but the machine stays on. Which Control Panel setting controls this behaviour?",opts:["Device Manager","Power Options","Network and Sharing Center","User Accounts"],correct:1,exps:["Device Manager manages hardware drivers — not power behaviour.","Correct! Power Options → 'Choose what closing the lid does' controls whether the laptop sleeps, hibernates, shuts down, or does nothing when the lid is closed.","Network and Sharing Center manages network settings — not power behaviour.","User Accounts manages user credentials — not power settings."]},
+
+  // ---- 2.0 SECURITY ----
+  {id:"q018",domain:2,obj:"2.4",q:"Which type of malware encrypts a victim's files and demands payment to restore access?",opts:["Rootkit","Keylogger","Ransomware","Spyware"],correct:2,exps:["A rootkit hides malware deep in the OS — it does not encrypt files for ransom.","A keylogger records keystrokes to steal credentials — it does not encrypt files.","Correct! Ransomware encrypts files or locks the system and demands a ransom payment to restore access.","Spyware secretly collects information — it does not encrypt and ransom files."]},
+  {id:"q019",domain:2,obj:"2.5",q:"An attacker calls a user, pretends to be from IT support, and asks for their password. This is an example of?",opts:["Phishing","Smishing","Vishing","Whaling"],correct:2,exps:["Phishing is email-based social engineering — not a phone call.","Smishing uses SMS text messages — not voice calls.","Correct! Vishing (Voice Phishing) uses phone calls where the attacker impersonates a trusted person to steal information.","Whaling targets high-profile executives via email — it is not a phone-call attack."]},
+  {id:"q020",domain:2,obj:"2.2",q:"What does UAC (User Account Control) do in Windows?",opts:["Encrypts user files automatically","Prompts for elevated permissions before allowing system changes","Manages Active Directory users","Configures Windows Firewall rules"],correct:1,exps:["UAC does not encrypt files — that is BitLocker or EFS.","Correct! UAC prompts the user or admin for permission when an application tries to make changes that require elevated privileges, preventing unauthorised modifications.","Active Directory users are managed via ADUC, not UAC.","Firewall rules are set in Windows Defender Firewall — not UAC."]},
+  {id:"q021",domain:2,obj:"2.3",q:"Which wireless security protocol provides the strongest protection for a modern Wi-Fi network?",opts:["WEP","WPA","WPA2 with TKIP","WPA3"],correct:3,exps:["WEP is severely outdated and trivially cracked — never use it.","WPA was an improvement over WEP but is no longer considered secure.","WPA2 with TKIP uses a legacy cipher; WPA2 with AES is stronger, but WPA3 is stronger still.","Correct! WPA3 is the most current Wi-Fi security protocol with improved encryption and brute-force resistance."]},
+  {id:"q022",domain:2,obj:"2.4",q:"A PC has very high CPU usage with no obvious cause. Which malware is MOST likely responsible?",opts:["Keylogger","Adware","Cryptominer","Rootkit"],correct:2,exps:["Keyloggers have minimal CPU impact.","Adware causes pop-ups — it rarely spikes CPU usage dramatically.","Correct! A cryptominer secretly uses the victim's CPU/GPU to mine cryptocurrency, causing extremely high resource usage.","A rootkit hides other malware — its goal is concealment, not CPU-intensive tasks."]},
+  {id:"q023",domain:2,obj:"2.1",q:"What is the principle of least privilege?",opts:["Users should have the strongest passwords","Users should have only the minimum access needed for their job","All users share one admin account","Passwords never expire"],correct:1,exps:["Password strength is a separate security concept.","Correct! Least privilege means granting users only the permissions they need to do their job — reducing the attack surface.","Sharing an admin account violates least privilege and prevents auditing.","Password expiration is a separate policy — not least privilege."]},
+  {id:"q024",domain:2,obj:"2.9",q:"Which data destruction method uses a powerful magnetic field to erase data from a hard drive?",opts:["Drilling","Shredding","Degaussing","Low-level format"],correct:2,exps:["Drilling physically destroys platters — it does not use a magnetic field.","Shredding grinds the drive — physical, not magnetic.","Correct! Degaussing exposes the drive to a strong magnetic field that erases all magnetically stored data.","Low-level formatting overwrites sectors in software — less thorough than degaussing for sensitive data."]},
+  {id:"q025",domain:2,obj:"2.5",q:"An attacker follows an authorised employee through a secure door without using their own credentials. This is called?",opts:["Shoulder surfing","Tailgating","Dumpster diving","Impersonation"],correct:1,exps:["Shoulder surfing is watching someone enter credentials or sensitive info — not bypassing a physical door.","Correct! Tailgating (piggybacking) is when an unauthorised person follows an authorised one through a secured entry.","Dumpster diving searches discarded materials for sensitive information.","Impersonation involves pretending to be someone else — tailgating is the specific physical breach act."]},
+  {id:"q026",domain:2,obj:"2.6",q:"A technician confirms a workstation is infected with malware. What is the FIRST step in the SOHO malware removal process?",opts:["Run antivirus in Safe Mode","Quarantine the infected system","Reimage the OS","Educate the user"],correct:1,exps:["Running antivirus is a remediation step that comes later.","Correct! Step 1 is always to quarantine (isolate) the infected system from the network to prevent the malware spreading.","Reimaging is a valid later step — not the first.","User education is the final step after resolution."]},
+  {id:"q027",domain:2,obj:"2.7",q:"A user leaves their desk. Someone walks up and uses the unlocked PC. Which practice would have prevented this?",opts:["Enable BitLocker","Use a screensaver lock or log off when not in use","Install antivirus","Change the admin password"],correct:1,exps:["BitLocker protects data when a drive is physically removed — it doesn't lock an already-booted session.","Correct! A screensaver lock requiring a password on wake, or simply logging off, prevents unauthorised access to an unattended workstation.","Antivirus protects against malware — not physical access.","Changing the admin password improves security overall but doesn't lock an unattended active session."]},
+  {id:"q028",domain:2,obj:"2.2",q:"Which Windows encryption technology protects individual files and folders using the logged-in user's credentials?",opts:["BitLocker","BitLocker To Go","EFS","FileVault"],correct:2,exps:["BitLocker encrypts entire volumes — not individual files.","BitLocker To Go encrypts removable drives — not individual files.","Correct! EFS (Encrypting File System) encrypts individual files and folders and ties access to the user's Windows credentials.","FileVault is macOS full-disk encryption — not a Windows tool."]},
+  {id:"q029",domain:2,obj:"2.5",q:"Which type of attack overwhelms a target server with traffic from multiple sources to make it unavailable?",opts:["DoS","DDoS","SQL Injection","On-path attack"],correct:1,exps:["A DoS (Denial of Service) attack floods a server from a single source.","Correct! A DDoS (Distributed Denial of Service) attack uses many sources simultaneously to overwhelm a target, making it much harder to block.","SQL Injection targets databases via code — not a traffic-flooding attack.","An on-path (man-in-the-middle) attack intercepts communications — not a flooding attack."]},
+  {id:"q030",domain:2,obj:"2.1",q:"Which physical security device controls entry by trapping a person between two locked doors?",opts:["Badge reader","Magnetometer","Bollard","Access control vestibule"],correct:3,exps:["A badge reader grants entry via ID credential — it doesn't trap people.","A magnetometer detects metal/weapons on a person — it doesn't physically trap.","Bollards stop vehicles — not people.","Correct! An access control vestibule (mantrap) has two interlocking doors — a person enters the first, it locks, then they are verified before the second opens."]},
+  {id:"q031",domain:2,obj:"2.10",q:"When securing a SOHO wireless network, which of the following should be configured to reduce risk?",opts:["Enable UPnP","Use default router credentials","Disable SSID broadcast and change default SSID","Keep factory firmware"],correct:2,exps:["UPnP automatically opens ports for devices — this increases attack surface.","Default credentials are widely known — leaving them is a critical security failure.","Correct! Disabling SSID broadcast hides the network name and changing the default SSID removes an easy fingerprint of the router model.","Factory firmware may contain unpatched vulnerabilities — always update firmware."]},
+  {id:"q032",domain:2,obj:"2.11",q:"A user visits a website and gets a certificate warning. What does this MOST likely indicate?",opts:["The site is loading slowly","The site's SSL/TLS certificate is invalid, expired, or untrusted","The user's browser is outdated","The site uses HTTP"],correct:1,exps:["Slow loading causes no certificate warning.","Correct! A certificate warning means the site's certificate cannot be verified — it may be expired, self-signed, or from an untrusted CA. This could indicate a phishing or on-path attack.","An outdated browser may show warnings, but the MOST likely cause of a cert warning is a certificate issue on the site.","HTTP sites don't present certificates at all — they just lack the padlock."]},
+
+  // ---- MULTI-SELECT QUESTIONS ----
+  {id:"q033",domain:2,obj:"2.1",multi:true,q:"Which of the following are valid Multifactor Authentication (MFA) factors? (Select all that apply)",opts:["Hardware token","Username","Authenticator app","Security question"],correct:[0,2],exps:["Correct! A hardware token generates a one-time passcode — this is 'something you have'.","A username identifies you but is not an authentication factor on its own.","Correct! An authenticator app generates TOTP codes — this is 'something you have'.","Security questions are considered 'something you know' and are generally not recommended as strong MFA factors — most MFA definitions require distinct factor types."]},
+  {id:"q034",domain:1,obj:"1.5",multi:true,q:"Which of the following are valid Windows command-line tools for network troubleshooting? (Select all that apply)",opts:["ipconfig","netstat","diskpart","nslookup"],correct:[0,1,3],exps:["Correct! ipconfig shows the local IP configuration.","Correct! netstat displays active TCP/UDP connections and listening ports.","diskpart is a disk management tool — not a network tool.","Correct! nslookup queries DNS servers to resolve hostnames to IP addresses."]},
+  {id:"q035",domain:4,obj:"4.3",multi:true,q:"Which elements are part of the 3-2-1 backup rule? (Select all that apply)",opts:["3 copies of data","2 different media types","1 offsite copy","4 incremental backups weekly"],correct:[0,1,2],exps:["Correct! The '3' means maintaining three total copies of the data.","Correct! The '2' means storing copies on two different types of media (e.g. external HDD and tape).","Correct! The '1' means keeping at least one copy offsite to survive a local disaster.","4 incremental backups weekly is a backup schedule — not part of the 3-2-1 rule definition."]},
+  {id:"q036",domain:2,obj:"2.4",multi:true,q:"Which of the following are types of malware that can steal information from a victim? (Select all that apply)",opts:["Keylogger","Spyware","Ransomware","Boot sector virus"],correct:[0,1],exps:["Correct! A keylogger records keystrokes, capturing passwords and sensitive data.","Correct! Spyware secretly collects browsing habits, credentials, and personal data.","Ransomware encrypts files for extortion — data theft is not its primary function (though some ransomware variants do exfiltrate data).","A boot sector virus infects the MBR and disrupts booting — its goal is not primarily data theft."]},
+  {id:"q037",domain:1,obj:"1.9",multi:true,q:"Which of the following are Linux commands used for file management? (Select all that apply)",opts:["cp","mv","rm","top"],correct:[0,1,2],exps:["Correct! cp copies files and directories.","Correct! mv moves or renames files and directories.","Correct! rm removes (deletes) files and directories.","top is an informational command that displays running processes and resource usage — not file management."]},
+  {id:"q038",domain:4,obj:"4.2",multi:true,q:"Which of the following should be included in a change management request? (Select all that apply)",opts:["Purpose of the change","Rollback plan","Employee personal details","Risk analysis"],correct:[0,1,3],exps:["Correct! The purpose explains why the change is needed and what problem it solves.","Correct! A rollback plan defines how to revert if the change causes issues.","Employee personal details are not part of a change management request.","Correct! A risk analysis identifies potential impacts and the risk level of the change."]},
+
+  // ---- 3.0 TROUBLESHOOTING ----
+  {id:"q039",domain:3,obj:"3.1",q:"A Windows computer displays a BSOD. What is the MOST common cause?",opts:["Corrupt user profile","Hardware failure or incompatible driver","Slow internet connection","Outdated browser"],correct:1,exps:["A corrupt profile causes slow login/profile errors — not typically a BSOD.","Correct! BSODs are most commonly caused by failing hardware (bad RAM, overheating) or faulty/incompatible drivers that crash the Windows kernel.","Internet speed cannot cause a kernel crash.","Browser issues cause browser crashes — not OS-level BSODs."]},
+  {id:"q040",domain:3,obj:"3.2",q:"A mobile app crashes immediately on launch. What should the technician try FIRST?",opts:["Factory reset","Reinstall the app","Check for OS and app updates","Replace the battery"],correct:2,exps:["Factory reset is a last resort — it erases everything.","Reinstalling is valid, but checking for updates first is less invasive.","Correct! Updates often include bug fixes. Checking for OS and app updates is the least destructive first step.","Battery replacement does not fix software crashes."]},
+  {id:"q041",domain:3,obj:"3.4",q:"A user reports their browser keeps redirecting to unknown websites. This is MOST likely caused by?",opts:["Bad network cable","Browser hijacker malware","Outdated graphics driver","Low RAM"],correct:1,exps:["A bad cable causes connectivity loss — not redirects.","Correct! Browser redirects are a classic symptom of a browser hijacker — malware that alters browser settings to redirect traffic to malicious or ad-filled sites.","Graphics drivers affect display — not browser behaviour.","Low RAM causes slowness — not browser redirects."]},
+  {id:"q042",domain:3,obj:"3.1",q:"A Windows PC's system clock resets to an old date every time it is turned off and back on. What is the MOST likely cause?",opts:["Corrupt OS","Outdated display driver","Failing CMOS battery","Virus infection"],correct:2,exps:["A corrupt OS causes boot or stability issues — not just clock resets.","Display drivers affect graphics — not the system clock.","Correct! The CMOS battery on the motherboard maintains BIOS settings, including the system time, when power is off. A dead CMOS battery causes the clock to reset on every power cycle.","A virus can cause many issues, but persistent clock resets specifically point to the CMOS battery."]},
+  {id:"q043",domain:3,obj:"3.2",q:"A user's mobile phone battery drains very quickly. Which is LEAST likely to be the cause?",opts:["Screen brightness at maximum","Too many background apps","Using dark mode on an OLED screen","Outdated OS"],correct:2,exps:["Maximum brightness is a major battery drain.","Background apps consuming CPU and data drain batteries quickly.","Correct! Dark mode on OLED screens actually reduces power consumption — it is the LEAST likely cause of battery drain listed here.","An outdated OS may miss battery optimisation updates and can drain faster."]},
+  {id:"q044",domain:3,obj:"3.4",q:"A user can ping IP addresses successfully but cannot browse any websites by name. What is MOST likely the issue?",opts:["NIC hardware failure","DNS resolution failure","Firewall blocking all traffic","Bad network cable"],correct:1,exps:["If the NIC were failing, pinging IPs would also fail.","Correct! Being able to ping an IP but not resolve domain names means TCP/IP is functioning but DNS is broken or unreachable.","If the firewall blocked all traffic, pinging IPs would also fail.","A bad cable would prevent all network traffic including the successful IP ping."]},
+  {id:"q045",domain:3,obj:"3.4",q:"A technician notices renamed files, failed OS updates, and unusual programs running. What is the MOST likely cause?",opts:["Outdated drivers","RAM failure","Malware infection","HDD fragmentation"],correct:2,exps:["Outdated drivers cause compatibility issues — not renamed files or update failures.","RAM failure causes crashes and errors — not file renaming or blocked updates.","Correct! Renamed/missing files, blocked OS updates, and unexpected programs are classic signs of a malware infection.","HDD fragmentation slows file access — it doesn't rename files or block updates."]},
+  {id:"q046",domain:3,obj:"3.1",q:"A Windows workstation takes a very long time to log in. What is MOST likely the cause?",opts:["Slow GPU","Slow profile load or corrupt user profile","Low VRAM","BSOD on startup"],correct:1,exps:["GPU speed does not affect login time.","Correct! A corrupt or oversized roaming/local user profile is the most direct cause of slow Windows login times.","VRAM affects graphics performance — not login speed.","BSOD is a crash — not a slow login."]},
+  {id:"q047",domain:3,obj:"3.3",q:"A user's Android phone shows unexpected system-level pop-up ads. What is the MOST likely cause?",opts:["Low storage","Adware or malicious app","OS corruption","Hardware failure"],correct:1,exps:["Low storage causes performance issues and storage warnings — not ads.","Correct! System-wide ads (outside any browser) are a strong indicator of adware or a malicious app, often installed from an unofficial app store.","OS corruption typically causes instability or boot failure — not targeted ad injection.","Hardware failure causes physical/performance issues — not ads."]},
+
+  // ---- 4.0 OPERATIONAL PROCEDURES ----
+  {id:"q048",domain:4,obj:"4.3",q:"Which backup type copies only files changed since the LAST FULL backup, growing larger each day?",opts:["Incremental","Differential","Synthetic full","Mirror"],correct:1,exps:["An incremental backup copies files changed since the last backup of ANY type — staying small but making restores slower.","Correct! A differential backup copies everything changed since the last FULL backup. Each differential grows but restoring only needs the full + the latest differential.","A synthetic full combines a full and all incrementals into a new full backup — no extra backup of the source.","A mirror is an exact real-time copy — not a standard rotation type."]},
+  {id:"q049",domain:4,obj:"4.2",q:"Before making a major change to a production server, what document must be created?",opts:["Incident report","Change request with rollback plan","SLA","Malware scan report"],correct:1,exps:["An incident report documents problems after they occur — not a pre-change document.","Correct! A change request documents the purpose, scope, affected systems, risk, and rollback plan — required before any significant production change.","An SLA defines service expectations — it's not created per change.","A malware scan is a security task unrelated to change management."]},
+  {id:"q050",domain:4,obj:"4.4",q:"What does an ESD strap protect against?",opts:["Electric shock to the technician","Electrostatic discharge damaging components","Short circuits in PSU","CPU overheating"],correct:1,exps:["The strap grounds the technician but its main purpose is protecting components, not the technician.","Correct! An ESD (Electrostatic Discharge) strap drains static from the technician so it cannot discharge into sensitive electronic components, causing permanent damage.","PSU short circuits are electrical faults — not related to static discharge.","CPU overheating is a thermal issue — unrelated to ESD."]},
+  {id:"q051",domain:4,obj:"4.6",q:"Which concept requires documenting everyone who handled digital evidence and when?",opts:["NDA","SLA","Chain of custody","Acceptable Use Policy"],correct:2,exps:["An NDA protects confidential information — it's a legal agreement, not evidence handling.","An SLA defines service levels — unrelated to evidence handling.","Correct! Chain of custody documents every person who handled evidence, the time, and the reason — ensuring integrity and legal admissibility.","An AUP governs acceptable use of company technology — not evidence handling."]},
+  {id:"q052",domain:4,obj:"4.6",q:"A user asks whether they can install personal software on a work laptop. Which document answers this?",opts:["SLA","Change management policy","Acceptable Use Policy","Incident report"],correct:2,exps:["An SLA defines service expectations between provider and customer.","Change management governs IT changes — not personal software use.","Correct! The Acceptable Use Policy (AUP) defines what employees can and cannot do with company technology, including personal software rules.","An incident report documents problems — not a policy document."]},
+  {id:"q053",domain:4,obj:"4.9",q:"Which remote access protocol uses TCP port 3389 for graphical Windows desktop sessions?",opts:["SSH","VNC","RDP","SPICE"],correct:2,exps:["SSH uses port 22 for secure command-line access.","VNC provides graphical access but uses port 5900 by default.","Correct! RDP (Remote Desktop Protocol) is Windows' native graphical remote access protocol, running on TCP/UDP port 3389.","SPICE is used for VM remote access — not standard Windows RDP."]},
+  {id:"q054",domain:4,obj:"4.8",q:"Which file extension is used for PowerShell scripts?",opts:[".bat",".ps1",".vbs",".py"],correct:1,exps:[".bat files are Windows batch scripts.","Correct! .ps1 is the extension for PowerShell scripts.","vbs files are VBScript scripts.",".py files are Python scripts."]},
+  {id:"q055",domain:4,obj:"4.10",q:"An AI model confidently states a false fact. What term describes this AI limitation?",opts:["Bias","Plagiarism","Hallucination","Data privacy breach"],correct:2,exps:["AI bias produces skewed outputs from biased training data — not fabricated facts.","Plagiarism refers to reproducing copyrighted content — not making things up.","Correct! A hallucination is when an AI model generates confident but factually incorrect or nonsensical information.","Data privacy concerns relate to how AI handles input data — not output accuracy."]},
+  {id:"q056",domain:4,obj:"4.5",q:"Which device protects computers from power outages by providing battery backup?",opts:["Surge suppressor","UPS","PDU","Voltage regulator"],correct:1,exps:["A surge suppressor protects against voltage spikes — it provides no battery backup during an outage.","Correct! A UPS (Uninterruptible Power Supply) provides battery backup during power outages, allowing safe shutdown and protecting against surges and brownouts.","A PDU (Power Distribution Unit) distributes power — no battery backup.","A voltage regulator smooths voltage fluctuations — no battery backup."]},
+  {id:"q057",domain:4,obj:"4.7",q:"A customer becomes angry and begins shouting at a technician. What is the BEST professional response?",opts:["Argue back to defend the solution","Hang up or walk away immediately","Stay calm, listen actively, and avoid being defensive","Escalate to a manager without speaking to the customer"],correct:2,exps:["Arguing with a customer escalates the situation and is unprofessional.","Abandoning the interaction is inappropriate — the issue still needs resolution.","Correct! The best practice is to stay calm, actively listen, avoid being defensive or dismissive, and clarify the customer's concerns with open-ended questions.","Escalation may eventually be needed, but attempting to resolve it professionally first is the correct approach."]},
+  {id:"q058",domain:4,obj:"4.1",q:"Which asset management tool stores detailed configuration information about hardware and software in an organisation?",opts:["Ticketing system","CMDB","Inventory list","SLA"],correct:1,exps:["A ticketing system logs support incidents — not detailed configuration records.","Correct! A CMDB (Configuration Management Database) stores detailed info about IT assets including configuration, relationships, and ownership.","An inventory list is a simpler asset record — less detailed than a CMDB.","An SLA defines service expectations — not asset configuration data."]},
+  {id:"q059",domain:4,obj:"4.6",q:"Which type of software licence allows free use, modification, and redistribution?",opts:["Perpetual licence","Personal-use licence","Corporate licence","Open-source licence"],correct:3,exps:["A perpetual licence grants indefinite use but typically prohibits redistribution.","A personal-use licence restricts use to one person and is not freely redistributable.","A corporate licence allows organisational use under specific terms — not open modification.","Correct! An open-source licence (e.g. GPL, MIT) allows free use, modification, and distribution — often with specific conditions."]},
+  {id:"q060",domain:4,obj:"4.9",q:"Which remote access tool provides encrypted command-line access to a remote Linux/Unix system?",opts:["RDP","VNC","SSH","SPICE"],correct:2,exps:["RDP provides graphical Windows remote desktop — not primarily for Linux CLI.","VNC provides graphical remote access but is not encrypted by default.","Correct! SSH (Secure Shell) provides encrypted command-line remote access — the standard for Linux/Unix server management.","SPICE is a VM remote access protocol — not a general CLI tool."]},
+
+  // More diverse questions
+  {id:"q061",domain:2,obj:"2.8",q:"Which mobile device management action remotely erases all data from a lost or stolen device?",opts:["Remote backup","Remote lock","Remote wipe","MDM profile push"],correct:2,exps:["Remote backup copies data to the cloud — it does not erase the device.","Remote lock prevents access but does not erase data.","Correct! A remote wipe sends a command to erase all data on the device, protecting sensitive information if it is lost or stolen.","An MDM profile push installs configuration — it does not erase data."]},
+  {id:"q062",domain:2,obj:"2.8",q:"A user's phone was purchased for personal use and is now also used for work email. What BYOD concern does this raise?",opts:["Device may need a new battery","Company data sits on a personally owned, unmanaged device","The phone will run faster","The user needs a corporate licence for their apps"],correct:1,exps:["Battery health is a hardware concern unrelated to BYOD policy.","Correct! BYOD means company data lives on a personally owned device not fully controlled by IT — raising data security, DLP, and compliance concerns.","Personal devices do not inherently run faster.","App licensing is a separate concern — the key BYOD risk is data security on unmanaged personal hardware."]},
+  {id:"q063",domain:3,obj:"3.2",q:"A user's phone cannot connect to any Wi-Fi networks but cellular works fine. What should be checked FIRST?",opts:["Replace the SIM card","Toggle Wi-Fi off and on, check settings, and forget/reconnect the network","Factory reset","Check for a new phone model"],correct:1,exps:["The SIM is for cellular — toggling or replacing it doesn't affect Wi-Fi.","Correct! The least invasive first step is to toggle Wi-Fi, check settings, and try forgetting and reconnecting the network. This resolves most Wi-Fi connectivity issues quickly.","Factory reset is a last resort.","Buying a new phone is not a troubleshooting step."]},
+  {id:"q064",domain:1,obj:"1.7",q:"A Windows workstation needs to access shared folders on a company domain server. What is required?",opts:["A workgroup membership","Domain join using Active Directory","A VPN only","A static IP address"],correct:1,exps:["Workgroup is peer-to-peer sharing — it does not provide domain-based access control.","Correct! To access domain resources, the workstation must be joined to the Active Directory domain, which provides centralised authentication and access control.","A VPN provides remote network access but does not replace domain membership.","A static IP is not required to join a domain."]},
+  {id:"q065",domain:2,obj:"2.2",q:"A technician needs to ensure a standard user cannot install software on a Windows PC. What is the BEST approach?",opts:["Delete the user account","Set up the account as a Standard User (not Administrator)","Disable UAC","Enable the Guest account"],correct:1,exps:["Deleting the account removes access entirely — the user still needs to work.","Correct! Standard User accounts cannot install software or change system settings without administrator credentials — this enforces least privilege without removing access.","Disabling UAC removes the prompt but doesn't prevent standard users from attempting installs — it's a security regression.","The Guest account has limited access but is generally discouraged for regular use."]},
+  {id:"q066",domain:4,obj:"4.4",q:"A technician is about to work inside a desktop PC. What should they do FIRST for safety?",opts:["Put on safety goggles","Disconnect power from the PC","Attach an ESD strap","Check the BIOS"],correct:1,exps:["Safety goggles are appropriate for some tasks (e.g. cutting cables) but disconnecting power is the absolute first step.","Correct! Disconnecting power before working inside a PC prevents electric shock and protects components from live circuit damage.","An ESD strap is important but applied AFTER disconnecting power.","Checking the BIOS is done before opening the case — but power disconnection is the first physical safety step."]},
+  {id:"q067",domain:2,obj:"2.5",q:"An attacker sends a highly personalised email to a specific executive using details from their public LinkedIn profile. This is called?",opts:["Phishing","Smishing","Spear phishing","Vishing"],correct:2,exps:["Generic phishing targets many people with the same email — not targeted.","Smishing uses SMS — not email.","Correct! Spear phishing is a targeted phishing attack using personal details about a specific victim (often gathered via OSINT) to make the email highly convincing.","Vishing uses phone calls — not email."]},
+  {id:"q068",domain:4,obj:"4.3",q:"The Grandfather-Father-Son (GFS) backup scheme refers to?",opts:["Three generations of hardware","A rotation of daily, weekly, and monthly backup sets","A RAID configuration","A cloud backup tier system"],correct:1,exps:["GFS is a backup rotation scheme — not hardware.","Correct! GFS rotates daily (son), weekly (father), and monthly (grandfather) backup sets, keeping multiple restore points without storing every backup indefinitely.","GFS is unrelated to RAID.","GFS is a local/tape rotation scheme — not specifically a cloud tier."]},
+  {id:"q069",domain:1,obj:"1.1",multi:true,q:"Which of the following are mobile operating systems? (Select all that apply)",opts:["iOS","Chrome OS","Android","Windows Server"],correct:[0,2],exps:["Correct! iOS is Apple's mobile operating system for iPhones.","Chrome OS is a desktop/laptop OS from Google — not typically classified as a mobile OS.","Correct! Android is Google's mobile operating system used on smartphones and tablets.","Windows Server is a server operating system — not mobile."]},
+  {id:"q070",domain:2,obj:"2.7",multi:true,q:"Which of the following are best practices for workstation password security? (Select all that apply)",opts:["Use a minimum password length of 8+ characters","Reuse passwords across all systems","Enable account lockout after failed attempts","Use a password manager"],correct:[0,2,3],exps:["Correct! Longer passwords are harder to brute-force — a minimum of 8 characters (ideally 12+) is best practice.","Reusing passwords is a serious security risk — a breach of one system compromises all others.","Correct! Account lockout after failed attempts slows or prevents brute-force attacks.","Correct! Password managers generate and store strong, unique passwords — reducing the temptation to reuse or use weak passwords."]},
+  {id:"q071",domain:3,obj:"3.1",q:"A Windows service fails to start after a reboot. Where should the technician look FIRST?",opts:["Task Manager","Disk Management","Event Viewer","Registry Editor"],correct:2,exps:["Task Manager shows running processes — it won't explain why a service failed to start.","Disk Management handles storage — unrelated to service failures.","Correct! Event Viewer logs detailed error messages about service failures, including the specific error code and reason for failure.","Registry Editor can be used to investigate service settings but is not the first diagnostic step."]},
+  {id:"q072",domain:4,obj:"4.1",q:"A technician resolves a ticket and documents the steps taken. What section of the ticket should this go in?",opts:["Issue description","Progress notes","Issue resolution","Category"],correct:2,exps:["The issue description records the initial problem — not the fix.","Progress notes record updates during investigation — not the final resolution steps.","Correct! The issue resolution section documents the steps taken to fix the problem, for future reference and knowledge base use.","Category classifies the type of issue — not the resolution steps."]},
+];
+
+// =====================================================================
+//  STORAGE HELPERS
+// =====================================================================
+function storageKey(user, key) { return `aplus_${user}_${key}`; }
+
+function loadUserData(user) {
+  try {
+    const d = localStorage.getItem(storageKey(user, 'data'));
+    return d ? JSON.parse(d) : { answered:{}, wrongObjectives:{}, totalSessions:0 };
+  } catch { return { answered:{}, wrongObjectives:{}, totalSessions:0 }; }
+}
+
+function saveUserData(user, data) {
+  try { localStorage.setItem(storageKey(user, 'data'), JSON.stringify(data)); } catch {}
+}
+
+// =====================================================================
+//  STATE
+// =====================================================================
+let currentUser = null;
+let userData = null;
+let sessionMode = null; // 'batch' or 'lightning'
+let activeDomains = new Set([1,2,3,4]);
+let batchQuestions = [];
+let batchIndex = 0;
+let batchResults = [];
+let lightningStats = {total:0, correct:0, wrong:0};
+let answered = false;
+let currentQ = null;
+let selectedMulti = new Set();
+
+// =====================================================================
+//  DOM REFS
+// =====================================================================
+const loginScreen   = document.getElementById('auth-screen');
+const modeScreen    = document.getElementById('mode-screen');
+const statsBar      = document.getElementById('stats-bar');
+const domainFilters = document.getElementById('domain-filters');
+const progressWrap  = document.getElementById('progress-wrap');
+const progressBar   = document.getElementById('progress-bar-inner');
+const progressText  = document.getElementById('progress-text');
+const loadingEl     = document.getElementById('loading');
+const quizCard      = document.getElementById('quiz-card');
+const resultsScreen = document.getElementById('results-screen');
+const weakBanner    = document.getElementById('weak-banner');
+
+const qNumber    = document.getElementById('q-number');
+const qDomainEl  = document.getElementById('q-domain');
+const multiBadge = document.getElementById('multi-badge');
+const qTextEl    = document.getElementById('q-text');
+const optionsEl  = document.getElementById('options');
+const submitMulti= document.getElementById('submit-multi');
+const resultMsg  = document.getElementById('result-msg');
+const expEl      = document.getElementById('explanations');
+const nextBtn    = document.getElementById('next-btn');
+
+const statQ      = document.getElementById('stat-q');
+const statCorrect= document.getElementById('stat-correct');
+const statWrong  = document.getElementById('stat-wrong');
+const statPct    = document.getElementById('stat-pct');
+
+// =====================================================================
+//  DARK MODE
+// =====================================================================
+const dmBtn = document.getElementById('change-darkmode');
+dmBtn.addEventListener('click', () => {
+  document.body.classList.toggle('darkmode');
+  dmBtn.textContent = document.body.classList.contains('darkmode') ? '☀️' : '🌙';
+});
+
+// =====================================================================
+//  AUTH SYSTEM
+// =====================================================================
+
+// --- Tab switching ---
+function switchTab(tab) {
+  ['login','signup','forgot'].forEach(t => {
+    document.getElementById('panel-'+t).classList.remove('active');
+    const tabEl = document.getElementById('tab-'+t);
+    if (tabEl) tabEl.classList.remove('active');
+  });
+  document.getElementById('panel-'+tab).classList.add('active');
+  const tabEl = document.getElementById('tab-'+tab);
+  if (tabEl) tabEl.classList.add('active');
+  // clear messages
+  ['login-msg','signup-msg','forgot-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.className='auth-msg'; el.textContent=''; }
+  });
+}
+
+// --- Storage helpers for user accounts ---
+function getAccounts() {
+  try { return JSON.parse(localStorage.getItem('aplus_accounts') || '{}'); } catch { return {}; }
+}
+function saveAccounts(accounts) {
+  try { localStorage.setItem('aplus_accounts', JSON.stringify(accounts)); } catch {}
+}
+function showAuthMsg(id, text, type='error') {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'auth-msg ' + (type==='success' ? 'success-msg' : 'error-msg');
+}
+
+// --- Login ---
+function doLogin() {
+  const username = document.getElementById('login-username').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const password = document.getElementById('login-password').value;
+  if (!username || !password) { showAuthMsg('login-msg','Please enter your username and password.'); return; }
+  const accounts = getAccounts();
+  if (!accounts[username]) { showAuthMsg('login-msg','No account found for that username.'); return; }
+  if (accounts[username].password !== btoa(password)) { showAuthMsg('login-msg','Incorrect password.'); return; }
+  startSession(username, accounts[username].displayName || username);
+}
+
+// --- Sign Up ---
+function doSignup() {
+  const email = document.getElementById('signup-email').value.trim();
+  const username = document.getElementById('signup-username').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const password = document.getElementById('signup-password').value;
+  if (!email || !username || !password) { showAuthMsg('signup-msg','Please fill in all fields.'); return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showAuthMsg('signup-msg','Please enter a valid email address.'); return; }
+  if (username.length < 2) { showAuthMsg('signup-msg','Username must be at least 2 characters.'); return; }
+  if (password.length < 6) { showAuthMsg('signup-msg','Password must be at least 6 characters.'); return; }
+  const accounts = getAccounts();
+  if (accounts[username]) { showAuthMsg('signup-msg','That username is already taken.'); return; }
+  // Check if email already used
+  const emailTaken = Object.values(accounts).some(a => a.email === email);
+  if (emailTaken) { showAuthMsg('signup-msg','An account with that email already exists.'); return; }
+  accounts[username] = { email, password: btoa(password), displayName: username, created: Date.now() };
+  saveAccounts(accounts);
+  showAuthMsg('signup-msg', '✅ Account created! Logging you in…', 'success');
+  setTimeout(() => startSession(username, username), 900);
+}
+
+// --- Forgot Password ---
+function doForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { showAuthMsg('forgot-msg','Please enter your email address.'); return; }
+  const accounts = getAccounts();
+  const found = Object.entries(accounts).find(([,a]) => a.email === email);
+  if (!found) { showAuthMsg('forgot-msg','No account found with that email address.'); return; }
+  const [username, account] = found;
+  // Show hint: first 2 chars of password (decoded) + stars
+  const decoded = atob(account.password);
+  const hint = decoded.substring(0,2) + '*'.repeat(Math.max(decoded.length-2,2));
+  showAuthMsg('forgot-msg', `✅ Account found for "${username}". Password hint: ${hint}. Please log in with your password or contact support.`, 'success');
+}
+
+// --- Guest ---
+function doGuest() {
+  const guestId = 'guest_' + Math.random().toString(36).substring(2,8);
+  startSession(guestId, '👤 Guest', true);
+}
+
+// --- Start session ---
+function startSession(username, displayName, isGuest=false) {
+  currentUser = username;
+  userData = loadUserData(username);
+  userData.totalSessions = (userData.totalSessions || 0) + 1;
+  if (!isGuest) saveUserData(currentUser, userData);
+  loginScreen.style.display = 'none';
+  showModeScreen();
+  document.getElementById('mode-welcome').textContent = isGuest
+    ? `Welcome, Guest! Choose your session type:`
+    : `Welcome back, ${displayName}! Choose your session type:`;
+}
+
+// --- Keyboard enter support ---
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('login-password').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  document.getElementById('login-username').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  document.getElementById('signup-password').addEventListener('keydown', e => { if(e.key==='Enter') doSignup(); });
+  document.getElementById('forgot-email').addEventListener('keydown', e => { if(e.key==='Enter') doForgot(); });
+});
+
+// =====================================================================
+//  MODE SCREEN
+// =====================================================================
+function showModeScreen() {
+  modeScreen.style.display = 'block';
+  hideQuizUI();
+  resultsScreen.style.display = 'none';
+  showWeakBanner();
+}
+
+document.getElementById('mode-30').addEventListener('click', () => startMode('batch'));
+document.getElementById('mode-lightning').addEventListener('click', () => startMode('lightning'));
+
+function startMode(mode) {
+  sessionMode = mode;
+  modeScreen.style.display = 'none';
+  showQuizUI(mode);
+  if (mode === 'batch') {
+    buildBatch();
+  } else {
+    lightningStats = {total:0, correct:0, wrong:0};
+    updateLightningStats();
+    loadNextQuestion();
+  }
+}
+
+// =====================================================================
+//  WEAK AREAS BANNER
+// =====================================================================
+function showWeakBanner() {
+  if (!userData || !userData.wrongObjectives) { weakBanner.classList.remove('show'); return; }
+  const entries = Object.entries(userData.wrongObjectives).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  if (!entries.length) { weakBanner.classList.remove('show'); return; }
+  const text = entries.map(([obj,count])=>`${OBJECTIVES[obj]||obj} (${count} wrong)`).join(' · ');
+  document.getElementById('weak-areas-text').textContent = text;
+  weakBanner.classList.add('show');
+}
+
+// =====================================================================
+//  UI SHOW/HIDE HELPERS
+// =====================================================================
+function showQuizUI(mode) {
+  statsBar.style.display = 'flex';
+  domainFilters.style.display = 'flex';
+  progressWrap.style.display = mode === 'batch' ? 'block' : 'none';
+  weakBanner.classList.remove('show');
+}
+
+function hideQuizUI() {
+  statsBar.style.display = 'none';
+  domainFilters.style.display = 'none';
+  progressWrap.style.display = 'none';
+  quizCard.style.display = 'none';
+  loadingEl.style.display = 'none';
+  weakBanner.classList.remove('show');
+}
+
+// =====================================================================
+//  DOMAIN CHIPS
+// =====================================================================
+document.querySelectorAll('.chip-btn').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const d = parseInt(chip.dataset.domain);
+    if (activeDomains.has(d)) {
+      if (activeDomains.size > 1) { activeDomains.delete(d); chip.classList.add('inactive'); }
+    } else { activeDomains.add(d); chip.classList.remove('inactive'); }
+  });
+});
+
+// =====================================================================
+//  BATCH MODE
+// =====================================================================
+function buildBatch() {
+  batchIndex = 0;
+  batchResults = [];
+
+  // Pool filtered by active domains
+  let pool = LOCAL_QUESTIONS.filter(q => activeDomains.has(q.domain));
+
+  // Sort: unanswered or answered-wrong first, then answered-correct last
+  const wrongs = userData.wrongObjectives || {};
+  const answeredMap = userData.answered || {};
+
+  pool.sort((a, b) => {
+    const aAnswered = answeredMap[a.id] !== undefined;
+    const bAnswered = answeredMap[b.id] !== undefined;
+    const aWrong = (wrongs[a.obj] || 0);
+    const bWrong = (wrongs[b.obj] || 0);
+    if (!aAnswered && bAnswered) return -1;
+    if (aAnswered && !bAnswered) return 1;
+    return bWrong - aWrong; // prioritise weak objectives
+  });
+
+  // Shuffle within priority groups then take 30
+  const unanswered = pool.filter(q => answeredMap[q.id] === undefined);
+  const answeredQ  = pool.filter(q => answeredMap[q.id] !== undefined);
+  shuffle(unanswered); shuffle(answeredQ);
+  const combined = [...unanswered, ...answeredQ];
+  batchQuestions = combined.slice(0, 30);
+
+  if (!batchQuestions.length) {
+    loadingEl.style.display = 'block';
+    loadingEl.innerHTML = '<p>No questions available for selected domains.</p>';
+    return;
+  }
+
+  renderBatchQuestion();
+}
+
+function renderBatchQuestion() {
+  if (batchIndex >= batchQuestions.length) { showResults(); return; }
+  answered = false;
+  selectedMulti = new Set();
+  submitMulti.disabled = false;
+  const q = batchQuestions[batchIndex];
+  updateBatchProgress();
+  renderQuestion(q);
+}
+
+function updateBatchProgress() {
+  const pct = Math.round((batchIndex / batchQuestions.length) * 100);
+  progressBar.style.width = pct + '%';
+  progressText.textContent = `Question ${batchIndex + 1} of ${batchQuestions.length}`;
+  qNumber.textContent = `Q${batchIndex + 1} of ${batchQuestions.length}`;
+  statQ.textContent = batchIndex;
+  const correct = batchResults.filter(r=>r.correct).length;
+  const wrong = batchResults.filter(r=>!r.correct).length;
+  statCorrect.textContent = correct;
+  statWrong.textContent = wrong;
+  const pctScore = batchIndex > 0 ? Math.round((correct/batchIndex)*100) : 0;
+  statPct.textContent = batchIndex > 0 ? pctScore+'%' : '—';
+  statPct.style.color = pctScore >= 70 ? '#4caf50' : pctScore >= 50 ? '#f6c14e' : '#e74c3c';
+}
+
+// =====================================================================
+//  LIGHTNING MODE STATS
+// =====================================================================
+function updateLightningStats() {
+  statQ.textContent = lightningStats.total;
+  statCorrect.textContent = lightningStats.correct;
+  statWrong.textContent = lightningStats.wrong;
+  const pct = lightningStats.total > 0 ? Math.round((lightningStats.correct/lightningStats.total)*100) : 0;
+  statPct.textContent = lightningStats.total > 0 ? pct+'%' : '—';
+  statPct.style.color = pct >= 70 ? '#4caf50' : pct >= 50 ? '#f6c14e' : '#e74c3c';
+  qNumber.textContent = `⚡ Lightning Round — Question ${lightningStats.total + 1}`;
+}
+
+// =====================================================================
+//  QUESTION RENDER
+// =====================================================================
+function renderQuestion(q) {
+  answered = false;
+  selectedMulti = new Set();
+  currentQ = q;
+
+  loadingEl.style.display = 'none';
+  quizCard.style.display = 'block';
+
+  qDomainEl.textContent = DOMAINS[q.domain] || `Domain ${q.domain}`;
+  multiBadge.style.display = q.multi ? 'inline-block' : 'none';
+  qTextEl.textContent = q.q;
+  resultMsg.className = 'result-msg';
+  resultMsg.textContent = '';
+  expEl.innerHTML = '';
+  expEl.classList.remove('show');
+  nextBtn.classList.remove('show');
+  // Always fully reset the submit button state
+  submitMulti.classList.remove('show');
+  submitMulti.disabled = false;
+  submitMulti.textContent = 'Submit Answer';
+  optionsEl.innerHTML = '';
+
+  if (sessionMode === 'lightning') updateLightningStats();
+
+  if (q.multi) {
+    renderMultiOptions(q);
+    submitMulti.classList.add('show');
+  } else {
+    renderSingleOptions(q);
+  }
+}
+
+function renderSingleOptions(q) {
+  const indices = [0,1,2,3];
+  const shuffled = [...indices].sort(()=>Math.random()-.5);
+  const newCorrectPos = shuffled.indexOf(q.correct);
+  q._shuffled = shuffled;
+  q._shuffledCorrect = newCorrectPos;
+
+  shuffled.forEach((origIdx, pos) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-check"></span><span>${String.fromCharCode(65+pos)}. ${q.opts[origIdx]}</span>`;
+    btn.dataset.orig = origIdx; btn.dataset.pos = pos;
+    btn.addEventListener('click', () => handleSingleAnswer(pos, newCorrectPos, shuffled, q));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function renderMultiOptions(q) {
+  const indices = [0,1,2,3];
+  const shuffled = [...indices].sort(()=>Math.random()-.5);
+  q._shuffled = shuffled;
+
+  shuffled.forEach((origIdx, pos) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-check"></span><span>${String.fromCharCode(65+pos)}. ${q.opts[origIdx]}</span>`;
+    btn.dataset.orig = origIdx; btn.dataset.pos = pos;
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      if (selectedMulti.has(pos)) {
+        selectedMulti.delete(pos);
+        btn.classList.remove('selected');
+        btn.querySelector('.opt-check').textContent = '';
+      } else {
+        selectedMulti.add(pos);
+        btn.classList.add('selected');
+        btn.querySelector('.opt-check').textContent = '✓';
+      }
+    });
+    optionsEl.appendChild(btn);
+  });
+}
+
+// =====================================================================
+//  ANSWER HANDLING
+// =====================================================================
+function handleSingleAnswer(chosenPos, correctPos, shuffled, q) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = chosenPos === correctPos;
+  const allBtns = optionsEl.querySelectorAll('.option-btn');
+
+  allBtns.forEach((btn, pos) => {
+    btn.disabled = true;
+    if (pos === correctPos) btn.classList.add('correct');
+    else if (pos === chosenPos && !isCorrect) btn.classList.add('wrong');
+    else btn.classList.add('revealed');
+  });
+
+  showResult(isCorrect ? 'correct' : 'wrong', isCorrect ? '✅ Correct!' : '❌ Incorrect!');
+  buildExplanations(q, shuffled, isCorrect ? null : chosenPos, correctPos, false);
+  recordAnswer(q, isCorrect);
+}
+
+submitMulti.addEventListener('click', () => {
+  if (answered || submitMulti.disabled || !currentQ || !currentQ.multi) return;
+  if (selectedMulti.size === 0) {
+    submitMulti.style.outline = '3px solid var(--wrong)';
+    setTimeout(() => { submitMulti.style.outline = ''; }, 800);
+    return;
+  }
+  answered = true;
+  submitMulti.disabled = true;
+
+  const q = currentQ;
+  const shuffled = q._shuffled;
+  // Map selected shuffled positions back to original indices
+  const selectedOriginals = new Set([...selectedMulti].map(pos => shuffled[pos]));
+  const correctOriginals = new Set(q.correct);
+
+  const isFullyCorrect = selectedOriginals.size === correctOriginals.size &&
+    [...selectedOriginals].every(v => correctOriginals.has(v));
+  const isPartial = [...selectedOriginals].some(v => correctOriginals.has(v)) && !isFullyCorrect;
+
+  const allBtns = optionsEl.querySelectorAll('.option-btn');
+  allBtns.forEach((btn, pos) => {
+    btn.disabled = true;
+    const origIdx = shuffled[pos];
+    if (correctOriginals.has(origIdx)) {
+      btn.classList.add(selectedOriginals.has(origIdx) ? 'correct' : 'missed');
+    } else if (selectedOriginals.has(origIdx)) {
+      btn.classList.add('wrong');
+    } else {
+      btn.classList.add('revealed');
+    }
+  });
+
+  let type = isFullyCorrect ? 'correct' : isPartial ? 'partial' : 'wrong';
+  let msg = isFullyCorrect ? '✅ Correct! All correct options selected.' :
+            isPartial ? '⚠️ Partial — you missed some correct answers.' :
+            '❌ Incorrect!';
+  showResult(type, msg);
+  buildExplanations(q, shuffled, null, null, true);
+  recordAnswer(q, isFullyCorrect);
+});
+
+function showResult(type, msg) {
+  resultMsg.className = `result-msg show ${type}-msg`;
+  resultMsg.textContent = msg;
+  nextBtn.classList.add('show');
+}
+
+function buildExplanations(q, shuffled, wrongPos, correctPos, isMulti) {
+  expEl.innerHTML = '';
+  shuffled.forEach((origIdx, pos) => {
+    const div = document.createElement('div');
+    let isCor = isMulti ? q.correct.includes(origIdx) : pos === correctPos;
+    div.className = `exp-item ${isCor ? 'correct-exp' : 'wrong-exp'}`;
+    div.innerHTML = `<strong>${String.fromCharCode(65+pos)}. ${q.opts[origIdx]} — ${isCor ? '✅ Correct' : '❌ Incorrect'}</strong>${q.exps[origIdx]}`;
+    expEl.appendChild(div);
+  });
+  expEl.classList.add('show');
+}
+
+function recordAnswer(q, isCorrect) {
+  // Update user data
+  if (!userData.answered) userData.answered = {};
+  userData.answered[q.id] = isCorrect ? 'correct' : 'wrong';
+
+  if (!isCorrect) {
+    if (!userData.wrongObjectives) userData.wrongObjectives = {};
+    userData.wrongObjectives[q.obj] = (userData.wrongObjectives[q.obj] || 0) + 1;
+  }
+  saveUserData(currentUser, userData);
+
+  // Batch tracking
+  if (sessionMode === 'batch') {
+    batchResults.push({ q, correct: isCorrect });
+    updateBatchProgress();
+  } else {
+    if (isCorrect) lightningStats.correct++; else lightningStats.wrong++;
+    lightningStats.total++;
+    updateLightningStats();
+  }
+}
+
+// =====================================================================
+//  NEXT BUTTON
+// =====================================================================
+nextBtn.addEventListener('click', () => {
+  if (sessionMode === 'batch') {
+    batchIndex++;
+    if (batchIndex >= batchQuestions.length) { showResults(); return; }
+    renderBatchQuestion();
+  } else {
+    loadNextQuestion();
+  }
+});
+
+// =====================================================================
+//  LIGHTNING QUESTION LOADER
+// =====================================================================
+let recentLightningIds = [];
+
+async function loadNextQuestion() {
+  answered = false;
+  selectedMulti = new Set();
+  submitMulti.disabled = false;
+  quizCard.style.display = 'none';
+  loadingEl.style.display = 'block';
+  loadingEl.innerHTML = '<div class="spinner"></div><div>Loading question…</div>';
+
+  let q = null;
+  if (lightningStats.total > 0 && lightningStats.total % 5 === 0 && Math.random() < 0.5) {
+    q = await fetchAIQuestion();
+  }
+  if (!q) q = pickLocalLightningQuestion();
+  if (!q) { loadingEl.innerHTML = '<p>No domains selected. Enable at least one above.</p>'; return; }
+  loadingEl.style.display = 'none';
+  renderQuestion(q);
+}
+
+function pickLocalLightningQuestion() {
+  const pool = LOCAL_QUESTIONS.filter(q => activeDomains.has(q.domain));
+  if (!pool.length) return null;
+  const avoidN = Math.min(recentLightningIds.length, Math.floor(pool.length/2));
+  const recent = recentLightningIds.slice(-avoidN);
+  let candidates = pool.filter(q => !recent.includes(q.id));
+  if (!candidates.length) candidates = pool;
+  const q = candidates[Math.floor(Math.random()*candidates.length)];
+  recentLightningIds.push(q.id);
+  if (recentLightningIds.length > 40) recentLightningIds.shift();
+  return q;
+}
+
+async function fetchAIQuestion() {
+  const domainList = [...activeDomains].map(d=>DOMAINS[d]).join(', ');
+  const recentObjs = Object.entries(userData.wrongObjectives||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]).join(', ');
+  const focusHint = recentObjs ? `Focus on objectives: ${recentObjs}.` : '';
+  const prompt = `You are a CompTIA A+ Core 2 (220-1202) V15 exam question writer. ${focusHint} Generate ONE unique multiple-choice question from these domains: ${domainList}.
+
+Return ONLY valid JSON with no markdown, exactly this structure:
+{"domain":<1-4>,"obj":"<e.g. 2.4>","q":"<question>","opts":["<A>","<B>","<C>","<D>"],"correct":<0-3>,"exps":["<why A>","<why B>","<why C>","<why D>"]}
+
+Rules: Realistic CompTIA A+ Core 2 style. One correct answer. Each explanation clearly states why that option is correct or incorrect.`;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const text = data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const p = JSON.parse(text);
+    if (!p.q||!Array.isArray(p.opts)||p.opts.length!==4||typeof p.correct!=='number'||!Array.isArray(p.exps)||p.exps.length!==4) throw new Error();
+    p.id = 'ai_'+Date.now(); p.multi = false;
+    return p;
+  } catch { return null; }
+}
+
+// =====================================================================
+//  RESULTS SCREEN (BATCH)
+// =====================================================================
+function showResults() {
+  quizCard.style.display = 'none';
+  loadingEl.style.display = 'none';
+  progressWrap.style.display = 'none';
+
+  const total = batchResults.length;
+  const correct = batchResults.filter(r=>r.correct).length;
+  const wrong = total - correct;
+  const pct = total > 0 ? Math.round((correct/total)*100) : 0;
+  const pass = pct >= 70;
+
+  // Circle
+  const circle = document.getElementById('result-circle');
+  circle.textContent = pct+'%';
+  circle.style.borderColor = pass ? '#4caf50' : pct>=50 ? '#f6c14e' : '#e74c3c';
+  circle.style.color = pass ? '#4caf50' : pct>=50 ? '#e65100' : '#e74c3c';
+
+  // Summary table
+  const summary = document.getElementById('score-summary');
+  summary.innerHTML = `
+    <div class="score-row"><span>Questions Answered</span><span>${total}</span></div>
+    <div class="score-row"><span>✅ Correct</span><span style="color:#4caf50">${correct}</span></div>
+    <div class="score-row"><span>❌ Wrong</span><span style="color:#e74c3c">${wrong}</span></div>
+    <div class="score-row"><span>Score</span><span>${correct}/${total} — ${pct}%</span></div>
+    <div class="score-row"><span>Status</span><span style="color:${pass?'#4caf50':'#e74c3c'};font-weight:700">${pass?'✅ PASS (70%+ threshold)':'❌ BELOW PASS MARK (70%)'}</span></div>
+  `;
+
+  // Improvement breakdown by objective
+  const objResults = {}; // obj -> {correct, wrong, questions}
+  batchResults.forEach(r => {
+    const obj = r.q.obj || 'unknown';
+    if (!objResults[obj]) objResults[obj] = {correct:0,wrong:0,qs:[]};
+    if (r.correct) objResults[obj].correct++; else { objResults[obj].wrong++; objResults[obj].qs.push(r.q.q.substring(0,80)+'…'); }
+  });
+
+  const improveContent = document.getElementById('improve-content');
+  improveContent.innerHTML = '';
+
+  // Sort: worst first
+  const sorted = Object.entries(objResults).sort((a,b)=>b[1].wrong-a[1].wrong);
+  if (!sorted.length) {
+    improveContent.innerHTML = '<p>No data yet.</p>';
+  } else {
+    sorted.forEach(([obj, data]) => {
+      const total = data.correct + data.wrong;
+      const pctObj = Math.round((data.correct/total)*100);
+      const isGood = pctObj >= 70;
+      const div = document.createElement('div');
+      div.className = `improve-item ${isGood ? 'improve-ok' : ''}`;
+      div.innerHTML = `
+        <strong>${obj} — ${OBJECTIVES[obj]||obj} &nbsp; <span style="color:${isGood?'#4caf50':'#e74c3c'}">${pctObj}% (${data.correct}/${total})</span></strong>
+        ${!isGood && data.qs.length ? `<span style="opacity:.8;font-size:.82rem">Missed topics:<br>` + data.qs.map(q=>`• ${q}`).join('<br>') + '</span>' : ''}
+        ${isGood ? '<span style="opacity:.7">Good work — keep it up!</span>' : '<span style="opacity:.7">Review this objective and retry.</span>'}
+      `;
+      improveContent.appendChild(div);
+    });
+  }
+
+  resultsScreen.style.display = 'block';
+  statsBar.style.display = 'none';
+  domainFilters.style.display = 'none';
+  weakBanner.classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('new-batch-btn').addEventListener('click', () => {
+  resultsScreen.style.display = 'none';
+  showQuizUI('batch');
+  buildBatch();
+});
+document.getElementById('results-lightning-btn').addEventListener('click', () => {
+  resultsScreen.style.display = 'none';
+  startMode('lightning');
+});
+document.getElementById('results-home-btn').addEventListener('click', () => {
+  resultsScreen.style.display = 'none';
+  showModeScreen();
+});
+
+// =====================================================================
+//  NAV
+// =====================================================================
+document.getElementById('restart-link').addEventListener('click', e => {
+  e.preventDefault();
+  if (sessionMode === 'batch') { resultsScreen.style.display='none'; showQuizUI('batch'); buildBatch(); }
+  else { lightningStats={total:0,correct:0,wrong:0}; updateLightningStats(); loadNextQuestion(); }
+});
+document.getElementById('lightning-link').addEventListener('click', e => {
+  e.preventDefault();
+  resultsScreen.style.display = 'none';
+  startMode('lightning');
+});
+document.getElementById('home-link').addEventListener('click', e => {
+  e.preventDefault();
+  resultsScreen.style.display = 'none';
+  showModeScreen();
+});
+document.getElementById('logout-link').addEventListener('click', e => {
+  e.preventDefault();
+  currentUser = null; userData = null; sessionMode = null;
+  hideQuizUI();
+  resultsScreen.style.display = 'none';
+  modeScreen.style.display = 'none';
+  weakBanner.classList.remove('show');
+  loginScreen.style.display = 'block';
+  switchTab('login');
+  // Clear auth fields
+  ['login-username','login-password','signup-email','signup-username','signup-password','forgot-email'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+});
+
+// =====================================================================
+//  UTILS
+// =====================================================================
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+</script>
+</body>
+</html>
