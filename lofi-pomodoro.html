@@ -473,7 +473,7 @@ const STREAMS = [
   { name:'lofi hip hop radio ☁️', url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
   { name:'plaza lofi 🌸',           url:'https://radio.plaza.one/mp3' },
   { name:'retrowave 🏎️',      url:'https://stream.nightride.fm/nightride.mp3' },
-  { name:'ambient rain 🌧️',   url:'https://orangefreesounds.com/wp-content/uploads/2024/09/Loop-rain-sound.mp3' },
+  { name:'ambient rain 🌧️',   url:'https://orangefreesounds.com/wp-content/uploads/2024/09/Loop-rain-sound.mp3', loop:true },
 ];
 let streamIdx = 0;
 
@@ -498,6 +498,8 @@ function getAudio() {
     audio.volume = vol;
     audio.onerror = () => { setStatus('stream error…'); };
   }
+  // rain MP3 is short (~30s) so must loop; streams run continuously
+  audio.loop = STREAMS[streamIdx].loop === true;
   return audio;
 }
 // ── rain synth state ──────────────────────────────────────
@@ -658,10 +660,7 @@ function updateRainVolume() {
   if (rainMaster) rainMaster.gain.value = vol * 0.85;
 }
 
-function isRain() { return STREAMS[streamIdx].url === '__RAIN__'; }
-
 function tryPlay() {
-  if (isRain()) { startRain(); return; }
   stopRain();
   const a = getAudio();
   a.src = STREAMS[streamIdx].url;
@@ -672,7 +671,7 @@ function tryPlay() {
     .catch(() => { setMusicUI(false); setStatus('blocked — open as local file ✿'); });
 }
 function pauseAudio() {
-  if (isRain()) { stopRain(); setMusicUI(false); return; }
+  stopRain();
   if (audio) audio.pause(); setMusicUI(false);
 }
 function setMusicUI(on) {
