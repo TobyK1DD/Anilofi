@@ -37,7 +37,7 @@ header{background:var(--bg);text-align:center;font-size:1.9rem;font-family:monos
 header small{display:block;font-size:.95rem;font-family:"Sour Gummy",sans-serif;opacity:.7;margin-top:2px;color:var(--text)}
 
 /* ---- NAV ---- */
-#navigation{width:100%;background:var(--bg);text-align:center;padding:6px 0}
+#navigation{width:100%;background:var(--bg);text-align:center;padding:6px 0;display:none}
 .links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:4px 0}
 button,.links a,.Button{font-family:"Sour Gummy",sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:8px 16px;border-radius:8px;text-decoration:none;cursor:pointer;transition:all .25s}
 button:hover,.links a:hover,.Button:hover{background:var(--bg);color:var(--text)}
@@ -198,6 +198,32 @@ footer{background:var(--bg);color:var(--text);text-align:center;margin-top:20px;
 .exam-badge.c1{background:#4caf50;color:#fff}
 .exam-badge.c2{background:#2196f3;color:#fff}
 
+
+#practice-timer-wrap{display:none;max-width:760px;margin:0 auto 10px;background:var(--bg-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 18px;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+#practice-timer-wrap.show{display:flex}
+#practice-timer-display{font-size:1.6rem;font-weight:700;font-family:monospace;letter-spacing:2px;transition:color .3s}
+#practice-timer-display.warn{color:#f6c14e}
+#practice-timer-display.danger{color:#e74c3c;animation:ptpulse .8s infinite}
+@keyframes ptpulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pt-label{font-size:.78rem;opacity:.65;margin-bottom:2px}
+.pt-right{text-align:right}
+.pt-qcount{font-size:.95rem;font-weight:600}
+#practice-results{max-width:760px;margin:0 auto 30px}
+#practice-results h2{text-align:center;font-size:1.45rem;margin-bottom:16px}
+.pr-circle-wrap{text-align:center;margin-bottom:20px}
+.pr-circle{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:140px;height:140px;border-radius:50%;border:6px solid var(--primary);font-weight:700;background:var(--bg-soft);box-shadow:var(--card-shadow);gap:2px}
+.pr-circle .pr-pct{font-size:2.1rem;line-height:1}
+.pr-circle .pr-scaled{font-size:.82rem;opacity:.72;font-weight:400}
+.pr-tbl{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:var(--card-shadow)}
+.pr-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--accent);font-size:.92rem}
+.pr-row:last-child{border-bottom:none;font-weight:700}
+.pr-breakdown{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:var(--card-shadow)}
+.pr-breakdown h3{font-size:1.05rem;margin-bottom:11px}
+.pr-domain{border-radius:8px;padding:10px 13px;margin-bottom:8px;font-size:.86rem}
+.pr-domain.bad{background:var(--wrexp-bg);border:1px solid var(--wrexp-border)}
+.pr-domain.good{background:var(--exp-bg);border:1px solid var(--exp-border)}
+.pr-domain strong{display:block;margin-bottom:3px}
+.pr-btns{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 </style>
 </head>
 <body>
@@ -211,7 +237,7 @@ footer{background:var(--bg);color:var(--text);text-align:center;margin-top:20px;
 
 <div id="navigation">
   <div class="links">
-    <a href="/TobyK1DD/index.html">🏠 Home</a>
+    <a href="#" id="home-link">🏠 Home</a>
     <a href="#" id="restart-link">🔄 Restart</a>
     <a href="#" id="lightning-link">⚡ Lightning Round</a>
     <a href="#" id="logout-link">👤 Switch User</a>
@@ -293,6 +319,12 @@ footer{background:var(--bg);color:var(--text);text-align:center;margin-top:20px;
   <div id="mode-screen" style="display:none">
     <h2 id="mode-welcome">Welcome! Choose your session type:</h2>
     <div class="mode-cards">
+      <div class="mode-card" id="mode-practice">
+        <div class="icon">🎯</div>
+        <h3>Practice Exam</h3>
+        <p>90 questions · 90 minutes · timed from the moment you start. Simulates the real CompTIA exam.</p>
+        <div style="margin-top:8px;display:inline-block;background:var(--primary);color:#fff;border-radius:6px;padding:3px 10px;font-size:.73rem;font-weight:700;">Exam Simulation</div>
+      </div>
       <div class="mode-card" id="mode-30">
         <div class="icon">📋</div>
         <h3>30-Question Batch</h3>
@@ -310,6 +342,39 @@ footer{background:var(--bg);color:var(--text);text-align:center;margin-top:20px;
   <div class="weak-banner" id="weak-banner">
     <strong>📌 Focus Areas Based on Your History:</strong>
     <span id="weak-areas-text"></span>
+  </div>
+
+
+  <!-- PRACTICE TIMER -->
+  <div id="practice-timer-wrap">
+    <div>
+      <div class="pt-label">⏱ Time Remaining</div>
+      <div id="practice-timer-display">90:00</div>
+    </div>
+    <div class="pt-right">
+      <div class="pt-label">Question</div>
+      <div class="pt-qcount" id="pt-qcount">1 / 90</div>
+    </div>
+  </div>
+
+  <!-- PRACTICE RESULTS -->
+  <div id="practice-results" style="display:none">
+    <h2>🎯 Practice Exam Results</h2>
+    <div class="pr-circle-wrap">
+      <div class="pr-circle" id="pr-circle">
+        <span class="pr-pct" id="pr-pct">—</span>
+        <span class="pr-scaled" id="pr-scaled">— / 900</span>
+      </div>
+    </div>
+    <div class="pr-tbl" id="pr-tbl"></div>
+    <div class="pr-breakdown">
+      <h3>📌 Domain Breakdown</h3>
+      <div id="pr-domains"></div>
+    </div>
+    <div class="pr-btns">
+      <div class="btn" onclick="startMode('practice')">🔄 Retake Exam</div>
+      <div class="btn" onclick="showModeScreen()">🏠 Choose Mode</div>
+    </div>
   </div>
 
   <!-- STATS BAR -->
@@ -858,6 +923,9 @@ let lightningStats = {total:0, correct:0, wrong:0};
 let answered = false;
 let currentQ = null;
 let selectedMulti = new Set();
+// Practice exam
+let practiceQs = [], practiceIdx = 0, practiceResults = [];
+let practiceTimer = null, practiceSecsLeft = 5400;
 
 // =====================================================================
 //  DOM REFS
@@ -991,6 +1059,7 @@ function startSession(username, displayName, isGuest=false) {
   userData.totalSessions = (userData.totalSessions || 0) + 1;
   if (!isGuest) saveUserData(currentUser, userData);
   loginScreen.style.display = 'none';
+  document.getElementById('navigation').style.display = 'block';
   showExamPicker(displayName, isGuest);
 }
 
@@ -1077,16 +1146,23 @@ function showModeScreen() {
   showWeakBanner();
 }
 
+document.getElementById('mode-practice').addEventListener('click', () => startMode('practice'));
 document.getElementById('mode-30').addEventListener('click', () => startMode('batch'));
 document.getElementById('mode-lightning').addEventListener('click', () => startMode('lightning'));
 
 function startMode(mode) {
   sessionMode = mode;
   modeScreen.style.display = 'none';
-  showQuizUI(mode);
-  if (mode === 'batch') {
+  var pr = document.getElementById('practice-results');
+  if (pr) pr.style.display = 'none';
+  if (mode === 'practice') {
+    showQuizUI('practice');
+    buildPracticeExam();
+  } else if (mode === 'batch') {
+    showQuizUI('batch');
     buildBatch();
   } else {
+    showQuizUI('lightning');
     lightningStats = {total:0, correct:0, wrong:0};
     updateLightningStats();
     loadNextQuestion();
@@ -1110,9 +1186,10 @@ function showWeakBanner() {
 //  UI SHOW/HIDE HELPERS
 // =====================================================================
 function showQuizUI(mode) {
-  statsBar.style.display = 'flex';
+  statsBar.style.display = mode === 'practice' ? 'none' : 'flex';
   domainFilters.style.display = 'flex';
   progressWrap.style.display = mode === 'batch' ? 'block' : 'none';
+  document.getElementById('practice-timer-wrap').classList.toggle('show', mode === 'practice');
   weakBanner.classList.remove('show');
 }
 
@@ -1123,6 +1200,11 @@ function hideQuizUI() {
   quizCard.style.display = 'none';
   loadingEl.style.display = 'none';
   weakBanner.classList.remove('show');
+  document.getElementById('practice-timer-wrap').classList.remove('show');
+  if (sessionMode !== 'practice' && sessionMode !== 'done') {
+    document.getElementById('practice-results').style.display = 'none';
+  }
+  stopPracticeTimer();
 }
 
 // =====================================================================
@@ -1367,6 +1449,7 @@ function buildExplanations(q, shuffled, wrongPos, correctPos, isMulti) {
 }
 
 function recordAnswer(q, isCorrect) {
+  if (sessionMode === 'practice') { recordPracticeAnswer(q, isCorrect); return; }
   // Update user data
   if (!userData.answered) userData.answered = {};
   userData.answered[q.id] = isCorrect ? 'correct' : 'wrong';
@@ -1392,7 +1475,11 @@ function recordAnswer(q, isCorrect) {
 //  NEXT BUTTON
 // =====================================================================
 nextBtn.addEventListener('click', () => {
-  if (sessionMode === 'batch') {
+  if (sessionMode === 'practice') {
+    practiceIdx++;
+    if (practiceIdx >= practiceQs.length) { showPracticeResults(); return; }
+    renderPracticeQ();
+  } else if (sessionMode === 'batch') {
     batchIndex++;
     if (batchIndex >= batchQuestions.length) { showResults(); return; }
     renderBatchQuestion();
@@ -1574,6 +1661,7 @@ document.getElementById('logout-link').addEventListener('click', e => {
   resultsScreen.style.display = 'none';
   modeScreen.style.display = 'none';
   weakBanner.classList.remove('show');
+  document.getElementById('navigation').style.display = 'none';
   loginScreen.style.display = 'block';
   switchTab('login');
   // Clear auth fields
@@ -1589,6 +1677,172 @@ function shuffle(arr) {
   for (let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
   return arr;
 }
+
+// =====================================================================
+//  PRACTICE EXAM FUNCTIONS
+// =====================================================================
+function stopPracticeTimer() {
+  if (practiceTimer) { clearInterval(practiceTimer); practiceTimer = null; }
+}
+
+function buildPracticeExam() {
+  practiceIdx = 0;
+  practiceResults = [];
+  practiceSecsLeft = 5400;
+  let pool = getActiveBank().filter(q => activeDomains.has(q.domain));
+  shuffle(pool);
+  practiceQs = pool.slice(0, 90);
+  if (!practiceQs.length) {
+    loadingEl.style.display = 'block';
+    loadingEl.innerHTML = '<p>No questions available.</p>';
+    return;
+  }
+  startPracticeTimer();
+  renderPracticeQ();
+}
+
+function renderPracticeQ() {
+  document.getElementById('pt-qcount').textContent = (practiceIdx + 1) + ' / ' + practiceQs.length;
+  qNumber.textContent = 'Q' + (practiceIdx + 1) + ' of ' + practiceQs.length;
+  renderQuestion(practiceQs[practiceIdx]);
+}
+
+function startPracticeTimer() {
+  stopPracticeTimer();
+  updateTimerDisplay();
+  practiceTimer = setInterval(function() {
+    practiceSecsLeft--;
+    updateTimerDisplay();
+    if (practiceSecsLeft <= 0) { stopPracticeTimer(); showPracticeResults(true); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  var el = document.getElementById('practice-timer-display');
+  var m = Math.floor(practiceSecsLeft / 60);
+  var s = practiceSecsLeft % 60;
+  el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  el.className = '';
+  if (practiceSecsLeft <= 300 && practiceSecsLeft > 60) el.className = 'warn';
+  if (practiceSecsLeft <= 60) el.className = 'danger';
+}
+
+function recordPracticeAnswer(q, isCorrect) {
+  practiceResults.push({ q: q, correct: isCorrect });
+  if (userData) {
+    if (!userData.answered) userData.answered = {};
+    userData.answered[q.id] = isCorrect ? 'correct' : 'wrong';
+    if (!isCorrect) {
+      if (!userData.wrongObjectives) userData.wrongObjectives = {};
+      userData.wrongObjectives[q.obj] = (userData.wrongObjectives[q.obj] || 0) + 1;
+    }
+    if (currentUser && !isGuestSession) saveUserData(currentUser, userData);
+  }
+  document.getElementById('pt-qcount').textContent = (practiceIdx + 1) + ' / ' + practiceQs.length;
+}
+
+function showPracticeResults(timeUp) {
+  // Stop timer and clear all quiz UI
+  stopPracticeTimer();
+  sessionMode = 'done'; // prevent any hideQuizUI from hiding results
+
+  var el = document.getElementById('quiz-card');
+  if (el) el.style.display = 'none';
+  var el2 = document.getElementById('loading');
+  if (el2) el2.style.display = 'none';
+  var el3 = document.getElementById('stats-bar');
+  if (el3) el3.style.display = 'none';
+  var el4 = document.getElementById('domain-filters');
+  if (el4) el4.style.display = 'none';
+  var el5 = document.getElementById('progress-wrap');
+  if (el5) el5.style.display = 'none';
+  var el6 = document.getElementById('practice-timer-wrap');
+  if (el6) el6.classList.remove('show');
+  var el7 = document.getElementById('weak-banner');
+  if (el7) el7.classList.remove('show');
+
+  // Calculate scores
+  var answered = practiceResults.length;
+  var total = practiceQs.length;
+  var correct = 0;
+  for (var i = 0; i < practiceResults.length; i++) {
+    if (practiceResults[i].correct) correct++;
+  }
+  var wrong = answered - correct;
+  var skipped = total - answered;
+  var pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  var scaled = 100 + Math.round((correct / (total || 1)) * 800);
+  var pass = scaled >= 700;
+  var usedSecs = 5400 - practiceSecsLeft;
+  var usedMins = Math.floor(usedSecs / 60);
+  var usedSecR = usedSecs % 60;
+  var timeStr = timeUp ? 'Time expired' : (usedMins + 'm ' + usedSecR + 's');
+
+  // Fill score circle
+  var pctEl = document.getElementById('pr-pct');
+  if (pctEl) { pctEl.textContent = pct + '%'; pctEl.style.color = pass ? '#4caf50' : '#e74c3c'; }
+  var scEl = document.getElementById('pr-scaled');
+  if (scEl) scEl.textContent = scaled + ' / 900';
+  var circ = document.getElementById('pr-circle');
+  if (circ) circ.style.borderColor = pass ? '#4caf50' : '#e74c3c';
+
+  // Fill summary table
+  var tbl = document.getElementById('pr-tbl');
+  if (tbl) {
+    tbl.innerHTML =
+      '<div class="pr-row"><span>Questions Answered</span><span>' + answered + ' / ' + total + '</span></div>' +
+      (skipped > 0 ? '<div class="pr-row"><span>⏭ Not Reached</span><span>' + skipped + '</span></div>' : '') +
+      '<div class="pr-row"><span>✅ Correct</span><span style="color:#4caf50">' + correct + '</span></div>' +
+      '<div class="pr-row"><span>❌ Incorrect</span><span style="color:#e74c3c">' + wrong + '</span></div>' +
+      '<div class="pr-row"><span>⏱ Time Used</span><span>' + timeStr + '</span></div>' +
+      '<div class="pr-row"><span>Scaled Score</span><span style="font-weight:700">' + scaled + ' / 900</span></div>' +
+      '<div class="pr-row"><span>Pass Mark</span><span>700 / 900</span></div>' +
+      '<div class="pr-row"><span>Result</span><span style="color:' + (pass ? '#4caf50' : '#e74c3c') + ';font-weight:700">' + (pass ? '✅ PASS' : '❌ FAIL') + '</span></div>';
+  }
+
+  // Fill domain breakdown - use simple domain numbers to avoid getDomains() errors
+  var domainNames = {1:'1.0 Operating Systems',2:'2.0 Security',3:'3.0 Software Troubleshooting',4:'4.0 Operational Procedures',5:'5.0 Hardware & Network Troubleshooting'};
+  var domMap = {};
+  for (var j = 0; j < practiceResults.length; j++) {
+    var r = practiceResults[j];
+    var dname = domainNames[r.q.domain] || ('Domain ' + r.q.domain);
+    if (!domMap[dname]) domMap[dname] = { ok: 0, no: 0, qs: [] };
+    if (r.correct) { domMap[dname].ok++; }
+    else { domMap[dname].no++; if (r.q.q) domMap[dname].qs.push(r.q.q.substring(0, 75) + '…'); }
+  }
+
+  var ic = document.getElementById('pr-domains');
+  if (ic) {
+    ic.innerHTML = '';
+    if (timeUp) {
+      var wb = document.createElement('div');
+      wb.style.cssText = 'background:var(--wrexp-bg);border:1px solid var(--wrexp-border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.86rem;font-weight:600;text-align:center;color:#b71c1c';
+      wb.textContent = '⏰ Time expired — ' + skipped + ' question' + (skipped !== 1 ? 's' : '') + ' not reached.';
+      ic.appendChild(wb);
+    }
+    var entries = Object.keys(domMap).map(function(k){ return [k, domMap[k]]; });
+    entries.sort(function(a,b){ return b[1].no - a[1].no; });
+    for (var k = 0; k < entries.length; k++) {
+      var dname2 = entries[k][0], d = entries[k][1];
+      var t = d.ok + d.no;
+      var dp = t > 0 ? Math.round((d.ok / t) * 100) : 0;
+      var isGood = dp >= 70;
+      var div = document.createElement('div');
+      div.className = 'pr-domain ' + (isGood ? 'good' : 'bad');
+      div.innerHTML = '<strong>' + dname2 + ' &nbsp;<span style="color:' + (isGood ? '#2e7d32' : '#b71c1c') + '">' + dp + '% (' + d.ok + '/' + t + ')</span></strong>' +
+        (!isGood && d.qs.length ? '<span style="font-size:.8rem;opacity:.8">Missed topics:<br>' + d.qs.map(function(q){ return '• ' + q; }).join('<br>') + '</span>' : '<span style="font-size:.8rem;opacity:.7">Strong area — keep it up!</span>');
+      ic.appendChild(div);
+    }
+  }
+
+  // Show results - directly, no setTimeout
+  var res = document.getElementById('practice-results');
+  if (res) {
+    res.style.display = 'block';
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 </script>
 </body>
 </html>
