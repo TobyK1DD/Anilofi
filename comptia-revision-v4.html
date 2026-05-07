@@ -268,6 +268,58 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
 #srs-status{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
 #srs-status span{display:inline-flex;align-items:center;gap:4px}
 
+/* ========== DASHBOARD ========== */
+#dashboard-screen{display:none;max-width:820px;margin:0 auto 40px}
+#dashboard-screen h2{text-align:center;font-size:1.4rem;margin-bottom:6px}
+.dash-subtitle{text-align:center;font-size:.82rem;opacity:.6;margin-bottom:22px}
+
+/* Stat cards row */
+.dash-cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:22px}
+.dash-card{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;
+  padding:14px 20px;min-width:130px;text-align:center;box-shadow:var(--card-shadow);flex:1}
+.dash-card .dc-val{font-size:2rem;font-weight:700;line-height:1.1}
+.dash-card .dc-lbl{font-size:.74rem;opacity:.65;margin-top:3px}
+.dash-card.streak .dc-val{color:#f6c14e}
+.dash-card.pass .dc-val{color:#4caf50}
+
+/* Section panels */
+.dash-panel{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;
+  padding:16px;margin-bottom:16px;box-shadow:var(--card-shadow)}
+.dash-panel h3{font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+
+/* Score trend */
+#trend-canvas{width:100%;height:140px;display:block}
+
+/* Heatmap */
+.heatmap-wrap{overflow-x:auto}
+.heatmap{display:grid;grid-template-rows:repeat(7,14px);grid-auto-flow:column;
+  gap:3px;width:max-content}
+.hm-cell{width:14px;height:14px;border-radius:3px;background:var(--accent);opacity:.25;
+  position:relative;cursor:default}
+.hm-cell.l1{opacity:.4;background:#4caf50}
+.hm-cell.l2{opacity:.6;background:#4caf50}
+.hm-cell.l3{opacity:.8;background:#4caf50}
+.hm-cell.l4{opacity:1;background:#4caf50}
+.heatmap-legend{display:flex;align-items:center;gap:6px;font-size:.72rem;
+  opacity:.65;margin-top:8px;justify-content:flex-end}
+.hm-leg-cell{width:12px;height:12px;border-radius:2px}
+
+/* Radar chart */
+#radar-canvas{width:100%;max-width:320px;height:260px;display:block;margin:0 auto}
+
+/* Domain bars */
+.dom-bar-row{margin-bottom:10px}
+.dom-bar-label{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:3px}
+.dom-bar-track{height:10px;background:var(--accent);border-radius:5px;overflow:hidden;opacity:.35}
+.dom-bar-fill{height:100%;border-radius:5px;transition:width .6s ease}
+
+/* Exam toggle */
+.dash-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+.dash-tab{padding:6px 18px;border-radius:20px;cursor:pointer;font-size:.85rem;
+  border:2px solid var(--accent);background:transparent;color:var(--text);
+  font-family:"Sour Gummy",sans-serif;transition:all .2s}
+.dash-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
 </style>
 </head>
 <body>
@@ -282,6 +334,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
 <div id="navigation">
   <div class="links">
     <a href="#" id="home-link">🏠 Home</a>
+    <a href="#" id="dashboard-link">📊 Progress</a>
     <a href="#" id="restart-link">🔄 Restart</a>
     <a href="#" id="lightning-link">⚡ Lightning Round</a>
     <a href="#" id="logout-link">👤 Switch User</a>
@@ -381,6 +434,80 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       </div>
     </div>
   </div>
+
+<!-- DASHBOARD SCREEN -->
+  <div id="dashboard-screen">
+    <h2>📊 Your Progress</h2>
+    <p class="dash-subtitle" id="dash-subtitle">Loading your stats…</p>
+
+    <!-- Exam toggle -->
+    <div class="dash-tabs">
+      <button class="dash-tab active" id="dash-tab-c2" onclick="showDash('c2')">Core 2 (220-1202)</button>
+      <button class="dash-tab" id="dash-tab-c1" onclick="showDash('c1')">Core 1 (220-1201)</button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="dash-cards">
+      <div class="dash-card streak">
+        <div class="dc-val" id="dash-streak">0</div>
+        <div class="dc-lbl">🔥 Day Streak</div>
+      </div>
+      <div class="dash-card">
+        <div class="dc-val" id="dash-sessions">0</div>
+        <div class="dc-lbl">📚 Sessions</div>
+      </div>
+      <div class="dash-card pass">
+        <div class="dc-val" id="dash-best">—</div>
+        <div class="dc-lbl">🏆 Best Score</div>
+      </div>
+      <div class="dash-card">
+        <div class="dc-val" id="dash-avg">—</div>
+        <div class="dc-lbl">📈 Avg Score</div>
+      </div>
+      <div class="dash-card">
+        <div class="dc-val" id="dash-answered">0</div>
+        <div class="dc-lbl">✅ Answered</div>
+      </div>
+    </div>
+
+    <!-- Score trend -->
+    <div class="dash-panel">
+      <h3>📈 Score Trend <span style="font-size:.75rem;opacity:.55;font-weight:400">(last 20 sessions)</span></h3>
+      <canvas id="trend-canvas" width="760" height="140"></canvas>
+      <div id="trend-empty" style="text-align:center;opacity:.5;font-size:.85rem;padding:20px;display:none">
+        No sessions recorded yet — complete a Batch or Practice Exam to see your trend.
+      </div>
+    </div>
+
+    <!-- Activity heatmap -->
+    <div class="dash-panel">
+      <h3>🗓 Activity Heatmap <span style="font-size:.75rem;opacity:.55;font-weight:400">(last 26 weeks)</span></h3>
+      <div class="heatmap-wrap">
+        <div class="heatmap" id="heatmap-grid"></div>
+      </div>
+      <div class="heatmap-legend">
+        Less
+        <div class="hm-leg-cell" style="background:var(--accent);opacity:.25"></div>
+        <div class="hm-leg-cell hm-cell l1"></div>
+        <div class="hm-leg-cell hm-cell l2"></div>
+        <div class="hm-leg-cell hm-cell l3"></div>
+        <div class="hm-leg-cell hm-cell l4"></div>
+        More
+      </div>
+    </div>
+
+    <!-- Domain breakdown -->
+    <div class="dash-panel">
+      <h3>🎯 Domain Performance</h3>
+      <div id="domain-bars"></div>
+      <canvas id="radar-canvas" width="320" height="260"></canvas>
+    </div>
+
+    <div style="text-align:center;margin-top:8px">
+      <button class="btn" onclick="showExamPicker(currentUser, isGuestSession)">🏠 Back to Home</button>
+    </div>
+  </div>
+
 
   <!-- WEAK AREAS BANNER -->
   <div class="weak-banner" id="weak-banner">
@@ -2215,6 +2342,19 @@ function showResults() {
     <div class="score-row"><span>Status</span><span style="color:${pass?'#4caf50':'#e74c3c'};font-weight:700">${pass?'✅ PASS (70%+ threshold)':'❌ BELOW PASS MARK (70%)'}</span></div>
   `;
 
+  // Save session to history
+  if (currentUser && !isGuestSession) {
+    if (!userData.history) userData.history = {c1:[], c2:[]};
+    if (!userData.activity) userData.activity = {};
+    var exam = currentExam || 'c2';
+    if (!userData.history[exam]) userData.history[exam] = [];
+    var dateKey = new Date().toISOString().slice(0,10);
+    userData.history[exam].push({ date: dateKey, pct: pct, correct: correct, total: total, type: 'batch' });
+    if (userData.history[exam].length > 200) userData.history[exam] = userData.history[exam].slice(-200);
+    userData.activity[dateKey] = (userData.activity[dateKey] || 0) + 1;
+    saveUserData(currentUser, userData);
+  }
+
   // Improvement breakdown by objective
   const objResults = {}; // obj -> {correct, wrong, questions}
   batchResults.forEach(r => {
@@ -2399,6 +2539,7 @@ function showPracticeResults(timeUp) {
   if (el7) el7.classList.remove('show');
 
   // Calculate scores
+
   var answered = practiceResults.length;
   var total = practiceQs.length;
   var correct = 0;
@@ -2808,6 +2949,383 @@ function srsCardSummary(qid) {
     due: c.due,
     n: c.n
   };
+}
+
+// =====================================================================
+//  PROGRESS DASHBOARD
+// =====================================================================
+var dashExam = 'c2';
+
+document.getElementById('dashboard-link').addEventListener('click', function(e) {
+  e.preventDefault();
+  if (!currentUser) return;
+  // Hide everything
+  modeScreen.style.display = 'none';
+  document.getElementById('exam-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('practice-results').style.display = 'none';
+  hideQuizUI();
+  weakBanner.classList.remove('show');
+  // Show dashboard in context of current exam
+  dashExam = currentExam || 'c2';
+  renderDashboard();
+  document.getElementById('dashboard-screen').style.display = 'block';
+});
+
+function showDash(exam) {
+  dashExam = exam;
+  document.getElementById('dash-tab-c2').classList.toggle('active', exam === 'c2');
+  document.getElementById('dash-tab-c1').classList.toggle('active', exam === 'c1');
+  renderDashboard();
+}
+
+function renderDashboard() {
+  if (!userData) return;
+  if (!userData.history) userData.history = {c1:[], c2:[]};
+  if (!userData.activity) userData.activity = {};
+
+  var history = userData.history[dashExam] || [];
+  var examLabel = dashExam === 'c1' ? 'Core 1 (220-1201)' : 'Core 2 (220-1202)';
+  document.getElementById('dash-subtitle').textContent =
+    (currentUser || 'Guest') + ' — ' + examLabel;
+
+  // ── Streak ──────────────────────────────────────────────────
+  var streak = calcStreak(userData.activity);
+  document.getElementById('dash-streak').textContent = streak;
+
+  // ── Sessions & scores ────────────────────────────────────────
+  document.getElementById('dash-sessions').textContent = history.length;
+  var pcts = history.map(function(s){return s.pct;});
+  var best = pcts.length ? Math.max.apply(null, pcts) : null;
+  var avg = pcts.length ? Math.round(pcts.reduce(function(a,b){return a+b;},0)/pcts.length) : null;
+  document.getElementById('dash-best').textContent = best !== null ? best+'%' : '—';
+  document.getElementById('dash-avg').textContent = avg !== null ? avg+'%' : '—';
+
+  // ── Answered questions ────────────────────────────────────────
+  var answered = Object.keys(userData.answered || {}).filter(function(id){
+    return dashExam === 'c1' ? id.indexOf('c1q') === 0 : id.indexOf('c1q') !== 0;
+  });
+  document.getElementById('dash-answered').textContent = answered.length;
+
+  // ── Score trend chart ─────────────────────────────────────────
+  drawTrend(history.slice(-20));
+
+  // ── Activity heatmap ──────────────────────────────────────────
+  drawHeatmap(userData.activity);
+
+  // ── Domain bars + radar ───────────────────────────────────────
+  drawDomainStats();
+}
+
+// ── Streak calculation ────────────────────────────────────────────────
+function calcStreak(activity) {
+  var today = new Date();
+  var streak = 0;
+  for (var i = 0; i < 365; i++) {
+    var d = new Date(today);
+    d.setDate(d.getDate() - i);
+    var key = d.toISOString().slice(0,10);
+    if (activity[key]) { streak++; }
+    else if (i > 0) { break; }
+  }
+  return streak;
+}
+
+// ── Score trend canvas ────────────────────────────────────────────────
+function drawTrend(history) {
+  var canvas = document.getElementById('trend-canvas');
+  var empty = document.getElementById('trend-empty');
+  if (!history.length) {
+    canvas.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  empty.style.display = 'none';
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = canvas.offsetWidth || 700;
+  var H = 140;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  var isDark = document.body.classList.contains('darkmode');
+  var textCol = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
+  var gridCol = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+
+  var pad = {t:10, r:10, b:28, l:32};
+  var cW = W - pad.l - pad.r;
+  var cH = H - pad.t - pad.b;
+
+  // Grid lines at 0, 25, 50, 70, 100
+  [0,25,50,70,100].forEach(function(pct) {
+    var y = pad.t + cH - (pct/100)*cH;
+    ctx.beginPath();
+    ctx.strokeStyle = pct === 70 ? 'rgba(246,193,78,0.35)' : gridCol;
+    ctx.lineWidth = pct === 70 ? 1.5 : 1;
+    ctx.setLineDash(pct === 70 ? [4,4] : []);
+    ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = textCol;
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(pct+'%', pad.l - 4, y + 3);
+  });
+
+  // Pass label
+  var passY = pad.t + cH - (70/100)*cH;
+  ctx.fillStyle = 'rgba(246,193,78,0.7)';
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('pass', pad.l + 4, passY - 3);
+
+  if (history.length < 2) {
+    // Single dot
+    var x = pad.l + cW/2;
+    var y = pad.t + cH - (history[0].pct/100)*cH;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI*2);
+    ctx.fillStyle = history[0].pct >= 70 ? '#4caf50' : '#e74c3c';
+    ctx.fill();
+    return;
+  }
+
+  // Gradient fill under line
+  var grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + cH);
+  grad.addColorStop(0, 'rgba(76,175,80,0.3)');
+  grad.addColorStop(1, 'rgba(76,175,80,0)');
+  ctx.beginPath();
+  history.forEach(function(s, i) {
+    var x = pad.l + (i/(history.length-1))*cW;
+    var y = pad.t + cH - (s.pct/100)*cH;
+    if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(pad.l + cW, pad.t + cH);
+  ctx.lineTo(pad.l, pad.t + cH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = '#4caf50';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  history.forEach(function(s, i) {
+    var x = pad.l + (i/(history.length-1))*cW;
+    var y = pad.t + cH - (s.pct/100)*cH;
+    if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  history.forEach(function(s, i) {
+    var x = pad.l + (i/(history.length-1))*cW;
+    var y = pad.t + cH - (s.pct/100)*cH;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = s.pct >= 70 ? '#4caf50' : '#e74c3c';
+    ctx.strokeStyle = isDark ? '#1e1e1e' : '#fff';
+    ctx.lineWidth = 2;
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // X-axis date labels (first and last)
+  ctx.fillStyle = textCol;
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(history[0].date.slice(5), pad.l, H - 4);
+  ctx.textAlign = 'right';
+  ctx.fillText(history[history.length-1].date.slice(5), pad.l + cW, H - 4);
+}
+
+// ── Activity heatmap ──────────────────────────────────────────────────
+function drawHeatmap(activity) {
+  var grid = document.getElementById('heatmap-grid');
+  grid.innerHTML = '';
+
+  // Build 26 weeks × 7 days = 182 days back from today
+  var today = new Date();
+  var days = [];
+  for (var i = 181; i >= 0; i--) {
+    var d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0,10));
+  }
+
+  // Pad front so first cell aligns to Monday
+  var firstDow = new Date(days[0]).getDay(); // 0=Sun
+  var padDays = (firstDow + 6) % 7; // shift to Mon=0
+  for (var p = 0; p < padDays; p++) {
+    var ghost = document.createElement('div');
+    ghost.style.visibility = 'hidden';
+    ghost.className = 'hm-cell';
+    grid.appendChild(ghost);
+  }
+
+  var maxAct = Math.max.apply(null, days.map(function(d){ return activity[d] || 0; }).concat([1]));
+
+  days.forEach(function(dateStr) {
+    var count = activity[dateStr] || 0;
+    var cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    if (count > 0) {
+      var level = Math.ceil((count / maxAct) * 4);
+      cell.classList.add('l' + Math.min(level, 4));
+    }
+    cell.title = dateStr + ': ' + count + ' session' + (count !== 1 ? 's' : '');
+    grid.appendChild(cell);
+  });
+}
+
+// ── Domain bars + radar ───────────────────────────────────────────────
+function drawDomainStats() {
+  var domainNames = dashExam === 'c1'
+    ? {1:'Mobile Devices',2:'Networking',3:'Hardware',4:'Virtualisation & Cloud',5:'HW & Network Troubleshooting'}
+    : {1:'Operating Systems',2:'Security',3:'Software Troubleshooting',4:'Operational Procedures'};
+
+  var bank = dashExam === 'c1' ? LOCAL_QUESTIONS_C1 : LOCAL_QUESTIONS;
+  var ans = userData.answered || {};
+  var wrong = userData.wrongObjectives || {};
+
+  // Build domain stats from answered questions
+  var domStats = {};
+  Object.keys(domainNames).forEach(function(d) {
+    domStats[d] = {correct:0, wrong:0, total:0};
+  });
+
+  bank.forEach(function(q) {
+    var prefix = dashExam === 'c1' ? 'c1q' : '';
+    var id = q.id;
+    if (ans[id] !== undefined) {
+      var d = String(q.domain);
+      if (domStats[d]) {
+        domStats[d].total++;
+        if (ans[id] === 'correct') domStats[d].correct++;
+        else domStats[d].wrong++;
+      }
+    }
+  });
+
+  // Domain bars
+  var barsEl = document.getElementById('domain-bars');
+  barsEl.innerHTML = '';
+  var hasAny = false;
+  Object.keys(domainNames).forEach(function(d) {
+    var stat = domStats[d];
+    if (!stat.total) return;
+    hasAny = true;
+    var pct = Math.round((stat.correct / stat.total) * 100);
+    var colour = pct >= 70 ? '#4caf50' : pct >= 50 ? '#f6c14e' : '#e74c3c';
+    var row = document.createElement('div');
+    row.className = 'dom-bar-row';
+    row.innerHTML = '<div class="dom-bar-label"><span>' + domainNames[d] + '</span><span style="color:' + colour + '">' + pct + '% (' + stat.correct + '/' + stat.total + ')</span></div>' +
+      '<div class="dom-bar-track"><div class="dom-bar-fill" style="width:' + pct + '%;background:' + colour + '"></div></div>';
+    barsEl.appendChild(row);
+  });
+
+  if (!hasAny) {
+    barsEl.innerHTML = '<p style="text-align:center;opacity:.5;font-size:.85rem;padding:8px">Answer some questions to see domain breakdown.</p>';
+  }
+
+  // Radar chart
+  drawRadar(domainNames, domStats);
+}
+
+function drawRadar(domainNames, domStats) {
+  var canvas = document.getElementById('radar-canvas');
+  var dpr = window.devicePixelRatio || 1;
+  var SIZE = Math.min(canvas.offsetWidth || 320, 320);
+  canvas.width = SIZE * dpr;
+  canvas.height = SIZE * dpr;
+  canvas.style.width = SIZE + 'px';
+  canvas.style.height = SIZE + 'px';
+
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, SIZE, SIZE);
+
+  var keys = Object.keys(domainNames);
+  var n = keys.length;
+  var cx = SIZE / 2, cy = SIZE / 2;
+  var R = SIZE * 0.38;
+  var isDark = document.body.classList.contains('darkmode');
+  var gridCol = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+  var textCol = isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.65)';
+
+  function angle(i) { return (Math.PI * 2 * i / n) - Math.PI / 2; }
+  function pt(i, r) { return { x: cx + r * Math.cos(angle(i)), y: cy + r * Math.sin(angle(i)) }; }
+
+  // Grid rings
+  [0.25, 0.5, 0.75, 1].forEach(function(frac) {
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var p = pt(i, R * frac);
+      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = gridCol;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Spokes
+  for (var i = 0; i < n; i++) {
+    var p = pt(i, R);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = gridCol;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Data polygon
+  var hasData = false;
+  ctx.beginPath();
+  keys.forEach(function(d, i) {
+    var stat = domStats[d];
+    var val = stat.total > 0 ? (stat.correct / stat.total) : 0;
+    if (val > 0) hasData = true;
+    var p = pt(i, R * val);
+    if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+  });
+  ctx.closePath();
+  if (hasData) {
+    ctx.fillStyle = 'rgba(76,175,80,0.25)';
+    ctx.fill();
+    ctx.strokeStyle = '#4caf50';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Labels
+  ctx.font = 'bold 10px "Sour Gummy", sans-serif';
+  ctx.fillStyle = textCol;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  keys.forEach(function(d, i) {
+    var labelR = R + 22;
+    var p = pt(i, labelR);
+    var name = domainNames[d];
+    // Wrap long names
+    var words = name.split(' ');
+    if (words.length > 2 && name.length > 14) {
+      var mid = Math.ceil(words.length / 2);
+      ctx.fillText(words.slice(0, mid).join(' '), p.x, p.y - 6);
+      ctx.fillText(words.slice(mid).join(' '), p.x, p.y + 6);
+    } else {
+      ctx.fillText(name, p.x, p.y);
+    }
+  });
 }
 
 </script>
