@@ -1738,6 +1738,7 @@ let batchResults = [];
 let lightningStats = {total:0, correct:0, wrong:0};
 let answered = false;
 let currentQ = null;
+let isGuestSession = false;
 let selectedMulti = new Set();
 // Practice exam
 let practiceQs = [], practiceIdx = 0, practiceResults = [];
@@ -1871,6 +1872,7 @@ function doGuest() {
 // --- Start session ---
 function startSession(username, displayName, isGuest=false) {
   currentUser = username;
+  isGuestSession = isGuest;
   userData = loadUserData(username);
   userData.totalSessions = (userData.totalSessions || 0) + 1;
   if (!isGuest) saveUserData(currentUser, userData);
@@ -1885,6 +1887,8 @@ function showExamPicker(displayName, isGuest) {
   resultsScreen.style.display = 'none';
   hideQuizUI();
   weakBanner.classList.remove('show');
+  var _dse = document.getElementById('dashboard-screen');
+  if (_dse) _dse.style.display = 'none';
   // Then show exam screen
   const greeting = isGuest ? 'Guest' : displayName;
   document.getElementById('exam-welcome').textContent = `Hi ${greeting}! Which exam are you revising for?`;
@@ -1954,6 +1958,8 @@ document.addEventListener('DOMContentLoaded', () => {
 //  MODE SCREEN
 // =====================================================================
 function showModeScreen() {
+  var _dsm = document.getElementById('dashboard-screen');
+  if (_dsm) _dsm.style.display = 'none';
   modeScreen.style.display = 'block';
   hideQuizUI();
   resultsScreen.style.display = 'none';
@@ -2023,6 +2029,8 @@ function hideQuizUI() {
   if (sessionMode !== 'practice' && sessionMode !== 'done') {
     document.getElementById('practice-results').style.display = 'none';
   }
+  var _ds = document.getElementById('dashboard-screen');
+  if (_ds) _ds.style.display = 'none';
   stopPracticeTimer();
 }
 
@@ -2316,6 +2324,8 @@ Rules: Realistic CompTIA A+ Core 2 style. One correct answer. Each explanation c
 //  RESULTS SCREEN (BATCH)
 // =====================================================================
 function showResults() {
+  var _dsr = document.getElementById('dashboard-screen');
+  if (_dsr) _dsr.style.display = 'none';
   quizCard.style.display = 'none';
   loadingEl.style.display = 'none';
   progressWrap.style.display = 'none';
@@ -2540,7 +2550,24 @@ function showPracticeResults(timeUp) {
 
   // Calculate scores
 
-  var answered = practiceResults.length;
+  // Save practice session to history
+  if (currentUser && !isGuestSession) {
+    if (!userData.history) userData.history = {c1:[], c2:[]};
+    if (!userData.activity) userData.activity = {};
+    var exam2 = currentExam || 'c2';
+    if (!userData.history[exam2]) userData.history[exam2] = [];
+    var dk = new Date().toISOString().slice(0,10);
+    var answeredTmp = practiceResults.length;
+    var correctTmp = practiceResults.filter(function(r){return r.correct;}).length;
+    var pctTmp = answeredTmp > 0 ? Math.round((correctTmp/answeredTmp)*100) : 0;
+    var scaledTmp = 100 + Math.round((correctTmp/(practiceQs.length||1))*800);
+    userData.history[exam2].push({ date: dk, pct: pctTmp, correct: correctTmp,
+      total: answeredTmp, scaled: scaledTmp, type: 'practice' });
+    if (userData.history[exam2].length > 200) userData.history[exam2] = userData.history[exam2].slice(-200);
+    userData.activity[dk] = (userData.activity[dk] || 0) + 1;
+    saveUserData(currentUser, userData);
+  }
+    var answered = practiceResults.length;
   var total = practiceQs.length;
   var correct = 0;
   for (var i = 0; i < practiceResults.length; i++) {
@@ -2903,8 +2930,10 @@ function updateSRSStatus(dueCount, learned, total) {
   let el = document.getElementById('srs-status');
   if (!el) return;
   const pct = total > 0 ? Math.round((learned / total) * 100) : 0;
+  // Only show "due" count if user has actually started studying
+  const dueDisplay = learned === 0 ? '0' : String(dueCount);
   el.innerHTML =
-    '<span title="Questions due for review today">📅 ' + dueCount + ' due</span>' +
+    '<span title="Questions due for review today">📅 ' + dueDisplay + ' due</span>' +
     '<span title="Questions you have studied at least once">📚 ' + learned + '/' + total + ' learned (' + pct + '%)</span>';
 }
 
@@ -3003,7 +3032,8 @@ function renderDashboard() {
 
   // ── Answered questions ────────────────────────────────────────
   var answered = Object.keys(userData.answered || {}).filter(function(id){
-    return dashExam === 'c1' ? id.indexOf('c1q') === 0 : id.indexOf('c1q') !== 0;
+    if (dashExam === 'c1') return id.indexOf('c1q') === 0;
+    return id.indexOf('c1q') !== 0 && id.indexOf('q') === 0;
   });
   document.getElementById('dash-answered').textContent = answered.length;
 
@@ -3150,39 +3180,59 @@ function drawTrend(history) {
 // ── Activity heatmap ──────────────────────────────────────────────────
 function drawHeatmap(activity) {
   var grid = document.getElementById('heatmap-grid');
+  if (!grid) return;
   grid.innerHTML = '';
 
-  // Build 26 weeks × 7 days = 182 days back from today
   var today = new Date();
-  var days = [];
-  for (var i = 181; i >= 0; i--) {
-    var d = new Date(today);
-    d.setDate(d.getDate() - i);
-    days.push(d.toISOString().slice(0,10));
-  }
+  today.setHours(0,0,0,0);
 
-  // Pad front so first cell aligns to Monday
-  var firstDow = new Date(days[0]).getDay(); // 0=Sun
-  var padDays = (firstDow + 6) % 7; // shift to Mon=0
-  for (var p = 0; p < padDays; p++) {
-    var ghost = document.createElement('div');
-    ghost.style.visibility = 'hidden';
-    ghost.className = 'hm-cell';
-    grid.appendChild(ghost);
-  }
+  // Build array of 26 complete weeks (Mon–Sun), ending with the week containing today
+  // Find the Monday of the current week
+  var dow = today.getDay(); // 0=Sun
+  var daysSinceMonday = (dow + 6) % 7;
+  var weekStart = new Date(today);
+  weekStart.setDate(weekStart.getDate() - daysSinceMonday);
 
-  var maxAct = Math.max.apply(null, days.map(function(d){ return activity[d] || 0; }).concat([1]));
+  // Go back 25 more weeks
+  var startMonday = new Date(weekStart);
+  startMonday.setDate(startMonday.getDate() - 25 * 7);
 
-  days.forEach(function(dateStr) {
-    var count = activity[dateStr] || 0;
-    var cell = document.createElement('div');
-    cell.className = 'hm-cell';
-    if (count > 0) {
-      var level = Math.ceil((count / maxAct) * 4);
-      cell.classList.add('l' + Math.min(level, 4));
+  // Build 26 weeks × 7 days
+  var weeks = [];
+  for (var w = 0; w < 26; w++) {
+    var week = [];
+    for (var d = 0; d < 7; d++) {
+      var day = new Date(startMonday);
+      day.setDate(day.getDate() + w * 7 + d);
+      week.push(day.toISOString().slice(0, 10));
     }
-    cell.title = dateStr + ': ' + count + ' session' + (count !== 1 ? 's' : '');
-    grid.appendChild(cell);
+    weeks.push(week);
+  }
+
+  var maxAct = 1;
+  weeks.forEach(function(week) {
+    week.forEach(function(dateStr) {
+      if ((activity[dateStr] || 0) > maxAct) maxAct = activity[dateStr];
+    });
+  });
+
+  // Render: grid is 7 rows × 26 cols (CSS handles columns via grid-auto-flow:column)
+  // We append day-by-day within each week so they flow into columns correctly
+  weeks.forEach(function(week) {
+    week.forEach(function(dateStr) {
+      var count = activity[dateStr] || 0;
+      var cell = document.createElement('div');
+      cell.className = 'hm-cell';
+      if (count > 0) {
+        var level = Math.ceil((count / maxAct) * 4);
+        cell.classList.add('l' + Math.min(level, 4));
+      }
+      // Grey out future dates
+      var cellDate = new Date(dateStr);
+      if (cellDate > today) cell.style.opacity = '0.1';
+      cell.title = dateStr + ': ' + count + ' session' + (count !== 1 ? 's' : '');
+      grid.appendChild(cell);
+    });
   });
 }
 
