@@ -1853,6 +1853,7 @@ function showExamPicker(displayName, isGuest) {
   // Hide everything first
   modeScreen.style.display = 'none';
   resultsScreen.style.display = 'none';
+  document.getElementById('dashboard-screen').style.display = 'none';
   hideQuizUI();
   weakBanner.classList.remove('show');
   // Then show exam screen
@@ -1925,6 +1926,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // =====================================================================
 function showModeScreen() {
   modeScreen.style.display = 'block';
+  document.getElementById('dashboard-screen').style.display = 'none';
   hideQuizUI();
   resultsScreen.style.display = 'none';
   const examLabel = currentExam === 'c1' ? 'Core 1 (220-1101)' : 'Core 2 (220-1202)';
@@ -1939,6 +1941,7 @@ document.getElementById('mode-lightning').addEventListener('click', () => startM
 function startMode(mode) {
   sessionMode = mode;
   modeScreen.style.display = 'none';
+  document.getElementById('dashboard-screen').style.display = 'none';
   var pr = document.getElementById('practice-results');
   if (pr) pr.style.display = 'none';
   if (mode === 'practice') {
@@ -2289,6 +2292,7 @@ function showResults() {
   quizCard.style.display = 'none';
   loadingEl.style.display = 'none';
   progressWrap.style.display = 'none';
+  document.getElementById('dashboard-screen').style.display = 'none';
 
   const total = batchResults.length;
   const correct = batchResults.filter(r=>r.correct).length;
@@ -2507,6 +2511,7 @@ function showPracticeResults(timeUp) {
   if (el6) el6.classList.remove('show');
   var el7 = document.getElementById('weak-banner');
   if (el7) el7.classList.remove('show');
+  document.getElementById('dashboard-screen').style.display = 'none';
 
   // Calculate scores
 
