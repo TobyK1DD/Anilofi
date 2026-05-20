@@ -3560,7 +3560,25 @@ function joinMPRoom() {
   
   // Listen for quiz start
   mpChannel.subscribe('quiz-start', (msg) => {
-    mpQuestions = msg.data.questions;
+    console.log('Received quiz-start message:', msg.data);
+    
+    // Generate same questions using the seed
+    const bank = getActiveBank();
+    const filtered = bank.filter(q => {
+      if (activeDomains.size === 0) return true;
+      return activeDomains.has(q.domain);
+    });
+    
+    const seed = msg.data.seed;
+    const shuffled = [...filtered];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(seededRandom(seed + i) * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    
+    mpQuestions = shuffled.slice(0, msg.data.questionCount);
+    console.log('Joiner generated questions. First:', mpQuestions[0].q);
+    
     startMPGame();
   });
   
@@ -3632,17 +3650,35 @@ function startMPQuiz() {
   
   console.log('Filtered questions:', filtered.length);
   
-  // Shuffle and take 10
-  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+  // Use room code as seed for consistent shuffle across both players
+  const seed = mpRoomCode.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+  // Seeded shuffle
+  const shuffled = [...filtered];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRandom(seed + i) * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
   mpQuestions = shuffled.slice(0, 10);
   
-  console.log('MP Questions selected:', mpQuestions.length, mpQuestions[0]);
+  console.log('MP Questions selected:', mpQuestions.length);
+  console.log('First question:', mpQuestions[0].q);
   
-  // Send questions to opponent
-  mpChannel.publish('quiz-start', {questions: mpQuestions});
+  // Send START signal with just the seed (not full questions to save bandwidth)
+  mpChannel.publish('quiz-start', {
+    seed: seed,
+    questionCount: 10
+  });
   
-  // Start game
+  // Start game immediately
   setTimeout(startMPGame, 500);
+}
+
+// Simple seeded random function
+function seededRandom(seed) {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
 }
 
 function startMPGame() {
@@ -3653,15 +3689,14 @@ function startMPGame() {
   mpYourScore = 0;
   mpOppScore = 0;
   
-  // Listen for opponent answers if not already
-  if (!mpIsHost) {
-    mpChannel.subscribe('answer', (msg) => {
-      mpOppScore = msg.data.score;
-      updateMPScoreboard();
-    });
-  }
+  // ALWAYS listen for opponent answers (both host and joiner)
+  mpChannel.subscribe('answer', (msg) => {
+    console.log('Received opponent answer:', msg.data);
+    mpOppScore = msg.data.score;
+    updateMPScoreboard();
+  });
   
-  // Hide lobby, show game (quiz is inside mp-game now)
+  // Hide lobby, show game
   document.getElementById('mp-lobby').style.display = 'none';
   document.getElementById('mp-game').style.display = 'block';
   
@@ -3721,23 +3756,33 @@ function loadMPQuestion() {
 }
 
 function answerMPQuestion(isCorrect) {
+  const currentIndex = mpCurrentQ;
+  
   if (isCorrect) {
     mpYourScore++;
-    updateMPScoreboard();
   }
   
-  // Publish score to opponent
-  mpChannel.publish('answer', {score: mpYourScore});
+  // Publish YOUR answer to opponent
+  mpChannel.publish('answer', {
+    questionIndex: currentIndex,
+    score: mpYourScore,
+    isCorrect: isCorrect
+  });
   
-  // Show brief feedback
-  const opts = document.querySelectorAll('.opt');
+  console.log('Answered Q' + currentIndex + '. Correct:', isCorrect, 'Your score:', mpYourScore);
+  
+  // Disable buttons
+  const opts = document.querySelectorAll('#mp-options .opt');
   opts.forEach(opt => opt.disabled = true);
+  
+  // Update your own scoreboard
+  updateMPScoreboard();
   
   // Next question after brief delay
   setTimeout(() => {
     mpCurrentQ++;
     loadMPQuestion();
-  }, 800);
+  }, 1000);
 }
 
 function updateMPScoreboard() {
