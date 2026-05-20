@@ -3527,55 +3527,55 @@ function joinMPRoom() {
   // Join channel
   mpChannel = ably.channels.get('certready-' + mpRoomCode);
   
-  // Check if room exists by getting presence
+  // Listen for existing presence (host)
   mpChannel.presence.get((err, members) => {
-    if (err || !members || members.length === 0) {
-      alert('Room not found! Check the code and try again.');
-      mpChannel.detach();
-      return;
-    }
-    
-    if (members.length >= 2) {
-      alert('Room is full! Only 2 players allowed.');
-      mpChannel.detach();
-      return;
-    }
-    
-    // Get host name
-    const host = members.find(m => m.data.isHost);
-    mpOpponentName = host ? host.data.name : 'Host';
-    
-    // Listen for quiz start
-    mpChannel.subscribe('quiz-start', (msg) => {
-      mpQuestions = msg.data.questions;
-      startMPGame();
-    });
-    
-    // Listen for opponent answers
-    mpChannel.subscribe('answer', (msg) => {
-      mpOppScore = msg.data.score;
-      updateMPScoreboard();
-    });
-    
-    // Listen for host leaving
-    mpChannel.presence.subscribe('leave', (member) => {
-      if (member.data.isHost) {
-        alert('Host left the room!');
-        endMP();
+    if (!err && members && members.length > 0) {
+      const host = members.find(m => m.data && m.data.isHost);
+      if (host) {
+        mpOpponentName = host.data.name || 'Host';
       }
-    });
-    
-    // Enter presence
-    const yourName = userData.name || 'Player';
-    mpChannel.presence.enter({name: yourName, isHost: false});
-    
-    // Show lobby
-    document.getElementById('mp-setup').style.display = 'none';
-    document.getElementById('mp-lobby').style.display = 'block';
-    document.getElementById('mp-display-code').textContent = mpRoomCode;
-    document.getElementById('mp-lobby-status').textContent = 'Waiting for host to start...';
-    updateLobby();
+    }
   });
+  
+  // Listen for host entering (if they join after us)
+  mpChannel.presence.subscribe('enter', (member) => {
+    if (member.data && member.data.isHost) {
+      mpOpponentName = member.data.name || 'Host';
+      updateLobby();
+      document.getElementById('mp-lobby-status').textContent = 'Connected! Waiting for host to start...';
+    }
+  });
+  
+  // Listen for quiz start
+  mpChannel.subscribe('quiz-start', (msg) => {
+    mpQuestions = msg.data.questions;
+    startMPGame();
+  });
+  
+  // Listen for opponent answers
+  mpChannel.subscribe('answer', (msg) => {
+    mpOppScore = msg.data.score;
+    updateMPScoreboard();
+  });
+  
+  // Listen for host leaving
+  mpChannel.presence.subscribe('leave', (member) => {
+    if (member.data && member.data.isHost) {
+      alert('Host left the room!');
+      endMP();
+    }
+  });
+  
+  // Enter presence
+  const yourName = userData.name || 'Player';
+  mpChannel.presence.enter({name: yourName, isHost: false});
+  
+  // Show lobby immediately
+  document.getElementById('mp-setup').style.display = 'none';
+  document.getElementById('mp-lobby').style.display = 'block';
+  document.getElementById('mp-display-code').textContent = mpRoomCode;
+  document.getElementById('mp-lobby-status').textContent = mpOpponentName ? 'Connected! Waiting for host to start...' : 'Joined room! Waiting for host...';
+  updateLobby();
 }
 
 function updateLobby() {
