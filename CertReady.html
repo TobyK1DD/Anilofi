@@ -642,7 +642,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
         <div style="margin:20px 0">
           <button class="auth-btn" onclick="createMPRoom()">🎯 Create Room</button>
           <div class="auth-divider">OR</div>
-          <input type="text" class="mp-input" id="mp-join-code" placeholder="Enter 6-Digit Room Code" maxlength="6">
+          <input type="text" class="mp-input" id="mp-join-code" placeholder="Enter 6-Digit Room Code" maxlength="6" style="text-transform:uppercase">
           <button class="auth-btn" onclick="joinMPRoom()">🚪 Join Room</button>
         </div>
         <button class="auth-btn secondary" onclick="cancelMP()">← Back</button>
@@ -3476,72 +3476,54 @@ function createMPRoom() {
   // Join channel
   mpChannel = ably.channels.get('certready-' + mpRoomCode);
   
-  // Set up subscriptions BEFORE entering presence
+  // Listen for messages from opponent
+  mpChannel.subscribe('player-joined', (msg) => {
+    if (!msg.data.isHost) {
+      mpOpponentName = msg.data.name;
+      updateLobby();
+      document.getElementById('mp-start-btn').style.display = 'block';
+      document.getElementById('mp-lobby-status').textContent = mpOpponentName + ' joined! Click Start when ready.';
+    }
+  });
   
-  // Listen for quiz start (in case we're not host)
   mpChannel.subscribe('quiz-start', (msg) => {
     mpQuestions = msg.data.questions;
     startMPGame();
   });
   
-  // Listen for opponent answers
   mpChannel.subscribe('answer', (msg) => {
     mpOppScore = msg.data.score;
     updateMPScoreboard();
   });
   
-  // Listen for ALL presence changes
-  mpChannel.presence.subscribe((presenceMsg) => {
-    // Get all current members
-    mpChannel.presence.get((err, members) => {
-      if (!err && members) {
-        // Find non-host member (the opponent)
-        const opponent = members.find(m => m.data && !m.data.isHost);
-        if (opponent) {
-          mpOpponentName = opponent.data.name || 'Opponent';
-          updateLobby();
-          document.getElementById('mp-start-btn').style.display = 'block';
-          document.getElementById('mp-lobby-status').textContent = mpOpponentName + ' joined! Click Start when ready.';
-        } else if (members.length === 1) {
-          // Only us in room
-          mpOpponentName = '';
-          updateLobby();
-          document.getElementById('mp-start-btn').style.display = 'none';
-          document.getElementById('mp-lobby-status').textContent = 'Waiting for opponent to join...';
-        }
-      }
-    });
+  mpChannel.subscribe('player-left', (msg) => {
+    if (mpActive) {
+      alert('Opponent disconnected!');
+      endMP();
+    } else {
+      mpOpponentName = '';
+      updateLobby();
+      document.getElementById('mp-start-btn').style.display = 'none';
+      document.getElementById('mp-lobby-status').textContent = 'Opponent left. Waiting for new opponent...';
+    }
   });
   
-  // Enter presence
+  // Listen for joiners requesting host info
+  mpChannel.subscribe('request-host', (msg) => {
+    const yourName = userData.name || 'Player';
+    mpChannel.publish('player-joined', {name: yourName, isHost: true});
+  });
+  
+  // Announce we're here
   const yourName = userData.name || 'Player';
-  mpChannel.presence.enter({name: yourName, isHost: true});
+  mpChannel.publish('player-joined', {name: yourName, isHost: true});
   
   // Show lobby
   document.getElementById('mp-setup').style.display = 'none';
   document.getElementById('mp-lobby').style.display = 'block';
   document.getElementById('mp-display-code').textContent = mpRoomCode;
+  document.getElementById('mp-lobby-status').textContent = 'Waiting for opponent to join...';
   updateLobby();
-  
-  // Backup: Poll for opponent every 2 seconds
-  const lobbyPoll = setInterval(() => {
-    if (!mpIsHost || mpActive || document.getElementById('mp-lobby').style.display === 'none') {
-      clearInterval(lobbyPoll);
-      return;
-    }
-    
-    mpChannel.presence.get((err, members) => {
-      if (!err && members) {
-        const opponent = members.find(m => m.data && !m.data.isHost);
-        if (opponent && !mpOpponentName) {
-          mpOpponentName = opponent.data.name || 'Opponent';
-          updateLobby();
-          document.getElementById('mp-start-btn').style.display = 'block';
-          document.getElementById('mp-lobby-status').textContent = mpOpponentName + ' joined! Click Start when ready.';
-        }
-      }
-    });
-  }, 2000);
 }
 
 function joinMPRoom() {
@@ -3561,20 +3543,10 @@ function joinMPRoom() {
   // Join channel
   mpChannel = ably.channels.get('certready-' + mpRoomCode);
   
-  // Listen for existing presence (host)
-  mpChannel.presence.get((err, members) => {
-    if (!err && members && members.length > 0) {
-      const host = members.find(m => m.data && m.data.isHost);
-      if (host) {
-        mpOpponentName = host.data.name || 'Host';
-      }
-    }
-  });
-  
-  // Listen for host entering (if they join after us)
-  mpChannel.presence.subscribe('enter', (member) => {
-    if (member.data && member.data.isHost) {
-      mpOpponentName = member.data.name || 'Host';
+  // Listen for host announcement
+  mpChannel.subscribe('player-joined', (msg) => {
+    if (msg.data.isHost) {
+      mpOpponentName = msg.data.name || 'Host';
       updateLobby();
       document.getElementById('mp-lobby-status').textContent = 'Connected! Waiting for host to start...';
     }
@@ -3593,42 +3565,28 @@ function joinMPRoom() {
   });
   
   // Listen for host leaving
-  mpChannel.presence.subscribe('leave', (member) => {
-    if (member.data && member.data.isHost) {
+  mpChannel.subscribe('player-left', (msg) => {
+    if (msg.data.isHost) {
       alert('Host left the room!');
       endMP();
     }
   });
   
-  // Enter presence
+  // Announce we joined
   const yourName = userData.name || 'Player';
-  mpChannel.presence.enter({name: yourName, isHost: false});
+  mpChannel.publish('player-joined', {name: yourName, isHost: false});
   
   // Show lobby immediately
   document.getElementById('mp-setup').style.display = 'none';
   document.getElementById('mp-lobby').style.display = 'block';
   document.getElementById('mp-display-code').textContent = mpRoomCode;
-  document.getElementById('mp-lobby-status').textContent = mpOpponentName ? 'Connected! Waiting for host to start...' : 'Joined room! Waiting for host...';
+  document.getElementById('mp-lobby-status').textContent = 'Joined room! Waiting for host...';
   updateLobby();
   
-  // Backup: Poll for host every 2 seconds  
-  const lobbyPoll = setInterval(() => {
-    if (mpIsHost || mpActive || document.getElementById('mp-lobby').style.display === 'none') {
-      clearInterval(lobbyPoll);
-      return;
-    }
-    
-    mpChannel.presence.get((err, members) => {
-      if (!err && members) {
-        const host = members.find(m => m.data && m.data.isHost);
-        if (host && !mpOpponentName) {
-          mpOpponentName = host.data.name || 'Host';
-          updateLobby();
-          document.getElementById('mp-lobby-status').textContent = 'Connected! Waiting for host to start...';
-        }
-      }
-    });
-  }, 2000);
+  // Request host to announce themselves
+  setTimeout(() => {
+    mpChannel.publish('request-host', {});
+  }, 500);
 }
 
 function updateLobby() {
@@ -3823,7 +3781,8 @@ function endMP() {
 
 function cleanupMP() {
   if (mpChannel) {
-    mpChannel.presence.leave();
+    // Announce we're leaving
+    mpChannel.publish('player-left', {isHost: mpIsHost});
     mpChannel.detach();
     mpChannel = null;
   }
@@ -3831,12 +3790,15 @@ function cleanupMP() {
   mpRoomCode = '';
   mpIsHost = false;
   mpOpponentName = '';
+  mpYourScore = 0;
+  mpOppScore = 0;
   document.getElementById('mp-screen').style.display = 'none';
   document.getElementById('mp-setup').style.display = 'block';
   document.getElementById('mp-lobby').style.display = 'none';
   document.getElementById('mp-game').style.display = 'none';
   document.getElementById('mp-results').style.display = 'none';
   document.getElementById('mp-join-code').value = '';
+  document.getElementById('mp-start-btn').style.display = 'none';
 }
 
 </script>
