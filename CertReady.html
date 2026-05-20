@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CompTIA A+ Revision (Core 1 &amp; Core 2)</title>
 <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -313,6 +314,32 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
   font-family:"Sour Gummy",sans-serif;transition:all .2s}
 .dash-tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
+/* Study with a Friend - Multiplayer */
+.mp-container{max-width:600px;margin:40px auto;padding:20px}
+.mp-card{background:var(--bg-soft);border:3px solid var(--border);border-radius:16px;padding:30px;box-shadow:var(--card-shadow);text-align:center}
+.mp-card h2{font-size:1.5rem;margin-bottom:10px}
+.mp-card p{opacity:.8;margin-bottom:25px;font-size:.95rem}
+.mp-room-code{font-size:2.8rem;font-weight:700;letter-spacing:12px;font-family:monospace;background:var(--bg);padding:20px;border-radius:12px;margin:25px 0;border:4px solid var(--primary);color:var(--primary)}
+.mp-input{width:100%;max-width:400px;padding:16px 20px;border-radius:10px;border:3px solid var(--accent);background:var(--bg);color:var(--text);font-family:"Sour Gummy",sans-serif;font-size:1.15rem;text-align:center;margin:15px auto;display:block}
+.mp-input:focus{outline:none;border-color:var(--primary)}
+.mp-input::placeholder{opacity:.5}
+.mp-players{background:var(--bg);border-radius:12px;padding:20px;margin:25px 0;max-width:400px;margin-left:auto;margin-right:auto}
+.mp-player{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--accent)}
+.mp-player:last-child{border-bottom:none}
+.mp-player-name{font-size:1.05rem;font-weight:600}
+.mp-status{font-size:.88rem;opacity:.7;padding:10px;background:var(--bg);border-radius:8px;margin:20px 0}
+.mp-scoreboard{display:flex;justify-content:space-around;gap:15px;margin:20px 0;flex-wrap:wrap}
+.mp-score{background:var(--bg);padding:16px 24px;border-radius:12px;border:3px solid var(--accent);min-width:140px}
+.mp-score.you{border-color:var(--primary)}
+.mp-score.opponent{border-color:#9c27b0}
+.mp-score-label{font-size:.8rem;opacity:.7;display:block;margin-bottom:5px}
+.mp-score-val{font-size:2.2rem;font-weight:700;display:block}
+.mp-winner{font-size:3.5rem;margin:20px 0;animation:winner-bounce .6s ease-out}
+@keyframes winner-bounce{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+.mp-final-scores{background:var(--bg);border-radius:12px;padding:25px;margin:25px 0}
+.mp-final-row{display:flex;justify-content:space-between;padding:12px;font-size:1.1rem}
+.mp-final-row strong{font-weight:700}
+
 </style>
 </head>
 <body>
@@ -430,6 +457,12 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
         <h3>Bookmarked Questions</h3>
         <p>Practice only your bookmarked questions — perfect for reviewing tricky topics.</p>
         <div style="margin-top:8px;font-size:.75rem;opacity:.65" id="bookmark-count">0 questions bookmarked</div>
+      </div>
+      <div class="mode-card" id="mode-multiplayer">
+        <div class="icon">👥</div>
+        <h3>Study with a Friend</h3>
+        <p>Create a room code and race against a friend — same questions, real-time competition!</p>
+        <div style="margin-top:8px;display:inline-block;background:#9c27b0;color:#fff;border-radius:6px;padding:3px 10px;font-size:.73rem;font-weight:700;">LIVE</div>
       </div>
     </div>
   </div>
@@ -596,6 +629,77 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       <button class="Button" id="new-batch-btn">🔄 New Batch</button>
       <button class="Button" id="results-lightning-btn">⚡ Lightning Round</button>
       <button class="Button" id="results-home-btn">🏠 Home</button>
+    </div>
+  </div>
+
+<!-- MULTIPLAYER SCREEN -->
+  <div id="mp-screen" style="display:none">
+    <div class="mp-container">
+      <!-- Setup Screen -->
+      <div id="mp-setup" class="mp-card">
+        <h2>👥 Study with a Friend</h2>
+        <p>Create a room or join with a code to compete in real-time!</p>
+        <div style="margin:20px 0">
+          <button class="auth-btn" onclick="createMPRoom()">🎯 Create Room</button>
+          <div class="auth-divider">OR</div>
+          <input type="text" class="mp-input" id="mp-join-code" placeholder="Enter 6-Digit Room Code" maxlength="6">
+          <button class="auth-btn" onclick="joinMPRoom()">🚪 Join Room</button>
+        </div>
+        <button class="auth-btn secondary" onclick="cancelMP()">← Back</button>
+      </div>
+
+      <!-- Lobby Screen -->
+      <div id="mp-lobby" class="mp-card" style="display:none">
+        <h2>🎮 Waiting Room</h2>
+        <div class="mp-room-code" id="mp-display-code">ABC123</div>
+        <p style="font-size:.85rem;opacity:.7">Share this code with your friend!</p>
+        <div class="mp-players" id="mp-players-list">
+          <div class="mp-player">
+            <span class="mp-player-name">You (Host) 👑</span>
+            <span style="color:#4caf50;font-size:.85rem">Ready ✓</span>
+          </div>
+        </div>
+        <div class="mp-status" id="mp-lobby-status">Waiting for opponent to join...</div>
+        <div style="margin-top:20px">
+          <button class="auth-btn" onclick="startMPQuiz()" id="mp-start-btn" style="display:none">🚀 Start Quiz</button>
+          <button class="auth-btn secondary" onclick="leaveMP()">← Leave Room</button>
+        </div>
+      </div>
+
+      <!-- Game Screen (uses main quiz card) -->
+      <div id="mp-game" style="display:none">
+        <div class="mp-scoreboard" id="mp-scoreboard">
+          <div class="mp-score you">
+            <span class="mp-score-label">You</span>
+            <span class="mp-score-val" id="mp-your-score">0</span>
+          </div>
+          <div class="mp-score opponent">
+            <span class="mp-score-label" id="mp-opp-name">Opponent</span>
+            <span class="mp-score-val" id="mp-opp-score">0</span>
+          </div>
+        </div>
+        <!-- Quiz card will show here -->
+      </div>
+
+      <!-- Results Screen -->
+      <div id="mp-results" class="mp-card" style="display:none">
+        <div class="mp-winner" id="mp-winner-text">🏆</div>
+        <h2 id="mp-result-title">Results</h2>
+        <div class="mp-final-scores">
+          <div class="mp-final-row">
+            <span>You:</span>
+            <strong id="mp-final-you">0/10</strong>
+          </div>
+          <div class="mp-final-row">
+            <span id="mp-final-opp-name">Opponent:</span>
+            <strong id="mp-final-opp">0/10</strong>
+          </div>
+        </div>
+        <div style="margin-top:25px">
+          <button class="auth-btn" onclick="playAgainMP()">🔄 Play Again</button>
+          <button class="auth-btn secondary" onclick="endMP()">🏠 Home</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3309,6 +3413,377 @@ function drawRadar(domainNames, domStats) {
       ctx.fillText(name, p.x, p.y);
     }
   });
+}
+
+// =======================================================================
+// MULTIPLAYER - STUDY WITH A FRIEND
+// =======================================================================
+let ably = null;
+let mpChannel = null;
+let mpRoomCode = '';
+let mpIsHost = false;
+let mpOpponentName = '';
+let mpYourScore = 0;
+let mpOppScore = 0;
+let mpQuestions = [];
+let mpCurrentQ = 0;
+let mpActive = false;
+
+// Initialize Ably
+function initAbly() {
+  if (!ably) {
+    ably = new Ably.Realtime('ZkO1yw.Hkft8A:YNglhTqiq_8cqtSYgilN_JgS1EWE_sZrCECMNl4D4Jk');
+  }
+}
+
+// Add multiplayer mode handler
+document.getElementById('mode-multiplayer').addEventListener('click', () => {
+  hideAllMP();
+  document.getElementById('mp-screen').style.display = 'block';
+  document.getElementById('mp-setup').style.display = 'block';
+  document.getElementById('navigation').style.display = 'block';
+});
+
+function hideAllMP() {
+  document.getElementById('mode-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('exam-screen').style.display = 'none';
+  document.getElementById('dashboard-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'none';
+  var qc = document.getElementById('quiz-card');
+  if (qc) qc.style.display = 'none';
+  var sb = document.getElementById('stats-bar');
+  if (sb) sb.style.display = 'none';
+}
+
+function generateRoomCode() {
+  const chars = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Removed I, O for clarity
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
+function createMPRoom() {
+  initAbly();
+  mpRoomCode = generateRoomCode();
+  mpIsHost = true;
+  mpOpponentName = '';
+  mpYourScore = 0;
+  mpOppScore = 0;
+  
+  // Join channel
+  mpChannel = ably.channels.get('certready-' + mpRoomCode);
+  
+  // Listen for opponent joining
+  mpChannel.presence.subscribe('enter', (member) => {
+    if (member.clientId !== ably.auth.clientId) {
+      mpOpponentName = member.data.name || 'Opponent';
+      updateLobby();
+      document.getElementById('mp-start-btn').style.display = 'block';
+      document.getElementById('mp-lobby-status').textContent = 'Opponent joined! Click Start when ready.';
+    }
+  });
+  
+  // Listen for opponent leaving
+  mpChannel.presence.subscribe('leave', () => {
+    if (mpActive) {
+      alert('Opponent disconnected!');
+      endMP();
+    } else {
+      mpOpponentName = '';
+      updateLobby();
+      document.getElementById('mp-start-btn').style.display = 'none';
+      document.getElementById('mp-lobby-status').textContent = 'Opponent left. Waiting for new opponent...';
+    }
+  });
+  
+  // Enter presence
+  const yourName = userData.name || 'Player';
+  mpChannel.presence.enter({name: yourName, isHost: true});
+  
+  // Show lobby
+  document.getElementById('mp-setup').style.display = 'none';
+  document.getElementById('mp-lobby').style.display = 'block';
+  document.getElementById('mp-display-code').textContent = mpRoomCode;
+  updateLobby();
+}
+
+function joinMPRoom() {
+  const code = document.getElementById('mp-join-code').value.toUpperCase().trim();
+  if (!code || code.length !== 6) {
+    alert('Please enter a valid 6-character room code');
+    return;
+  }
+  
+  initAbly();
+  mpRoomCode = code;
+  mpIsHost = false;
+  mpOpponentName = '';
+  mpYourScore = 0;
+  mpOppScore = 0;
+  
+  // Join channel
+  mpChannel = ably.channels.get('certready-' + mpRoomCode);
+  
+  // Check if room exists by getting presence
+  mpChannel.presence.get((err, members) => {
+    if (err || !members || members.length === 0) {
+      alert('Room not found! Check the code and try again.');
+      mpChannel.detach();
+      return;
+    }
+    
+    if (members.length >= 2) {
+      alert('Room is full! Only 2 players allowed.');
+      mpChannel.detach();
+      return;
+    }
+    
+    // Get host name
+    const host = members.find(m => m.data.isHost);
+    mpOpponentName = host ? host.data.name : 'Host';
+    
+    // Listen for quiz start
+    mpChannel.subscribe('quiz-start', (msg) => {
+      mpQuestions = msg.data.questions;
+      startMPGame();
+    });
+    
+    // Listen for opponent answers
+    mpChannel.subscribe('answer', (msg) => {
+      mpOppScore = msg.data.score;
+      updateMPScoreboard();
+    });
+    
+    // Listen for host leaving
+    mpChannel.presence.subscribe('leave', (member) => {
+      if (member.data.isHost) {
+        alert('Host left the room!');
+        endMP();
+      }
+    });
+    
+    // Enter presence
+    const yourName = userData.name || 'Player';
+    mpChannel.presence.enter({name: yourName, isHost: false});
+    
+    // Show lobby
+    document.getElementById('mp-setup').style.display = 'none';
+    document.getElementById('mp-lobby').style.display = 'block';
+    document.getElementById('mp-display-code').textContent = mpRoomCode;
+    document.getElementById('mp-lobby-status').textContent = 'Waiting for host to start...';
+    updateLobby();
+  });
+}
+
+function updateLobby() {
+  const list = document.getElementById('mp-players-list');
+  const yourName = userData.name || 'You';
+  let html = `<div class="mp-player">
+    <span class="mp-player-name">${yourName} ${mpIsHost ? '(Host) 👑' : ''}</span>
+    <span style="color:#4caf50;font-size:.85rem">Ready ✓</span>
+  </div>`;
+  
+  if (mpOpponentName) {
+    html += `<div class="mp-player">
+      <span class="mp-player-name">${mpOpponentName}</span>
+      <span style="color:#4caf50;font-size:.85rem">Ready ✓</span>
+    </div>`;
+  }
+  
+  list.innerHTML = html;
+}
+
+function startMPQuiz() {
+  if (!mpOpponentName) {
+    alert('Waiting for opponent to join!');
+    return;
+  }
+  
+  // Get 10 random questions from current exam
+  const bank = getActiveBank();
+  const filtered = bank.filter(q => {
+    if (activeDomains.size === 0) return true;
+    return activeDomains.has(q.domain);
+  });
+  
+  // Shuffle and take 10
+  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+  mpQuestions = shuffled.slice(0, 10);
+  
+  // Send questions to opponent
+  mpChannel.publish('quiz-start', {questions: mpQuestions});
+  
+  // Start game
+  setTimeout(startMPGame, 500);
+}
+
+function startMPGame() {
+  mpActive = true;
+  mpCurrentQ = 0;
+  mpYourScore = 0;
+  mpOppScore = 0;
+  
+  // Listen for opponent answers if not already
+  if (!mpIsHost) {
+    mpChannel.subscribe('answer', (msg) => {
+      mpOppScore = msg.data.score;
+      updateMPScoreboard();
+    });
+  }
+  
+  // Hide lobby, show game
+  document.getElementById('mp-lobby').style.display = 'none';
+  document.getElementById('mp-game').style.display = 'block';
+  
+  // Show quiz card
+  document.getElementById('quiz-card').style.display = 'block';
+  document.getElementById('stats-bar').style.display = 'flex';
+  
+  // Update scoreboard
+  document.getElementById('mp-opp-name').textContent = mpOpponentName;
+  updateMPScoreboard();
+  
+  // Load first question
+  loadMPQuestion();
+}
+
+function loadMPQuestion() {
+  if (mpCurrentQ >= mpQuestions.length) {
+    showMPResults();
+    return;
+  }
+  
+  const q = mpQuestions[mpCurrentQ];
+  
+  // Update progress
+  document.getElementById('q-number').textContent = `Question ${mpCurrentQ + 1} of ${mpQuestions.length}`;
+  document.getElementById('domain-name').textContent = `${(currentExam === 'c1' ? DOMAINS_C1 : DOMAINS)[q.domain]} • ${(currentExam === 'c1' ? OBJECTIVES_C1 : OBJECTIVES)[q.obj]}`;
+  
+  // Display question
+  document.getElementById('question').textContent = q.q;
+  
+  // Build options
+  const optionsDiv = document.getElementById('options');
+  optionsDiv.innerHTML = '';
+  
+  // Shuffle options
+  const indices = q.opts.map((_, i) => i);
+  const shuffled = [...indices].sort(() => Math.random() - 0.5);
+  const newCorrectPos = shuffled.indexOf(q.correct);
+  
+  shuffled.forEach((origIdx, pos) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = q.opts[origIdx];
+    btn.onclick = () => answerMPQuestion(pos === newCorrectPos);
+    optionsDiv.appendChild(btn);
+  });
+  
+  // Hide explanation
+  document.getElementById('explanation').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+}
+
+function answerMPQuestion(isCorrect) {
+  if (isCorrect) {
+    mpYourScore++;
+    updateMPScoreboard();
+  }
+  
+  // Publish score to opponent
+  mpChannel.publish('answer', {score: mpYourScore});
+  
+  // Show brief feedback
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(opt => opt.disabled = true);
+  
+  // Next question after brief delay
+  setTimeout(() => {
+    mpCurrentQ++;
+    loadMPQuestion();
+  }, 800);
+}
+
+function updateMPScoreboard() {
+  document.getElementById('mp-your-score').textContent = mpYourScore;
+  document.getElementById('mp-opp-score').textContent = mpOppScore;
+}
+
+function showMPResults() {
+  mpActive = false;
+  
+  // Hide game UI
+  document.getElementById('mp-game').style.display = 'none';
+  document.getElementById('quiz-card').style.display = 'none';
+  document.getElementById('stats-bar').style.display = 'none';
+  
+  // Show results
+  document.getElementById('mp-results').style.display = 'block';
+  
+  // Determine winner
+  const youWon = mpYourScore > mpOppScore;
+  const tie = mpYourScore === mpOppScore;
+  
+  document.getElementById('mp-winner-text').textContent = tie ? '🤝' : (youWon ? '🏆' : '😔');
+  document.getElementById('mp-result-title').textContent = tie ? "It's a Tie!" : (youWon ? "You Won!" : "You Lost!");
+  
+  // Show scores
+  document.getElementById('mp-final-you').textContent = `${mpYourScore}/${mpQuestions.length}`;
+  document.getElementById('mp-final-opp').textContent = `${mpOppScore}/${mpQuestions.length}`;
+  document.getElementById('mp-final-opp-name').textContent = mpOpponentName + ':';
+}
+
+function playAgainMP() {
+  if (!mpIsHost) {
+    alert('Only the host can start a new game!');
+    return;
+  }
+  
+  mpCurrentQ = 0;
+  mpYourScore = 0;
+  mpOppScore = 0;
+  
+  document.getElementById('mp-results').style.display = 'none';
+  document.getElementById('mp-lobby').style.display = 'block';
+  document.getElementById('mp-lobby-status').textContent = 'Click Start for another round!';
+}
+
+function leaveMP() {
+  if (confirm('Leave this room?')) {
+    cleanupMP();
+    goHome();
+  }
+}
+
+function cancelMP() {
+  cleanupMP();
+  goHome();
+}
+
+function endMP() {
+  cleanupMP();
+  goHome();
+}
+
+function cleanupMP() {
+  if (mpChannel) {
+    mpChannel.presence.leave();
+    mpChannel.detach();
+    mpChannel = null;
+  }
+  mpActive = false;
+  mpRoomCode = '';
+  mpIsHost = false;
+  mpOpponentName = '';
+  document.getElementById('mp-screen').style.display = 'none';
+  document.getElementById('mp-setup').style.display = 'block';
+  document.getElementById('mp-lobby').style.display = 'none';
+  document.getElementById('mp-game').style.display = 'none';
+  document.getElementById('mp-results').style.display = 'none';
+  document.getElementById('mp-join-code').value = '';
 }
 
 </script>
