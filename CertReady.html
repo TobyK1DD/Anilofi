@@ -678,7 +678,13 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
             <span class="mp-score-val" id="mp-opp-score">0</span>
           </div>
         </div>
-        <!-- Quiz card will show here -->
+        <!-- Multiplayer Quiz Display -->
+        <div class="quiz-card" id="mp-quiz-display" style="display:block;max-width:700px;margin:20px auto">
+          <div class="q-number" id="mp-q-number">Question 1 of 10</div>
+          <div class="domain-name" id="mp-domain-name"></div>
+          <div class="question" id="mp-question"></div>
+          <div class="options" id="mp-options"></div>
+        </div>
       </div>
 
       <!-- Results Screen -->
@@ -3645,13 +3651,9 @@ function startMPGame() {
     });
   }
   
-  // Hide lobby, show game
+  // Hide lobby, show game (quiz is inside mp-game now)
   document.getElementById('mp-lobby').style.display = 'none';
   document.getElementById('mp-game').style.display = 'block';
-  
-  // Show quiz card
-  document.getElementById('quiz-card').style.display = 'block';
-  document.getElementById('stats-bar').style.display = 'flex';
   
   // Update scoreboard
   document.getElementById('mp-opp-name').textContent = mpOpponentName;
@@ -3670,14 +3672,14 @@ function loadMPQuestion() {
   const q = mpQuestions[mpCurrentQ];
   
   // Update progress
-  document.getElementById('q-number').textContent = `Question ${mpCurrentQ + 1} of ${mpQuestions.length}`;
-  document.getElementById('domain-name').textContent = `${(currentExam === 'c1' ? DOMAINS_C1 : DOMAINS)[q.domain]} • ${(currentExam === 'c1' ? OBJECTIVES_C1 : OBJECTIVES)[q.obj]}`;
+  document.getElementById('mp-q-number').textContent = `Question ${mpCurrentQ + 1} of ${mpQuestions.length}`;
+  document.getElementById('mp-domain-name').textContent = `${(currentExam === 'c1' ? DOMAINS_C1 : DOMAINS)[q.domain]} • ${(currentExam === 'c1' ? OBJECTIVES_C1 : OBJECTIVES)[q.obj]}`;
   
   // Display question
-  document.getElementById('question').textContent = q.q;
+  document.getElementById('mp-question').textContent = q.q;
   
   // Build options
-  const optionsDiv = document.getElementById('options');
+  const optionsDiv = document.getElementById('mp-options');
   optionsDiv.innerHTML = '';
   
   // Shuffle options
@@ -3692,10 +3694,6 @@ function loadMPQuestion() {
     btn.onclick = () => answerMPQuestion(pos === newCorrectPos);
     optionsDiv.appendChild(btn);
   });
-  
-  // Hide explanation
-  document.getElementById('explanation').style.display = 'none';
-  document.getElementById('next-btn').style.display = 'none';
 }
 
 function answerMPQuestion(isCorrect) {
