@@ -6,16 +6,17 @@
 <title>lofi pomodoro ✿</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #c8d0d3;
+  --bg:      #c8d0d3;
   --bg-soft: #e3edf0;
-  --text: #000000;
+  --text:    #000000;
   --primary: #f64e4e;
-  --border: #ffffff;
-  --accent: #aac6d3;
+  --border:  #ffffff;
+  --accent:  #aac6d3;
   --btn-bg:  #f64e4e;
   --btn-text:#000000;
 }
@@ -30,258 +31,307 @@ body.darkmode {
   --btn-text:#000000;
 }
 
-body {
-  font-family: "Sour Gummy", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 10px;
-  transition: background 0.3s, color 0.3s;
-}
+body { font-family:"Sour Gummy",sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:10px; transition:background 0.3s,color 0.3s; }
+a,p,h1,h2,h3 { color:var(--text); font-family:"Sour Gummy",sans-serif; }
 
-a, p, h1, h2, h3 { color: var(--text); font-family: "Sour Gummy", sans-serif; }
+button { font-family:"Sour Gummy",sans-serif; font-size:16px; color:var(--btn-text); background-color:var(--btn-bg); border:3px solid var(--border); padding:8px 18px; border-radius:8px; cursor:pointer; transition:all 0.3s ease; }
+button:hover { background-color:var(--bg); color:var(--text); }
 
-/* ── universal button base ── */
-button {
-  font-family: "Sour Gummy", sans-serif;
-  font-size: 16px;
-  color: var(--btn-text);
-  background-color: var(--btn-bg);
-  border: 3px solid var(--border);
-  padding: 8px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-button:hover { background-color: var(--bg); color: var(--text); }
+/* ── fixed UI chrome ── */
+#change-darkmode { height:50px;width:50px;padding:0;border-radius:50%;display:flex;justify-content:center;align-items:center;background:var(--bg);border:3px solid var(--border);position:fixed;top:20px;right:20px;cursor:pointer;font-size:20px;transition:all 0.3s;z-index:100; }
+#change-darkmode:hover { background:var(--btn-bg); }
 
-/* ── dark mode toggle (top-right) ── */
-#change-darkmode {
-  height: 50px; width: 50px; padding: 0;
-  border-radius: 50%;
-  display: flex; justify-content: center; align-items: center;
-  background: var(--bg);
-  border: 3px solid var(--border);
-  position: fixed; top: 20px; right: 20px;
-  cursor: pointer; font-size: 20px;
-  transition: all 0.3s; z-index: 100;
-}
-#change-darkmode:hover { background: var(--btn-bg); }
+#auth-btns { position:fixed;top:20px;left:20px;display:flex;gap:8px;z-index:100;align-items:center; }
+.auth-top-btn { height:44px;padding:0 18px;border-radius:22px;font-size:14px;font-weight:700;background:var(--btn-bg);border:3px solid var(--border);color:var(--btn-text);cursor:pointer;transition:all 0.3s;font-family:"Sour Gummy",sans-serif;white-space:nowrap; }
+.auth-top-btn:hover { background:var(--bg);color:var(--text); }
+#btn-account { display:none; }
+#auth-btns.logged-in #btn-login  { display:none; }
+#auth-btns.logged-in #btn-signup { display:none; }
+#auth-btns.logged-in #btn-account { display:flex;align-items:center; }
 
-/* ── auth buttons (top-left) — only 2 shown at a time ── */
-#auth-btns {
-  position: fixed; top: 20px; left: 20px;
-  display: flex; gap: 8px; z-index: 100;
-  align-items: center;
-}
-.auth-top-btn {
-  height: 44px; padding: 0 18px;
-  border-radius: 22px;
-  font-size: 14px; font-weight: 700;
-  background: var(--btn-bg);
-  border: 3px solid var(--border);
-  color: var(--btn-text);
-  cursor: pointer;
-  transition: all 0.3s;
-  font-family: "Sour Gummy", sans-serif;
-  white-space: nowrap;
-}
-.auth-top-btn:hover { background: var(--bg); color: var(--text); }
-/* logged-out state: show login + signup, hide account */
-#btn-account { display: none; }
-/* logged-in state */
-#auth-btns.logged-in #btn-login   { display: none; }
-#auth-btns.logged-in #btn-signup  { display: none; }
-#auth-btns.logged-in #btn-account { display: flex; align-items: center; }
+/* ── header / nav ── */
+header { background-color:var(--bg);padding:10px 0 6px;text-align:center;font-size:40px;font-weight:900; }
+#navigation { width:100%;background-color:var(--bg);text-align:center;padding:8px 0; }
+.links { display:flex;justify-content:center;gap:12px;flex-wrap:wrap; }
+.links button { font-size:16px;padding:8px 18px;background:var(--btn-bg);color:var(--btn-text);border:3px solid var(--border);border-radius:8px; }
+.links button:hover { background:var(--bg);color:var(--text); }
+.links button.active { background:var(--bg);color:var(--text);font-weight:700;border-color:var(--primary); }
 
-/* ── header ── */
-header {
-  background-color: var(--bg);
-  padding: 10px 0 6px;
-  text-align: center;
-  font-size: 40px; font-weight: 900;
-  font-family: "Sour Gummy", sans-serif;
-}
+/* ── columns ── */
+.col-wrap { display:flex;flex-direction:row;gap:16px;max-width:1040px;margin:0 auto;align-items:flex-start; }
+.leftcolumn { flex:1;border:1px solid var(--accent);background-color:var(--bg-soft);padding:20px;margin-top:20px;min-width:0; }
+.rightcolumn { width:240px;flex-shrink:0;border:1px solid var(--accent);background-color:var(--bg-soft);padding:16px;margin-top:20px; }
+.container { text-align:center;padding:10px 0; }
 
-/* ── navigation ── */
-#navigation { width:100%; background-color:var(--bg); text-align:center; padding:8px 0; }
-.links { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
-.links button {
-  font-size: 16px; padding: 8px 18px;
-  background: var(--btn-bg); color: var(--btn-text);
-  border: 3px solid var(--border); border-radius: 8px;
+/* ── task input ── */
+.task-box {
+  display:flex;gap:8px;align-items:center;
+  background:var(--bg);border:1px solid var(--accent);
+  padding:10px 14px;margin-bottom:12px;
 }
-.links button:hover { background: var(--bg); color: var(--text); }
-.links button.active { background: var(--bg); color: var(--text); font-weight:700; border-color:var(--primary); }
-
-/* ── columns — always side by side ── */
-.col-wrap {
-  display: flex; flex-direction: row;
-  gap: 16px; max-width: 960px;
-  margin: 0 auto; align-items: flex-start;
+.task-box input {
+  flex:1;font-family:"Sour Gummy",sans-serif;font-size:14px;font-weight:700;
+  background:none;border:none;outline:none;color:var(--text);
 }
-.leftcolumn {
-  flex:1; border:1px solid var(--accent);
-  background-color:var(--bg-soft);
-  padding:20px; margin-top:20px; min-width:0;
+.task-box input::placeholder { opacity:0.45; }
+.task-label { font-size:18px;flex-shrink:0; }
+#taskDisplay {
+  font-size:12px;font-weight:700;color:var(--primary);
+  min-height:16px;margin-bottom:8px;text-align:center;
+  letter-spacing:0.04em;opacity:0.85;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.rightcolumn {
-  width:220px; flex-shrink:0;
-  border:1px solid var(--accent);
-  background-color:var(--bg-soft);
-  padding:16px; margin-top:20px;
-}
-.container { text-align:center; padding:10px 0; }
 
 /* ── ring timer ── */
-.ring-wrap {
-  position:relative; width:220px; height:220px;
-  margin:0 auto 20px;
-  display:flex; align-items:center; justify-content:center;
-}
-.ring-wrap svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
-.ring-track    { fill:none; stroke:var(--accent); stroke-width:10; opacity:0.45; }
-.ring-progress { fill:none; stroke:var(--primary); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s linear, stroke 0.4s; }
-.ring-inner    { position:relative; z-index:1; text-align:center; }
-.mode-label    { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; opacity:0.55; margin-bottom:4px; }
-.timer-digits  { font-family:"Sour Gummy",sans-serif; font-size:62px; font-weight:900; line-height:1; letter-spacing:-2px; cursor:pointer; }
-.timer-digits:hover { opacity: 0.8; }
-.session-dots  { display:flex; gap:8px; justify-content:center; margin-top:10px; }
-.dot { width:11px; height:11px; border-radius:50%; background:var(--accent); border:2px solid var(--border); transition:background 0.3s; }
+.ring-wrap { position:relative;width:220px;height:220px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center; }
+.ring-wrap svg { position:absolute;top:0;left:0;transform:rotate(-90deg); }
+.ring-track    { fill:none;stroke:var(--accent);stroke-width:10;opacity:0.45; }
+.ring-progress { fill:none;stroke:var(--primary);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke 0.4s; }
+.ring-inner    { position:relative;z-index:1;text-align:center; }
+.mode-label    { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.55;margin-bottom:4px; }
+.timer-digits  { font-family:"Sour Gummy",sans-serif;font-size:62px;font-weight:900;line-height:1;letter-spacing:-2px; }
+.session-dots  { display:flex;gap:8px;justify-content:center;margin-top:10px; }
+.dot { width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid var(--border);transition:background 0.3s; }
 .dot.done    { background:var(--primary); }
-.dot.current { background:var(--primary); box-shadow:0 0 0 3px var(--bg-soft),0 0 0 5px var(--primary); animation:dpulse 1.2s ease-in-out infinite; }
+.dot.current { background:var(--primary);box-shadow:0 0 0 3px var(--bg-soft),0 0 0 5px var(--primary);animation:dpulse 1.2s ease-in-out infinite; }
 @keyframes dpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
 
-/* ── custom timer controls (shown when not running) ── */
-.timer-adjust {
-  display: flex; align-items: center; justify-content: center;
-  gap: 12px; margin-bottom: 10px;
-}
-.adjust-group { display:flex; flex-direction:column; align-items:center; gap:4px; }
-.adjust-label { font-size:10px; font-weight:700; opacity:0.5; letter-spacing:0.08em; text-transform:uppercase; }
-.adjust-btns  { display:flex; gap:5px; }
-.adj-btn {
-  width:30px; height:30px; padding:0;
-  border-radius:8px; font-size:16px; font-weight:900;
-  background:var(--btn-bg); border:3px solid var(--border); color:var(--btn-text);
-  cursor:pointer; transition:all 0.2s;
-  display:flex; align-items:center; justify-content:center;
-  line-height:1;
-}
-.adj-btn:hover { background:var(--bg); color:var(--text); }
+/* ── timer adjust ── */
+.timer-adjust { display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px;margin-top:6px; }
+.adjust-group { display:flex;flex-direction:column;align-items:center;gap:4px; }
+.adjust-label { font-size:10px;font-weight:700;opacity:0.5;letter-spacing:0.08em;text-transform:uppercase; }
+.adjust-btns  { display:flex;gap:5px; }
+.adj-btn { width:30px;height:30px;padding:0;border-radius:8px;font-size:13px;font-weight:900;background:var(--btn-bg);border:3px solid var(--border);color:var(--btn-text);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center; }
+.adj-btn:hover { background:var(--bg);color:var(--text); }
 
-/* ── control buttons ── */
-.btn-row { display:flex; gap:10px; justify-content:center; margin-bottom:16px; }
-.ctrl { font-size:16px; padding:10px 20px; display:flex; align-items:center; gap:6px; background:var(--btn-bg); border:3px solid var(--border); color:var(--btn-text); border-radius:8px; }
-.ctrl:hover { background:var(--bg); color:var(--text); }
-.ctrl.big { font-size:20px; font-weight:700; padding:12px 32px; }
+/* ── controls ── */
+.btn-row { display:flex;gap:10px;justify-content:center;margin-bottom:16px; }
+.ctrl { font-size:16px;padding:10px 20px;display:flex;align-items:center;gap:6px;background:var(--btn-bg);border:3px solid var(--border);color:var(--btn-text);border-radius:8px; }
+.ctrl:hover { background:var(--bg);color:var(--text); }
+.ctrl.big { font-size:20px;font-weight:700;padding:12px 32px; }
 
 /* ── music bar ── */
-.music-bar {
-  display:flex; align-items:center; gap:10px;
-  border:1px solid var(--accent); background:var(--bg);
-  padding:10px 14px; margin-bottom:10px;
-}
-.eq { display:flex; align-items:flex-end; gap:3px; height:18px; flex-shrink:0; }
-.eq-b { width:4px; border-radius:2px; background:var(--primary); border:1px solid var(--border); animation:eqA 0.7s ease-in-out infinite alternate; transform-origin:bottom; }
-.eq-b:nth-child(1){height:7px;  animation-delay:0s;}
-.eq-b:nth-child(2){height:15px; animation-delay:.13s;}
-.eq-b:nth-child(3){height:10px; animation-delay:.26s;}
-.eq-b:nth-child(4){height:18px; animation-delay:.07s;}
-.eq-b:nth-child(5){height:6px;  animation-delay:.2s;}
+.music-bar { display:flex;align-items:center;gap:10px;border:1px solid var(--accent);background:var(--bg);padding:10px 14px;margin-bottom:10px; }
+.eq { display:flex;align-items:flex-end;gap:3px;height:18px;flex-shrink:0; }
+.eq-b { width:4px;border-radius:2px;background:var(--primary);border:1px solid var(--border);animation:eqA 0.7s ease-in-out infinite alternate;transform-origin:bottom; }
+.eq-b:nth-child(1){height:7px; animation-delay:0s;}
+.eq-b:nth-child(2){height:15px;animation-delay:.13s;}
+.eq-b:nth-child(3){height:10px;animation-delay:.26s;}
+.eq-b:nth-child(4){height:18px;animation-delay:.07s;}
+.eq-b:nth-child(5){height:6px; animation-delay:.2s;}
 .eq.paused .eq-b { animation-play-state:paused; }
 @keyframes eqA { from{transform:scaleY(0.2)} to{transform:scaleY(1)} }
-.music-info { flex:1; min-width:0; }
-.music-name   { font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.music-status { font-size:11px; opacity:0.55; margin-top:1px; }
-.vol-row { display:flex; align-items:center; gap:5px; flex-shrink:0; }
-.vol-lbl { font-size:11px; font-weight:700; }
-input[type=range].vol { -webkit-appearance:none; width:64px; height:5px; border-radius:4px; background:var(--accent); outline:none; border:none; cursor:pointer; }
-input[type=range].vol::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--primary); border:3px solid var(--border); cursor:pointer; }
+.music-info { flex:1;min-width:0; }
+.music-name   { font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.music-status { font-size:11px;opacity:0.55;margin-top:1px; }
+.vol-row { display:flex;align-items:center;gap:5px;flex-shrink:0; }
+.vol-lbl { font-size:11px;font-weight:700; }
+input[type=range].vol { -webkit-appearance:none;width:64px;height:5px;border-radius:4px;background:var(--accent);outline:none;border:none;cursor:pointer; }
+input[type=range].vol::-webkit-slider-thumb { -webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--primary);border:3px solid var(--border);cursor:pointer; }
 
-/* ── bell toggle row ── */
-.bell-row { display:flex; align-items:center; justify-content:space-between; background:var(--bg); border:1px solid var(--accent); padding:8px 14px; font-size:13px; font-weight:700; }
-.toggle { position:relative; width:40px; height:22px; flex-shrink:0; display:inline-block; }
-.toggle input { opacity:0; width:0; height:0; }
-.toggle-slider { position:absolute; inset:0; background:var(--accent); border-radius:22px; cursor:pointer; transition:background 0.25s; border:2px solid var(--border); }
-.toggle-slider:before { content:''; position:absolute; width:14px; height:14px; border-radius:50%; background:white; left:2px; top:2px; transition:transform 0.25s; }
+/* ── toggle rows ── */
+.toggle-row { display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--accent);padding:8px 14px;font-size:13px;font-weight:700;margin-bottom:6px; }
+.toggle { position:relative;width:40px;height:22px;flex-shrink:0;display:inline-block; }
+.toggle input { opacity:0;width:0;height:0; }
+.toggle-slider { position:absolute;inset:0;background:var(--accent);border-radius:22px;cursor:pointer;transition:background 0.25s;border:2px solid var(--border); }
+.toggle-slider:before { content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;left:2px;top:2px;transition:transform 0.25s; }
 .toggle input:checked + .toggle-slider { background:var(--primary); }
 .toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
 
+/* ── session note area ── */
+.note-area {
+  display:none;
+  flex-direction:column;gap:8px;
+  background:var(--bg);border:1px solid var(--accent);
+  padding:12px 14px;margin-top:6px;
+}
+.note-area.visible { display:flex; }
+.note-area label { font-size:12px;font-weight:700;opacity:0.6;text-transform:uppercase;letter-spacing:0.08em; }
+.note-area textarea {
+  font-family:"Sour Gummy",sans-serif;font-size:13px;
+  background:var(--bg-soft);border:2px solid var(--accent);
+  border-radius:8px;padding:8px;color:var(--text);
+  resize:vertical;min-height:60px;outline:none;
+  transition:border-color 0.2s;
+}
+.note-area textarea:focus { border-color:var(--primary); }
+.note-save { font-size:13px;font-weight:700;padding:7px 14px;align-self:flex-end; }
+
 /* ── right column ── */
-.section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; opacity:0.55; margin-bottom:8px; margin-top:14px; }
+.section-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.55;margin-bottom:8px;margin-top:14px; }
 .section-title:first-child { margin-top:0; }
-.stream-btn { display:block; width:100%; text-align:left; font-size:14px; padding:8px 12px; margin-bottom:7px; background:var(--btn-bg); border:3px solid var(--border); border-radius:8px; color:var(--btn-text); }
-.stream-btn:hover { background:var(--bg); color:var(--text); }
-.stream-btn.active { background:var(--bg); color:var(--text); font-weight:700; border-color:var(--primary); }
-.info-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; border-bottom:1px solid var(--accent); padding-bottom:5px; }
-.info-row:last-child { border-bottom:none; margin-bottom:0; }
+.stream-btn { display:block;width:100%;text-align:left;font-size:14px;padding:8px 12px;margin-bottom:7px;background:var(--btn-bg);border:3px solid var(--border);border-radius:8px;color:var(--btn-text); }
+.stream-btn:hover { background:var(--bg);color:var(--text); }
+.stream-btn.active { background:var(--bg);color:var(--text);font-weight:700;border-color:var(--primary); }
+.info-row { display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;border-bottom:1px solid var(--accent);padding-bottom:5px; }
+.info-row:last-child { border-bottom:none;margin-bottom:0; }
 .info-row span:first-child { opacity:0.6; }
 .info-row span:last-child  { font-weight:700; }
 
+/* ── streak / total ── */
+/* ── session goal bar ── */
+.goal-wrap { margin-top:10px; }
+.goal-label { font-size:11px;font-weight:700;opacity:0.55;display:flex;justify-content:space-between;margin-bottom:4px; }
+.goal-track { height:8px;background:var(--accent);border-radius:4px;overflow:hidden;border:1px solid var(--border); }
+.goal-fill  { height:100%;background:var(--primary);border-radius:4px;transition:width 0.4s; }
+.goal-input-row { display:flex;gap:6px;margin-top:6px;align-items:center; }
+.goal-input-row input[type=number] {
+  width:52px;font-family:"Sour Gummy",sans-serif;font-size:13px;font-weight:700;
+  background:var(--bg);border:2px solid var(--accent);border-radius:6px;
+  padding:4px 6px;color:var(--text);outline:none;text-align:center;
+}
+.goal-input-row input:focus { border-color:var(--primary); }
+.goal-set-btn { font-size:12px;font-weight:700;padding:5px 10px; }
+
+/* ── heatmap ── */
+.heatmap-grid {
+  display:grid;
+  grid-template-columns:repeat(13,1fr);
+  gap:3px;margin-top:6px;
+}
+.hm-cell {
+  aspect-ratio:1;border-radius:2px;
+  background:var(--accent);opacity:0.3;
+  transition:opacity 0.2s,background 0.2s;
+  cursor:default;position:relative;
+}
+.hm-cell[data-count="1"] { background:var(--primary);opacity:0.4; }
+.hm-cell[data-count="2"] { background:var(--primary);opacity:0.6; }
+.hm-cell[data-count="3"] { background:var(--primary);opacity:0.8; }
+.hm-cell[data-count="4"] { background:var(--primary);opacity:1; }
+.hm-cell:hover::after {
+  content:attr(data-tip);
+  position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+  background:#333;color:#fff;font-size:9px;padding:2px 5px;border-radius:4px;
+  white-space:nowrap;pointer-events:none;z-index:10;
+}
+
+/* ── weekly summary card ── */
+.week-card {
+  background:var(--bg);border:1px solid var(--accent);
+  border-radius:8px;padding:10px 12px;margin-top:10px;
+  font-size:12px;line-height:1.7;
+}
+.week-card strong { color:var(--primary); }
+
 /* ── footer ── */
-footer { background-color:var(--bg); color:var(--text); text-align:center; margin-top:16px; padding:10px; font-size:13px; opacity:0.65; clear:both; }
-.footer-link { background:none; border:none; font-family:"Sour Gummy",sans-serif; font-size:13px; cursor:pointer; text-decoration:underline; color:var(--text); padding:0; }
-.footer-link:hover { background:none; color:var(--text); opacity:1; }
+footer { background-color:var(--bg);color:var(--text);text-align:center;margin-top:16px;padding:10px;font-size:13px;opacity:0.65;clear:both; }
+.footer-link { background:none;border:none;font-family:"Sour Gummy",sans-serif;font-size:13px;cursor:pointer;text-decoration:underline;color:var(--text);padding:0; }
+.footer-link:hover { background:none;color:var(--text);opacity:1; }
+#shortcut-hint { font-size:11px;opacity:0.5;margin-top:4px; }
 
 /* ── toast ── */
-.toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--primary); color:var(--btn-text); border:3px solid var(--border); border-radius:8px; padding:10px 24px; font-family:"Sour Gummy",sans-serif; font-size:15px; font-weight:700; opacity:0; pointer-events:none; transition:opacity 0.3s, bottom 0.3s; z-index:200; white-space:nowrap; }
-.toast.show { opacity:1; bottom:36px; }
+.toast { position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--primary);color:var(--btn-text);border:3px solid var(--border);border-radius:8px;padding:10px 24px;font-family:"Sour Gummy",sans-serif;font-size:15px;font-weight:700;opacity:0;pointer-events:none;transition:opacity 0.3s,bottom 0.3s;z-index:200;white-space:nowrap; }
+.toast.show { opacity:1;bottom:36px; }
 
 /* ── modals ── */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500; align-items:center; justify-content:center; }
+.modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;align-items:center;justify-content:center; }
 .modal-overlay.open { display:flex; }
-.modal-box { background:var(--bg-soft); border:3px solid var(--border); border-radius:12px; padding:28px 28px 22px; width:100%; max-width:360px; position:relative; }
-.modal-box h2 { font-size:22px; font-weight:900; margin-bottom:18px; text-align:center; color:var(--text); }
-.modal-close { position:absolute; top:12px; right:14px; background:none !important; border:none !important; font-size:20px; cursor:pointer; color:var(--text); padding:0; line-height:1; width:auto; height:auto; }
-.modal-close:hover { color:var(--primary); background:none !important; }
-
-.auth-form { display:flex; flex-direction:column; gap:10px; }
-.auth-form input { font-family:"Sour Gummy",sans-serif; font-size:14px; padding:9px 12px; border-radius:8px; border:3px solid var(--border); background:var(--bg); color:var(--text); outline:none; transition:border-color 0.2s; }
+.modal-box { background:var(--bg-soft);border:3px solid var(--border);border-radius:12px;padding:28px 28px 22px;width:100%;max-width:380px;position:relative; }
+.modal-box h2 { font-size:22px;font-weight:900;margin-bottom:18px;text-align:center;color:var(--text); }
+.modal-close { position:absolute;top:12px;right:14px;background:none !important;border:none !important;font-size:20px;cursor:pointer;color:var(--text);padding:0;line-height:1;width:auto;height:auto; }
+.modal-close:hover { color:var(--primary);background:none !important; }
+.auth-form { display:flex;flex-direction:column;gap:10px; }
+.auth-form input { font-family:"Sour Gummy",sans-serif;font-size:14px;padding:9px 12px;border-radius:8px;border:3px solid var(--border);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.2s; }
 .auth-form input:focus { border-color:var(--primary); }
 .auth-form input::placeholder { opacity:0.5; }
-.auth-submit { font-family:"Sour Gummy",sans-serif; font-size:16px; font-weight:700; padding:10px; border-radius:8px; border:3px solid var(--border); background:var(--btn-bg); color:var(--btn-text); cursor:pointer; transition:all 0.3s; margin-top:4px; width:100%; }
-.auth-submit:hover { background:var(--bg); color:var(--text); }
-.auth-link { background:none !important; border:none !important; padding:0; font-family:"Sour Gummy",sans-serif; font-size:13px; color:var(--text); opacity:0.65; cursor:pointer; text-decoration:underline; text-align:center; margin-top:2px; }
-.auth-link:hover { opacity:1; background:none !important; }
-.auth-msg { font-size:12px; text-align:center; min-height:16px; margin-top:4px; font-weight:700; line-height:1.4; }
+.auth-submit { font-family:"Sour Gummy",sans-serif;font-size:16px;font-weight:700;padding:10px;border-radius:8px;border:3px solid var(--border);background:var(--btn-bg);color:var(--btn-text);cursor:pointer;transition:all 0.3s;margin-top:4px;width:100%; }
+.auth-submit:hover { background:var(--bg);color:var(--text); }
+.auth-link { background:none !important;border:none !important;padding:0;font-family:"Sour Gummy",sans-serif;font-size:13px;color:var(--text);opacity:0.65;cursor:pointer;text-decoration:underline;text-align:center;margin-top:2px; }
+.auth-link:hover { opacity:1;background:none !important; }
+.auth-msg { font-size:12px;text-align:center;min-height:16px;margin-top:4px;font-weight:700;line-height:1.4; }
 .auth-msg.ok  { color:#2a7a2a; }
 .auth-msg.err { color:#c0392b; }
-.supabase-note { font-size:11px; opacity:0.5; text-align:center; margin-top:10px; padding-top:10px; border-top:1px solid var(--accent); line-height:1.5; color:var(--text); }
+.supabase-note { font-size:11px;opacity:0.5;text-align:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--accent);line-height:1.5;color:var(--text); }
+
+/* ── stats modal (wider) ── */
+#statsModal .modal-box { max-width:520px; }
+.stats-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px; }
+.stat-card { background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:12px;text-align:center; }
+.stat-card .num { font-size:26px;font-weight:900;color:var(--primary); }
+.stat-card .lbl { font-size:10px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px; }
+.history-list { max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px; }
+.hist-item { background:var(--bg);border:1px solid var(--accent);border-radius:6px;padding:8px 10px;font-size:12px; }
+.hist-item .hi-date { opacity:0.5;font-size:10px; }
+.hist-item .hi-task { font-weight:700;color:var(--primary);margin:2px 0; }
+.hist-item .hi-note { opacity:0.7;font-style:italic; }
 
 /* ── code modal ── */
-.code-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:600; align-items:center; justify-content:center; }
+.code-modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:600;align-items:center;justify-content:center; }
 .code-modal-overlay.open { display:flex; }
-.code-modal-box { background:var(--bg-soft); border:3px solid var(--border); border-radius:12px; padding:20px; width:90vw; max-width:760px; max-height:80vh; display:flex; flex-direction:column; position:relative; }
-.code-area { flex:1; overflow:auto; background:var(--bg); border:2px solid var(--accent); border-radius:8px; padding:12px; font-family:monospace; font-size:11px; line-height:1.5; color:var(--text); white-space:pre; min-height:200px; }
-.code-btns { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
-.code-btn { font-family:"Sour Gummy",sans-serif; font-size:14px; font-weight:700; padding:8px 18px; border-radius:8px; border:3px solid var(--border); background:var(--btn-bg); color:var(--btn-text); cursor:pointer; transition:all 0.3s; }
-.code-btn:hover { background:var(--bg); color:var(--text); }
+.code-modal-box { background:var(--bg-soft);border:3px solid var(--border);border-radius:12px;padding:20px;width:90vw;max-width:760px;max-height:80vh;display:flex;flex-direction:column;position:relative; }
+.code-area { flex:1;overflow:auto;background:var(--bg);border:2px solid var(--accent);border-radius:8px;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;color:var(--text);white-space:pre;min-height:200px; }
+.code-btns { display:flex;gap:10px;margin-top:12px;flex-wrap:wrap; }
+.code-btn { font-family:"Sour Gummy",sans-serif;font-size:14px;font-weight:700;padding:8px 18px;border-radius:8px;border:3px solid var(--border);background:var(--btn-bg);color:var(--btn-text);cursor:pointer;transition:all 0.3s; }
+.code-btn:hover { background:var(--bg);color:var(--text); }
+
+/* ── study with me ── */
+.room-modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center; }
+.room-modal-overlay.open { display:flex; }
+.room-modal-box { background:var(--bg-soft);border:3px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:480px;position:relative;max-height:90vh;overflow-y:auto; }
+.room-modal-box h2 { font-size:22px;font-weight:900;margin-bottom:16px;text-align:center;color:var(--text); }
+
+.room-setup { display:flex;flex-direction:column;gap:10px; }
+.room-input { font-family:"Sour Gummy",sans-serif;font-size:14px;padding:9px 12px;border-radius:8px;border:3px solid var(--border);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.2s;width:100%; }
+.room-input:focus { border-color:var(--primary); }
+.room-input::placeholder { opacity:0.45; }
+.room-divider { text-align:center;font-size:12px;font-weight:700;opacity:0.45;margin:2px 0; }
+.room-submit { font-family:"Sour Gummy",sans-serif;font-size:16px;font-weight:700;padding:10px;border-radius:8px;border:3px solid var(--border);background:var(--btn-bg);color:var(--btn-text);cursor:pointer;transition:all 0.3s;width:100%; }
+.room-submit:hover { background:var(--bg);color:var(--text); }
+
+/* active room panel */
+.room-panel { display:none;flex-direction:column;gap:10px; }
+.room-panel.visible { display:flex; }
+.room-header { display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:10px 14px; }
+.room-code-display { font-size:13px;font-weight:700; }
+.room-code-display span { color:var(--primary);font-size:16px;letter-spacing:0.1em; }
+.room-leave { font-size:12px;padding:5px 12px; }
+
+.peers-list { display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto; }
+.peer-card {
+  background:var(--bg);border:1px solid var(--accent);border-radius:8px;
+  padding:10px 14px;display:flex;align-items:center;gap:12px;
+}
+.peer-card.is-me { border-color:var(--primary); }
+.peer-avatar { width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid var(--border); }
+.peer-info { flex:1;min-width:0; }
+.peer-name { font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px; }
+.peer-me-tag { font-size:9px;background:var(--primary);color:var(--btn-text);padding:1px 6px;border-radius:10px;font-weight:700; }
+.peer-task { font-size:11px;opacity:0.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px; }
+.peer-timer { text-align:right;flex-shrink:0; }
+.peer-time { font-family:"Sour Gummy",sans-serif;font-size:20px;font-weight:900;color:var(--primary);line-height:1; }
+.peer-mode { font-size:10px;font-weight:700;opacity:0.55;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px; }
+.peer-status-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.peer-status-dot.focus { background:#4caf50; }
+.peer-status-dot.break { background:#f6c14e; }
+.peer-status-dot.idle  { background:var(--accent); }
+
+.room-invite { display:flex;gap:8px;align-items:center;margin-top:4px; }
+.room-invite input { flex:1;font-family:"Sour Gummy",sans-serif;font-size:12px;padding:7px 10px;border-radius:8px;border:2px solid var(--accent);background:var(--bg);color:var(--text);outline:none; }
+.room-invite button { font-size:12px;font-weight:700;padding:7px 14px;white-space:nowrap; }
+.room-msg { font-size:11px;text-align:center;opacity:0.55;min-height:14px; }
 
 @media (max-width:620px) {
   .col-wrap { flex-direction:column; }
   .rightcolumn { width:100%; }
   .timer-digits { font-size:50px; }
   .links { gap:6px; }
-  .links button { font-size:13px; padding:6px 12px; }
+  .links button { font-size:13px;padding:6px 12px; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- top-left: Login + Sign Up (or account when logged in) -->
 <div id="auth-btns">
   <button class="auth-top-btn" id="btn-login"   onclick="openLogin()">🔑 Login</button>
   <button class="auth-top-btn" id="btn-signup"  onclick="openSignup()">✏️ Sign Up</button>
   <button class="auth-top-btn" id="btn-account" onclick="openAccount()">👤 <span id="acct-label"></span></button>
 </div>
-
-<!-- top-right: dark mode -->
 <button id="change-darkmode" onclick="toggleDark()">🌙</button>
-
 <div class="toast" id="toast"></div>
 
-<!-- ── LOGIN modal ── -->
+<!-- LOGIN -->
 <div class="modal-overlay" id="loginModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
@@ -297,7 +347,7 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
   </div>
 </div>
 
-<!-- ── SIGN UP modal ── -->
+<!-- SIGN UP -->
 <div class="modal-overlay" id="signupModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('signupModal')">✕</button>
@@ -313,7 +363,7 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
   </div>
 </div>
 
-<!-- ── FORGOT PASSWORD modal ── -->
+<!-- FORGOT -->
 <div class="modal-overlay" id="forgotModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('forgotModal')">✕</button>
@@ -327,24 +377,95 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
   </div>
 </div>
 
-<!-- ── ACCOUNT modal (logged in) ── -->
+<!-- ACCOUNT -->
 <div class="modal-overlay" id="accountModal">
   <div class="modal-box" style="text-align:center;">
     <button class="modal-close" onclick="closeModal('accountModal')">✕</button>
     <h2>👤 My Account</h2>
-    <p style="font-size:15px; margin-bottom:4px; color:var(--text);">Signed in as</p>
-    <p style="font-size:20px; font-weight:900; margin-bottom:4px; color:var(--text);" id="accUsername"></p>
-    <p style="font-size:12px; opacity:0.55; margin-bottom:20px; color:var(--text);" id="accEmail"></p>
+    <p style="font-size:15px;margin-bottom:4px;color:var(--text);">Signed in as</p>
+    <p style="font-size:20px;font-weight:900;margin-bottom:4px;color:var(--text);" id="accUsername"></p>
+    <p style="font-size:12px;opacity:0.55;margin-bottom:20px;color:var(--text);" id="accEmail"></p>
     <button class="auth-submit" onclick="doLogout()">Sign Out</button>
     <div class="supabase-note">🔗 Cross-device sync coming soon via Supabase</div>
   </div>
 </div>
 
-<!-- ── code viewer modal ── -->
+<!-- STATS modal -->
+<div class="modal-overlay" id="statsModal">
+  <div class="modal-box" style="max-width:520px;">
+    <button class="modal-close" onclick="closeModal('statsModal')">✕</button>
+    <h2>📊 Your Stats</h2>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="num" id="st-today">0</div><div class="lbl">Today</div></div>
+      <div class="stat-card"><div class="num" id="st-week">0</div><div class="lbl">This Week</div></div>
+      <div class="stat-card"><div class="num" id="st-total">0</div><div class="lbl">All Time</div></div>
+      <div class="stat-card"><div class="num" id="st-streak">0</div><div class="lbl">🔥 Streak</div></div>
+      <div class="stat-card"><div class="num" id="st-hours">0h</div><div class="lbl">Total Time</div></div>
+      <div class="stat-card"><div class="num" id="st-best">0</div><div class="lbl">Best Day</div></div>
+    </div>
+
+    <!-- daily goal -->
+    <div class="section-title" style="margin-top:4px;">🎯 Daily Goal</div>
+    <div class="goal-wrap">
+      <div class="goal-label">
+        <span>Sessions today</span>
+        <span id="goalProgress">0 / 4</span>
+      </div>
+      <div class="goal-track"><div class="goal-fill" id="goalFill" style="width:0%"></div></div>
+      <div class="goal-input-row">
+        <input type="number" id="goalInput" value="4" min="1" max="20">
+        <button class="ctrl goal-set-btn" onclick="setGoal()">Set</button>
+      </div>
+    </div>
+
+    <!-- heatmap -->
+    <div class="section-title">📅 Activity (13 weeks)</div>
+    <div class="heatmap-grid" id="heatmap"></div>
+
+    <div class="section-title">📅 Weekly Summary</div>
+    <div class="week-card" id="weekSummary">No sessions yet this week.</div>
+    <div class="section-title">📝 Session History</div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<!-- STUDY WITH ME modal -->
+<div class="room-modal-overlay" id="roomModal">
+  <div class="room-modal-box">
+    <button class="modal-close" onclick="closeRoomModal()">✕</button>
+    <h2>👥 Study With Me</h2>
+
+    <!-- setup screen (shown when not in a room) -->
+    <div class="room-setup" id="roomSetup">
+      <input class="room-input" id="roomDisplayName" placeholder="Your display name (e.g. Toby)" maxlength="20">
+      <button class="room-submit" onclick="createRoom()">✨ Create a Room</button>
+      <div class="room-divider">— or join an existing room —</div>
+      <input class="room-input" id="roomCodeInput" placeholder="Enter room code (e.g. FOCUS-4829)" maxlength="12" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+      <button class="room-submit" onclick="joinRoom()" style="background:var(--bg);color:var(--text);">🚪 Join Room</button>
+      <div class="room-msg" id="roomSetupMsg"></div>
+    </div>
+
+    <!-- active room panel -->
+    <div class="room-panel" id="roomPanel">
+      <div class="room-header">
+        <div class="room-code-display">Room: <span id="roomCodeDisplay"></span></div>
+        <button class="ctrl room-leave" onclick="leaveRoom()">Leave</button>
+      </div>
+      <div class="peers-list" id="peersList"></div>
+      <div class="room-invite">
+        <input type="text" id="roomInviteUrl" readonly>
+        <button onclick="copyInvite()">📋 Copy Link</button>
+      </div>
+      <div class="room-msg" id="roomPanelMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CODE viewer -->
 <div class="code-modal-overlay" id="codeModal">
   <div class="code-modal-box">
     <button class="modal-close" onclick="closeCodeModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text);">✕</button>
-    <h2 style="color:var(--text); font-size:18px; font-weight:900; margin-bottom:12px;">📋 Full Source Code</h2>
+    <h2 style="color:var(--text);font-size:18px;font-weight:900;margin-bottom:12px;">📋 Full Source Code</h2>
     <div class="code-area" id="codeArea"></div>
     <div class="code-btns">
       <button class="code-btn" id="copyBtn" onclick="copyCode()">📋 Copy All</button>
@@ -353,31 +474,42 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
   </div>
 </div>
 
-<!-- ── page ── -->
+<!-- PAGE -->
 <header>✿ lofi pomodoro ✿</header>
-  <div class="links"> 
-        <a href="index.html">Home</a>
-        <a href="About Me.html">About Me</a>
-        <a href="Blog.html">Blog</a>
-        <a href="My Work.html">My Work</a>
-        <a href="Contact.html">Contact</a>
-        <a href="https://linktr.ee/tobyk1dd">Links</button></a>
-    </div></nav>
+
+<div class="links" style="padding:6px 0;">
+  <a href="index.html" style="font-family:'Sour Gummy',sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:6px 14px;border-radius:8px;text-decoration:none;">Home</a>
+  <a href="About Me.html" style="font-family:'Sour Gummy',sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:6px 14px;border-radius:8px;text-decoration:none;">About Me</a>
+  <a href="Blog.html" style="font-family:'Sour Gummy',sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:6px 14px;border-radius:8px;text-decoration:none;">Blog</a>
+  <a href="My Work.html" style="font-family:'Sour Gummy',sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:6px 14px;border-radius:8px;text-decoration:none;">My Work</a>
+  <a href="Contact.html" style="font-family:'Sour Gummy',sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:6px 14px;border-radius:8px;text-decoration:none;">Contact</a>
+  <a href="https://linktr.ee/tobyk1dd" style="font-family:'Sour Gummy',sans-serif;font-size:15px;color:var(--btn-text);background:var(--btn-bg);border:3px solid var(--border);padding:6px 14px;border-radius:8px;text-decoration:none;">Links</a>
+</div>
 
 <div id="navigation">
   <div class="links">
     <button class="active" onclick="setMode('focus',this)">🍅 Focus</button>
     <button onclick="setMode('short',this)">☕ Short Break</button>
     <button onclick="setMode('long',this)">🌿 Long Break</button>
+    <button onclick="openModal('statsModal');renderStats();" style="background:var(--bg);color:var(--text);border-color:var(--accent);">📊 Stats</button>
+    <button onclick="openRoomModal()" style="background:var(--bg);color:var(--text);border-color:var(--accent);" id="roomNavBtn">👥 Study With Me</button>
   </div>
 </div>
 
 <div class="col-wrap">
-
-  <!-- LEFT: timer + controls -->
+  <!-- LEFT -->
   <div class="leftcolumn">
     <div class="container">
 
+      <!-- task input -->
+      <div class="task-box">
+        <span class="task-label">🎯</span>
+        <input type="text" id="taskInput" placeholder="What are you focusing on?" maxlength="80"
+          oninput="updateTaskDisplay()" onkeydown="if(event.key==='Enter')document.getElementById('playBtn').click()">
+      </div>
+      <div id="taskDisplay"></div>
+
+      <!-- ring -->
       <div class="ring-wrap">
         <svg width="220" height="220" viewBox="0 0 220 220">
           <circle class="ring-track"    cx="110" cy="110" r="95"/>
@@ -385,7 +517,7 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
         </svg>
         <div class="ring-inner">
           <div class="mode-label" id="modeLabel">Focus</div>
-          <div class="timer-digits" id="timerDisplay" title="Click to edit">25:00</div>
+          <div class="timer-digits" id="timerDisplay">25:00</div>
           <div class="session-dots">
             <div class="dot current" id="d0"></div>
             <div class="dot" id="d1"></div>
@@ -395,7 +527,7 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
         </div>
       </div>
 
-      <!-- custom timer adjust — hidden while running -->
+      <!-- timer adjust -->
       <div class="timer-adjust" id="timerAdjust">
         <div class="adjust-group">
           <div class="adjust-label">Minutes</div>
@@ -408,12 +540,14 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
         </div>
       </div>
 
+      <!-- controls -->
       <div class="btn-row">
         <button class="ctrl" onclick="resetTimer()">↺ Reset</button>
         <button class="ctrl big" id="playBtn" onclick="togglePlay()">▶ Start</button>
         <button class="ctrl" onclick="skipSession()">Skip ▷▷</button>
       </div>
 
+      <!-- music bar -->
       <div class="music-bar">
         <div class="eq paused" id="eq">
           <div class="eq-b"></div><div class="eq-b"></div><div class="eq-b"></div>
@@ -429,26 +563,27 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
         </div>
       </div>
 
-      <div class="bell-row">
-        <span>🔔 Timer bell</span>
-        <label class="toggle">
-          <input type="checkbox" id="bellToggle" checked>
-          <span class="toggle-slider"></span>
-        </label>
+      <!-- session note area (shown after a focus session ends) -->
+      <div class="note-area" id="noteArea">
+        <label>📝 Session note — what did you get done?</label>
+        <textarea id="noteInput" placeholder="Finished the intro section, reviewed chapter 3…"></textarea>
+        <button class="ctrl note-save" onclick="saveNote()">Save note ✓</button>
       </div>
 
     </div>
   </div>
 
-  <!-- RIGHT: streams + session info -->
+  <!-- RIGHT -->
   <div class="rightcolumn">
 
+    <!-- streams -->
     <div class="section-title">🎧 Stream</div>
     <button class="stream-btn active" onclick="switchStream(0,this)">☁️ Lofi Hip Hop</button>
     <button class="stream-btn"        onclick="switchStream(1,this)">🌸 Plaza Lofi</button>
     <button class="stream-btn"        onclick="switchStream(2,this)">🏎️ Retrowave</button>
     <button class="stream-btn"        onclick="switchStream(3,this)">🌧️ Ambient Rain</button>
 
+    <!-- session info -->
     <div class="section-title">📊 Session</div>
     <div class="info-row"><span>Mode</span><span id="infoMode">Focus</span></div>
     <div class="info-row"><span>Completed</span><span id="infoCompleted">0 sessions</span></div>
@@ -459,25 +594,41 @@ footer { background-color:var(--bg); color:var(--text); text-align:center; margi
     <div class="info-row"><span>Short break</span><span id="timingShort">5 min</span></div>
     <div class="info-row"><span>Long break</span><span id="timingLong">15 min</span></div>
 
+    <!-- settings -->
+    <div class="section-title">⚙️ Settings</div>
+    <div class="toggle-row">
+      <span>🔔 Timer bell</span>
+      <label class="toggle"><input type="checkbox" id="bellToggle" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-row" style="margin-top:6px;">
+      <span>🎵 Auto-play music</span>
+      <label class="toggle"><input type="checkbox" id="autoMusicToggle" checked><span class="toggle-slider"></span></label>
+    </div>
+
   </div>
 </div>
 
 <footer>
   made with ✿ &nbsp;—&nbsp; open as .html in chrome / firefox for audio &nbsp;|&nbsp;
   <button class="footer-link" onclick="openCodeModal()">📋 view source</button>
+  <div id="shortcut-hint">⌨️ Space = start/pause &nbsp;·&nbsp; R = reset &nbsp;·&nbsp; S = skip</div>
 </footer>
 
 <script>
-// ── streams ───────────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  STREAMS
+// ══════════════════════════════════════════════
 const STREAMS = [
   { name:'lofi hip hop radio ☁️', url:'https://streams.ilovemusic.de/iloveradio17.mp3' },
-  { name:'plaza lofi 🌸',           url:'https://radio.plaza.one/mp3' },
-  { name:'retrowave 🏎️',      url:'https://stream.nightride.fm/nightride.mp3' },
-  { name:'ambient rain 🌧️',   url:'https://orangefreesounds.com/wp-content/uploads/2024/09/Loop-rain-sound.mp3', loop:true },
+  { name:'plaza lofi 🌸',          url:'https://radio.plaza.one/mp3' },
+  { name:'retrowave 🏎️',          url:'https://stream.nightride.fm/nightride.mp3' },
+  { name:'ambient rain 🌧️',       url:'https://orangefreesounds.com/wp-content/uploads/2024/09/Loop-rain-sound.mp3', loop:true },
 ];
 let streamIdx = 0;
 
-// ── modes ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  MODES
+// ══════════════════════════════════════════════
 const MODES = {
   focus: { label:'Focus',       duration:25*60 },
   short: { label:'Short Break', duration:5*60  },
@@ -491,36 +642,231 @@ let intervalId  = null;
 let completedFocus = 0;
 let audio = null, vol = 0.75, dark = false;
 
-// ── audio ─────────────────────────────────────────────────
-function getAudio() {
-  if (!audio) {
-    audio = new Audio();
-    audio.volume = vol;
-    audio.onerror = () => { setStatus('stream error…'); };
-  }
-  // rain MP3 is short (~30s) so must loop; streams run continuously
-  audio.loop = STREAMS[streamIdx].loop === true;
-  return audio;
+// ══════════════════════════════════════════════
+//  STATS STORAGE
+//  lofi_stats = { sessions: [{date,task,note,mins,mode}], goal:4 }
+// ══════════════════════════════════════════════
+function getStats()   { return JSON.parse(localStorage.getItem('lofi_stats') || '{"sessions":[],"goal":4}'); }
+function saveStats(s) { localStorage.setItem('lofi_stats', JSON.stringify(s)); }
+
+function todayKey() { return new Date().toISOString().slice(0,10); }
+
+function recordSession(task, note) {
+  const st = getStats();
+  st.sessions.push({
+    date: todayKey(),
+    ts:   Date.now(),
+    task: task || '',
+    note: note || '',
+    mins: Math.round(totalTime / 60),
+    mode: currentMode,
+  });
+  saveStats(st);
+  updateSidebar();
+  renderHeatmap();
 }
-// ── rain synth state ──────────────────────────────────────
+
+// ══════════════════════════════════════════════
+//  STREAK
+// ══════════════════════════════════════════════
+function calcStreak() {
+  const st = getStats();
+  if (!st.sessions.length) return 0;
+  const days = [...new Set(st.sessions.filter(s=>s.mode==='focus').map(s=>s.date))].sort().reverse();
+  if (!days.length) return 0;
+  const today = todayKey();
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (days[0] !== today && days[0] !== yesterday) return 0;
+  let streak = 1;
+  for (let i = 1; i < days.length; i++) {
+    const prev = new Date(days[i-1]), curr = new Date(days[i]);
+    const diff = (prev - curr) / 86400000;
+    if (diff === 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function totalFocusMins() {
+  const st = getStats();
+  return st.sessions.filter(s=>s.mode==='focus').reduce((a,s)=>a+s.mins,0);
+}
+
+function sessionsToday() {
+  const st = getStats();
+  return st.sessions.filter(s=>s.mode==='focus' && s.date===todayKey()).length;
+}
+
+function sessionsThisWeek() {
+  const st = getStats();
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
+  weekStart.setHours(0,0,0,0);
+  return st.sessions.filter(s=>s.mode==='focus' && new Date(s.ts)>=weekStart).length;
+}
+
+function bestDay() {
+  const st = getStats();
+  const counts = {};
+  st.sessions.filter(s=>s.mode==='focus').forEach(s=>{ counts[s.date]=(counts[s.date]||0)+1; });
+  return Math.max(0,...Object.values(counts));
+}
+
+// ══════════════════════════════════════════════
+//  GOAL
+// ══════════════════════════════════════════════
+function getGoal() { return getStats().goal || 4; }
+function setGoal() {
+  const v = Math.max(1, Math.min(20, parseInt(document.getElementById('goalInput').value)||4));
+  document.getElementById('goalInput').value = v;
+  const st = getStats(); st.goal = v; saveStats(st);
+  updateSidebar();
+}
+
+// ══════════════════════════════════════════════
+//  SIDEBAR QUICK STATS
+// ══════════════════════════════════════════════
+function updateSidebar() {
+  const today = sessionsToday();
+  const goal  = getGoal();
+  const pct   = Math.min(100, Math.round((today/goal)*100));
+  // update goal elements (in stats modal)
+  const gp = document.getElementById('goalProgress');
+  const gf = document.getElementById('goalFill');
+  const gi = document.getElementById('goalInput');
+  if(gp) gp.textContent = today + ' / ' + goal;
+  if(gf) gf.style.width = pct + '%';
+  if(gi) gi.value = goal;
+  if(today >= goal && goal > 0 && today > 0) showToast('🎉 Daily goal reached!');
+}
+
+// ══════════════════════════════════════════════
+//  HEATMAP (13 weeks × 7 days = 91 cells)
+// ══════════════════════════════════════════════
+function renderHeatmap() {
+  const st = getStats();
+  const counts = {};
+  st.sessions.filter(s=>s.mode==='focus').forEach(s=>{ counts[s.date]=(counts[s.date]||0)+1; });
+
+  const grid = document.getElementById('heatmap');
+  grid.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  // start from 91 days ago (13 weeks)
+  const start = new Date(today); start.setDate(today.getDate()-90);
+
+  for (let i=0; i<91; i++) {
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const key = d.toISOString().slice(0,10);
+    const c = Math.min(4, counts[key]||0);
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    cell.dataset.count = c;
+    const label = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    cell.dataset.tip = label + ': ' + (counts[key]||0) + ' session' + ((counts[key]||0)!==1?'s':'');
+    grid.appendChild(cell);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  STATS MODAL
+// ══════════════════════════════════════════════
+function renderStats() {
+  const st = getStats();
+  const focusSessions = st.sessions.filter(s=>s.mode==='focus');
+  const mins = totalFocusMins();
+
+  document.getElementById('st-today').textContent  = sessionsToday();
+  document.getElementById('st-week').textContent   = sessionsThisWeek();
+  document.getElementById('st-total').textContent  = focusSessions.length;
+  document.getElementById('st-streak').textContent = calcStreak();
+  document.getElementById('st-hours').textContent  = Math.floor(mins/60) + 'h ' + (mins%60) + 'm';
+  document.getElementById('st-best').textContent   = bestDay();
+
+  // weekly summary
+  const weekSessions = sessionsThisWeek();
+  const weekMins = (() => {
+    const now = new Date();
+    const ws = new Date(now); ws.setDate(now.getDate()-now.getDay()); ws.setHours(0,0,0,0);
+    return st.sessions.filter(s=>s.mode==='focus'&&new Date(s.ts)>=ws).reduce((a,s)=>a+s.mins,0);
+  })();
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayCounts = {};
+  st.sessions.filter(s=>s.mode==='focus').forEach(s=>{ const d=new Date(s.ts); const k=dayNames[d.getDay()]; dayCounts[k]=(dayCounts[k]||0)+1; });
+  const bestDayName = Object.entries(dayCounts).sort((a,b)=>b[1]-a[1])[0];
+  const ws = document.getElementById('weekSummary');
+  if (!weekSessions) {
+    ws.innerHTML = 'No sessions yet this week. Start focusing! 🍅';
+  } else {
+    ws.innerHTML =
+      `This week: <strong>${weekSessions} session${weekSessions!==1?'s':''}</strong> · <strong>${Math.floor(weekMins/60)}h ${weekMins%60}m</strong> focused` +
+      (bestDayName ? ` · Best day ever: <strong>${bestDayName[0]} (${bestDayName[1]} sessions)</strong>` : '') +
+      (calcStreak() ? ` · 🔥 <strong>${calcStreak()} day streak</strong>` : '');
+  }
+
+  // history list (most recent first, last 30)
+  const hl = document.getElementById('historyList');
+  hl.innerHTML = '';
+  const recent = [...focusSessions].reverse().slice(0,30);
+  if (!recent.length) { hl.innerHTML = '<div style="opacity:0.5;font-size:12px;text-align:center;padding:10px;">No sessions recorded yet.</div>'; }
+  recent.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    const d = new Date(s.ts);
+    const dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}) + ' · ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    div.innerHTML =
+      `<div class="hi-date">${dateStr} · ${s.mins} min</div>` +
+      (s.task ? `<div class="hi-task">🎯 ${s.task}</div>` : '') +
+      (s.note ? `<div class="hi-note">"${s.note}"</div>` : '');
+    hl.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════
+//  TASK
+// ══════════════════════════════════════════════
+function updateTaskDisplay() {
+  const v = document.getElementById('taskInput').value.trim();
+  const el = document.getElementById('taskDisplay');
+  el.textContent = v ? '🎯 ' + v : '';
+}
+
+// ══════════════════════════════════════════════
+//  SESSION NOTE
+// ══════════════════════════════════════════════
+let pendingNote = false; // true while note area is visible after a session
+
+function showNoteArea() {
+  pendingNote = true;
+  document.getElementById('noteInput').value = '';
+  document.getElementById('noteArea').classList.add('visible');
+}
+
+function saveNote() {
+  const note = document.getElementById('noteInput').value.trim();
+  const task = document.getElementById('taskInput').value.trim();
+  recordSession(task, note);
+  document.getElementById('noteArea').classList.remove('visible');
+  pendingNote = false;
+  showToast('Session saved ✿');
+}
+
+// ══════════════════════════════════════════════
+//  AUDIO
+// ══════════════════════════════════════════════
 let rainCtx = null, rainNodes = [], rainMaster = null;
 
 function makeNoiseBuffer(ctx, seconds) {
   const sr = ctx.sampleRate;
-  const buf = ctx.createBuffer(2, sr * seconds, sr);
-  for (let c = 0; c < 2; c++) {
+  const buf = ctx.createBuffer(2, sr*seconds, sr);
+  for (let c=0;c<2;c++) {
     const d = buf.getChannelData(c);
-    // pink-ish noise: sum of white noise at different scales
     let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0;
-    for (let i = 0; i < d.length; i++) {
-      const w = Math.random() * 2 - 1;
-      b0 = 0.99886*b0 + w*0.0555179;
-      b1 = 0.99332*b1 + w*0.0750759;
-      b2 = 0.96900*b2 + w*0.1538520;
-      b3 = 0.86650*b3 + w*0.3104856;
-      b4 = 0.55000*b4 + w*0.5329522;
-      b5 = -0.7616*b5 + w*0.0168980;
-      d[i] = (b0+b1+b2+b3+b4+b5+w*0.5362) * 0.11;
+    for (let i=0;i<d.length;i++) {
+      const w=Math.random()*2-1;
+      b0=0.99886*b0+w*0.0555179; b1=0.99332*b1+w*0.0750759;
+      b2=0.96900*b2+w*0.1538520; b3=0.86650*b3+w*0.3104856;
+      b4=0.55000*b4+w*0.5329522; b5=-0.7616*b5+w*0.0168980;
+      d[i]=(b0+b1+b2+b3+b4+b5+w*0.5362)*0.11;
     }
   }
   return buf;
@@ -529,436 +875,663 @@ function makeNoiseBuffer(ctx, seconds) {
 function startRain() {
   stopRain();
   try {
-    rainCtx = new (window.AudioContext || window.webkitAudioContext)();
-    rainMaster = rainCtx.createGain();
-    rainMaster.gain.value = vol * 0.85;
+    rainCtx = new (window.AudioContext||window.webkitAudioContext)();
+    rainMaster = rainCtx.createGain(); rainMaster.gain.value=vol*0.85;
     rainMaster.connect(rainCtx.destination);
-
-    // ── Layer 1: steady rain body (pink noise + bandpass) ──
-    const noiseBuf = makeNoiseBuffer(rainCtx, 8);
-    function makeNoiseSrc(freq, Q, gainVal) {
-      const src = rainCtx.createBufferSource();
-      src.buffer = noiseBuf; src.loop = true;
-      src.loopStart = Math.random() * 4; // offset so channels differ
-      const bp = rainCtx.createBiquadFilter();
-      bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = Q;
-      const g = rainCtx.createGain(); g.gain.value = gainVal;
-      // gentle LFO on gain for natural swell
-      const lfo = rainCtx.createOscillator();
-      const lfoG = rainCtx.createGain();
-      lfo.frequency.value = 0.05 + Math.random() * 0.08;
-      lfoG.gain.value = gainVal * 0.25;
-      lfo.connect(lfoG); lfoG.connect(g.gain);
-      lfo.start();
-      src.connect(bp); bp.connect(g); g.connect(rainMaster);
-      src.start();
-      rainNodes.push(src, bp, g, lfo, lfoG);
+    const noiseBuf = makeNoiseBuffer(rainCtx,8);
+    function makeNoiseSrc(freq,Q,gainVal) {
+      const src=rainCtx.createBufferSource(); src.buffer=noiseBuf; src.loop=true; src.loopStart=Math.random()*4;
+      const bp=rainCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=freq; bp.Q.value=Q;
+      const g=rainCtx.createGain(); g.gain.value=gainVal;
+      const lfo=rainCtx.createOscillator(),lfoG=rainCtx.createGain();
+      lfo.frequency.value=0.05+Math.random()*0.08; lfoG.gain.value=gainVal*0.25;
+      lfo.connect(lfoG); lfoG.connect(g.gain); lfo.start();
+      src.connect(bp); bp.connect(g); g.connect(rainMaster); src.start();
+      rainNodes.push(src,bp,g,lfo,lfoG);
     }
-    makeNoiseSrc(600,  0.5, 0.60);  // core rain hiss
-    makeNoiseSrc(200,  0.4, 0.30);  // low distant rumble
-    makeNoiseSrc(2800, 0.8, 0.18);  // high frequency splash
-    makeNoiseSrc(1100, 0.3, 0.22);  // mid texture layer
-
-    // ── Layer 2: thunder rumble LFO (very slow, deep) ──
-    const thunderBuf = makeNoiseBuffer(rainCtx, 12);
-    const tSrc = rainCtx.createBufferSource();
-    tSrc.buffer = thunderBuf; tSrc.loop = true;
-    const tLp = rainCtx.createBiquadFilter();
-    tLp.type = 'lowpass'; tLp.frequency.value = 90;
-    const tG = rainCtx.createGain(); tG.gain.value = 0;
-    const tLfo = rainCtx.createOscillator();
-    const tLfoG = rainCtx.createGain();
-    tLfo.frequency.value = 0.02; tLfoG.gain.value = 0.08;
+    makeNoiseSrc(600,0.5,0.60); makeNoiseSrc(200,0.4,0.30);
+    makeNoiseSrc(2800,0.8,0.18); makeNoiseSrc(1100,0.3,0.22);
+    const tBuf=makeNoiseBuffer(rainCtx,12),tSrc=rainCtx.createBufferSource();
+    tSrc.buffer=tBuf; tSrc.loop=true;
+    const tLp=rainCtx.createBiquadFilter(); tLp.type='lowpass'; tLp.frequency.value=90;
+    const tG=rainCtx.createGain(); tG.gain.value=0;
+    const tLfo=rainCtx.createOscillator(),tLfoG=rainCtx.createGain();
+    tLfo.frequency.value=0.02; tLfoG.gain.value=0.08;
     tLfo.connect(tLfoG); tLfoG.connect(tG.gain);
     tSrc.connect(tLp); tLp.connect(tG); tG.connect(rainMaster);
-    tSrc.start(); tLfo.start();
-    rainNodes.push(tSrc, tLp, tG, tLfo, tLfoG);
-
-    // ── Layer 3: individual raindrop taps ──
+    tSrc.start(); tLfo.start(); rainNodes.push(tSrc,tLp,tG,tLfo,tLfoG);
     function scheduleDrop() {
-      if (!rainCtx) return;
-      // random drop type: splash, tap, or heavy drop
-      const type = Math.random();
-      const now = rainCtx.currentTime;
-      if (type < 0.6) {
-        // light tap
-        const buf = rainCtx.createBuffer(1, Math.floor(rainCtx.sampleRate * 0.04), rainCtx.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 2);
-        const src = rainCtx.createBufferSource(); src.buffer = buf;
-        const bp = rainCtx.createBiquadFilter(); bp.type='bandpass';
-        bp.frequency.value = 1200 + Math.random() * 2000; bp.Q.value = 2;
-        const g = rainCtx.createGain(); g.gain.value = 0.05 + Math.random() * 0.12;
-        src.connect(bp); bp.connect(g); g.connect(rainMaster);
-        src.start(now); rainNodes.push(src, bp, g);
-      } else if (type < 0.85) {
-        // heavier drop with resonance
-        const osc = rainCtx.createOscillator(); osc.type = 'sine';
-        const freq = 400 + Math.random() * 600;
-        osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(freq * 0.3, now + 0.15);
-        const g = rainCtx.createGain();
-        g.gain.setValueAtTime(0.06 + Math.random()*0.08, now);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-        osc.connect(g); g.connect(rainMaster);
-        osc.start(now); osc.stop(now + 0.2);
-        rainNodes.push(osc, g);
+      if(!rainCtx) return;
+      const type=Math.random(),now=rainCtx.currentTime;
+      if(type<0.6){
+        const buf=rainCtx.createBuffer(1,Math.floor(rainCtx.sampleRate*0.04),rainCtx.sampleRate);
+        const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+        const src=rainCtx.createBufferSource(); src.buffer=buf;
+        const bp=rainCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1200+Math.random()*2000; bp.Q.value=2;
+        const g=rainCtx.createGain(); g.gain.value=0.05+Math.random()*0.12;
+        src.connect(bp); bp.connect(g); g.connect(rainMaster); src.start(now); rainNodes.push(src,bp,g);
+      } else if(type<0.85){
+        const osc=rainCtx.createOscillator(); osc.type='sine';
+        const freq=400+Math.random()*600;
+        osc.frequency.setValueAtTime(freq,now); osc.frequency.exponentialRampToValueAtTime(freq*0.3,now+0.15);
+        const g=rainCtx.createGain(); g.gain.setValueAtTime(0.06+Math.random()*0.08,now); g.gain.exponentialRampToValueAtTime(0.0001,now+0.18);
+        osc.connect(g); g.connect(rainMaster); osc.start(now); osc.stop(now+0.2); rainNodes.push(osc,g);
       } else {
-        // occasional puddle splash (short noise burst)
-        const buf = rainCtx.createBuffer(1, Math.floor(rainCtx.sampleRate * 0.08), rainCtx.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 1.5);
-        const src = rainCtx.createBufferSource(); src.buffer = buf;
-        const lp = rainCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value = 800;
-        const g = rainCtx.createGain(); g.gain.value = 0.08 + Math.random() * 0.1;
-        src.connect(lp); lp.connect(g); g.connect(rainMaster);
-        src.start(now); rainNodes.push(src, lp, g);
+        const buf=rainCtx.createBuffer(1,Math.floor(rainCtx.sampleRate*0.08),rainCtx.sampleRate);
+        const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,1.5);
+        const src=rainCtx.createBufferSource(); src.buffer=buf;
+        const lp=rainCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=800;
+        const g=rainCtx.createGain(); g.gain.value=0.08+Math.random()*0.1;
+        src.connect(lp); lp.connect(g); g.connect(rainMaster); src.start(now); rainNodes.push(src,lp,g);
       }
-      // vary drop rate: between 30ms and 300ms
-      rainCtx._dropTimer = setTimeout(scheduleDrop, 30 + Math.random() * 270);
+      rainCtx._dropTimer=setTimeout(scheduleDrop,30+Math.random()*270);
     }
     scheduleDrop();
-
-    // ── Layer 4: distant window/indoor ambience crackle ──
     function scheduleCreak() {
-      if (!rainCtx) return;
-      if (Math.random() < 0.3) {
-        const now = rainCtx.currentTime;
-        const dur = 0.3 + Math.random() * 0.8;
-        const buf = rainCtx.createBuffer(1, Math.floor(rainCtx.sampleRate * dur), rainCtx.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < d.length; i++) {
-          const env = Math.sin(Math.PI * i / d.length);
-          d[i] = (Math.random()*2-1) * env * 0.015;
-        }
-        const src = rainCtx.createBufferSource(); src.buffer = buf;
-        const bp = rainCtx.createBiquadFilter(); bp.type='bandpass';
-        bp.frequency.value = 300 + Math.random()*200; bp.Q.value = 5;
-        const g = rainCtx.createGain(); g.gain.value = 0.4;
-        src.connect(bp); bp.connect(g); g.connect(rainMaster);
-        src.start(now); rainNodes.push(src, bp, g);
+      if(!rainCtx) return;
+      if(Math.random()<0.3){
+        const now=rainCtx.currentTime,dur=0.3+Math.random()*0.8;
+        const buf=rainCtx.createBuffer(1,Math.floor(rainCtx.sampleRate*dur),rainCtx.sampleRate);
+        const d=buf.getChannelData(0);
+        for(let i=0;i<d.length;i++){const env=Math.sin(Math.PI*i/d.length);d[i]=(Math.random()*2-1)*env*0.015;}
+        const src=rainCtx.createBufferSource(); src.buffer=buf;
+        const bp=rainCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=300+Math.random()*200; bp.Q.value=5;
+        const g=rainCtx.createGain(); g.gain.value=0.4;
+        src.connect(bp); bp.connect(g); g.connect(rainMaster); src.start(now); rainNodes.push(src,bp,g);
       }
-      rainCtx._creakTimer = setTimeout(scheduleCreak, 2000 + Math.random() * 5000);
+      rainCtx._creakTimer=setTimeout(scheduleCreak,2000+Math.random()*5000);
     }
     scheduleCreak();
-
     setMusicUI(true);
-  } catch(e) { setStatus('rain unavailable'); }
+  } catch(e){ setStatus('rain unavailable'); }
 }
 
 function stopRain() {
-  if (rainCtx) {
-    clearTimeout(rainCtx._dropTimer);
-    clearTimeout(rainCtx._creakTimer);
-    try { rainCtx.close(); } catch(e) {}
-    rainCtx = null; rainMaster = null;
-  }
-  rainNodes = [];
+  if(rainCtx){ clearTimeout(rainCtx._dropTimer); clearTimeout(rainCtx._creakTimer); try{rainCtx.close();}catch(e){} rainCtx=null; rainMaster=null; }
+  rainNodes=[];
 }
+function updateRainVolume() { if(rainMaster) rainMaster.gain.value=vol*0.85; }
+function isRain() { return STREAMS[streamIdx].url.includes('rain'); }
 
-function updateRainVolume() {
-  if (rainMaster) rainMaster.gain.value = vol * 0.85;
+function getAudio() {
+  if(!audio){ audio=new Audio(); audio.volume=vol; audio.onerror=()=>{setStatus('stream error…');}; }
+  audio.loop = STREAMS[streamIdx].loop===true;
+  return audio;
 }
 
 function tryPlay() {
+  if(isRain()){ startRain(); return; }
   stopRain();
-  const a = getAudio();
-  a.src = STREAMS[streamIdx].url;
-  a.load();
+  const a=getAudio(); a.src=STREAMS[streamIdx].url; a.load();
   setStatus('connecting…');
-  a.play()
-    .then(() => setMusicUI(true))
-    .catch(() => { setMusicUI(false); setStatus('blocked — open as local file ✿'); });
-}
-function pauseAudio() {
-  stopRain();
-  if (audio) audio.pause(); setMusicUI(false);
-}
-function setMusicUI(on) {
-  document.getElementById('eq').classList.toggle('paused', !on);
-  setStatus(on ? 'now playing ✦' : (running ? 'connecting…' : 'paused ☁️'));
-}
-function setStatus(s) { document.getElementById('musicStatus').textContent = s; }
-function setVol(v)    { vol = v / 100; if (audio) audio.volume = vol; updateRainVolume(); }
-function switchStream(idx, el) {
-  streamIdx = idx;
-  document.querySelectorAll('.stream-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('musicName').textContent = STREAMS[idx].name;
-  if (running) { if (audio) { audio.pause(); audio = null; } tryPlay(); }
+  a.play().then(()=>setMusicUI(true)).catch(()=>{ setMusicUI(false); setStatus('blocked — open as local file ✿'); });
 }
 
-// ── dark mode ─────────────────────────────────────────────
+function pauseAudio() {
+  if(isRain()){ stopRain(); setMusicUI(false); return; }
+  if(audio) audio.pause(); setMusicUI(false);
+}
+
+function fadeOutAudio(cb) {
+  if(isRain()){ stopRain(); setMusicUI(false); if(cb) cb(); return; }
+  if(!audio||audio.paused){ if(cb) cb(); return; }
+  const startVol=audio.volume;
+  const step=setInterval(()=>{
+    if(audio.volume>0.05){ audio.volume=Math.max(0,audio.volume-0.05); }
+    else { clearInterval(step); audio.pause(); audio.volume=startVol; setMusicUI(false); if(cb) cb(); }
+  },50);
+}
+
+function setMusicUI(on) {
+  document.getElementById('eq').classList.toggle('paused',!on);
+  setStatus(on?'now playing ✦':(running?'connecting…':'paused ☁️'));
+}
+function setStatus(s){ document.getElementById('musicStatus').textContent=s; }
+function setVol(v){ vol=v/100; if(audio) audio.volume=vol; updateRainVolume(); }
+function switchStream(idx,el) {
+  streamIdx=idx;
+  document.querySelectorAll('.stream-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('musicName').textContent=STREAMS[idx].name;
+  if(running){ if(audio){audio.pause();audio=null;} tryPlay(); }
+}
+
+// ══════════════════════════════════════════════
+//  DARK MODE
+// ══════════════════════════════════════════════
 function toggleDark() {
-  dark = !dark;
-  document.body.classList.toggle('darkmode', dark);
-  document.getElementById('change-darkmode').textContent = dark ? '☀️' : '🌙';
+  dark=!dark; document.body.classList.toggle('darkmode',dark);
+  document.getElementById('change-darkmode').textContent=dark?'☀️':'🌙';
   updateRing();
 }
 
-// ── ring ──────────────────────────────────────────────────
-const CIRC = 2 * Math.PI * 95;
-const ring  = document.getElementById('ring');
-ring.style.strokeDasharray = CIRC;
+// ══════════════════════════════════════════════
+//  RING
+// ══════════════════════════════════════════════
+const CIRC=2*Math.PI*95;
+const ring=document.getElementById('ring');
+ring.style.strokeDasharray=CIRC;
 
 function updateRing() {
-  ring.style.strokeDashoffset = CIRC * (1 - timeLeft / totalTime);
-  ring.style.stroke = dark ? '#f78af2' : '#f64e4e';
+  ring.style.strokeDashoffset=CIRC*(1-timeLeft/totalTime);
+  ring.style.stroke=dark?'#f78af2':'#f64e4e';
 }
 
-// ── display ───────────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  DISPLAY
+// ══════════════════════════════════════════════
 function renderDisplay() {
-  const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-  document.getElementById('timerDisplay').textContent =
-    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const m=Math.floor(timeLeft/60),s=timeLeft%60;
+  const timeStr=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('timerDisplay').textContent=timeStr;
+  // browser tab title
+  document.title=running?timeStr+' — '+MODES[currentMode].label:'lofi pomodoro ✿';
   updateRing(); renderDots(); renderInfo();
 }
+
 function renderDots() {
-  const cur = completedFocus % 4;
-  [0,1,2,3].forEach(i => {
-    const d = document.getElementById('d'+i);
+  const cur=completedFocus%4;
+  [0,1,2,3].forEach(i=>{
+    const d=document.getElementById('d'+i);
     d.classList.remove('done','current');
-    if (i < cur) d.classList.add('done');
-    else if (i === cur && currentMode === 'focus') d.classList.add('current');
+    if(i<cur) d.classList.add('done');
+    else if(i===cur&&currentMode==='focus') d.classList.add('current');
   });
 }
+
 function renderInfo() {
-  const left = 4 - (completedFocus % 4);
-  document.getElementById('infoMode').textContent      = MODES[currentMode].label;
-  document.getElementById('infoCompleted').textContent = completedFocus + (completedFocus === 1 ? ' session' : ' sessions');
-  document.getElementById('infoUntilLong').textContent = left + ' left';
-  document.getElementById('timingFocus').textContent   = Math.floor(MODES.focus.duration/60) + ' min';
-  document.getElementById('timingShort').textContent   = Math.floor(MODES.short.duration/60) + ' min';
-  document.getElementById('timingLong').textContent    = Math.floor(MODES.long.duration/60)  + ' min';
+  const left=4-(completedFocus%4);
+  document.getElementById('infoMode').textContent=MODES[currentMode].label;
+  document.getElementById('infoCompleted').textContent=completedFocus+(completedFocus===1?' session':' sessions');
+  document.getElementById('infoUntilLong').textContent=left+' left';
+  document.getElementById('timingFocus').textContent=Math.floor(MODES.focus.duration/60)+' min';
+  document.getElementById('timingShort').textContent=Math.floor(MODES.short.duration/60)+' min';
+  document.getElementById('timingLong').textContent=Math.floor(MODES.long.duration/60)+' min';
 }
 
-// ── custom timer adjust ────────────────────────────────────
+// ══════════════════════════════════════════════
+//  TIMER ADJUST
+// ══════════════════════════════════════════════
 function adjustTime(mins) {
-  if (running) return;
-  const newTotal = Math.max(60, totalTime + mins * 60); // min 1 min
-  totalTime = newTotal;
-  timeLeft  = newTotal;
-  MODES[currentMode].duration = newTotal;
+  if(running) return;
+  const newTotal=Math.max(60,totalTime+mins*60);
+  totalTime=newTotal; timeLeft=newTotal; MODES[currentMode].duration=newTotal;
   renderDisplay();
 }
 
-// ── timer ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  TIMER CORE
+// ══════════════════════════════════════════════
 function togglePlay() {
-  if (running) {
-    running = false; clearInterval(intervalId); pauseAudio();
-    document.getElementById('playBtn').textContent = '▶ Start';
-    document.getElementById('timerAdjust').style.display = 'flex';
+  if(running){
+    running=false; clearInterval(intervalId);
+    fadeOutAudio();
+    document.getElementById('playBtn').textContent='▶ Start';
+    document.getElementById('timerAdjust').style.display='flex';
+    document.title='lofi pomodoro ✿';
   } else {
-    running = true; tryPlay();
-    document.getElementById('playBtn').textContent = '⏸ Pause';
-    document.getElementById('timerAdjust').style.display = 'none';
-    intervalId = setInterval(tick, 1000);
+    running=true;
+    if(currentMode==='focus'&&document.getElementById('autoMusicToggle').checked) tryPlay();
+    document.getElementById('playBtn').textContent='⏸ Pause';
+    document.getElementById('timerAdjust').style.display='none';
+    document.getElementById('noteArea').classList.remove('visible');
+    intervalId=setInterval(tick,1000);
   }
 }
+
 function tick() {
-  if (timeLeft <= 0) {
-    clearInterval(intervalId); running = false;
-    document.getElementById('playBtn').textContent = '▶ Start';
-    document.getElementById('timerAdjust').style.display = 'flex';
+  if(timeLeft<=0){
+    clearInterval(intervalId); running=false;
+    document.getElementById('playBtn').textContent='▶ Start';
+    document.getElementById('timerAdjust').style.display='flex';
+    document.title='lofi pomodoro ✿';
     handleEnd(); return;
   }
   timeLeft--; renderDisplay();
+  if(myRoomCode && timeLeft%3===0) broadcastState(); // broadcast every 3s via tick too
 }
+
 function handleEnd() {
-  if (document.getElementById('bellToggle').checked) playBell();
-  pauseAudio();
-  if (currentMode === 'focus') {
+  if(document.getElementById('bellToggle').checked) playBell();
+  // auto-pause music on break, auto-play on focus
+  const autoMusic=document.getElementById('autoMusicToggle').checked;
+  if(currentMode==='focus'){
     completedFocus++;
-    const isLong = completedFocus % 4 === 0;
-    showToast(isLong ? '🌿 Long break time!' : '☕ Short break time!');
-    setTimeout(() => applyMode(isLong ? 'long' : 'short'), 600);
+    const isLong=completedFocus%4===0;
+    fadeOutAudio(()=>{ if(autoMusic){/* pause during break */} });
+    showToast(isLong?'🌿 Long break time!':'☕ Short break time!');
+    // show note area
+    showNoteArea();
+    setTimeout(()=>applyMode(isLong?'long':'short'),600);
   } else {
+    // break ended — start focus, auto-play music
+    if(autoMusic) setTimeout(tryPlay,700);
+    else fadeOutAudio();
     showToast('🍅 Back to focus!');
-    setTimeout(() => applyMode('focus'), 600);
+    setTimeout(()=>applyMode('focus'),600);
   }
 }
+
 function applyMode(mode) {
-  currentMode = mode;
-  timeLeft    = MODES[mode].duration;
-  totalTime   = MODES[mode].duration;
-  document.getElementById('modeLabel').textContent = MODES[mode].label;
-  renderDisplay();
-}
-function setMode(mode, el) {
-  clearInterval(intervalId); running = false;
-  document.getElementById('playBtn').textContent = '▶ Start';
-  document.getElementById('timerAdjust').style.display = 'flex';
-  pauseAudio(); currentMode = mode;
-  timeLeft  = MODES[mode].duration;
-  totalTime = MODES[mode].duration;
-  document.getElementById('modeLabel').textContent = MODES[mode].label;
-  document.querySelectorAll('#navigation .links button').forEach(b => b.classList.remove('active'));
-  el.classList.add('active'); renderDisplay();
-}
-function resetTimer() {
-  clearInterval(intervalId); running = false;
-  document.getElementById('playBtn').textContent = '▶ Start';
-  document.getElementById('timerAdjust').style.display = 'flex';
-  pauseAudio(); timeLeft = totalTime; renderDisplay();
-}
-function skipSession() {
-  clearInterval(intervalId); running = false;
-  document.getElementById('playBtn').textContent = '▶ Start';
-  document.getElementById('timerAdjust').style.display = 'flex';
-  handleEnd();
+  currentMode=mode; timeLeft=MODES[mode].duration; totalTime=MODES[mode].duration;
+  document.getElementById('modeLabel').textContent=MODES[mode].label;
+  renderDisplay(); updateSidebar();
 }
 
-// ── bell ──────────────────────────────────────────────────
+function setMode(mode,el) {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  document.getElementById('timerAdjust').style.display='flex';
+  fadeOutAudio(); currentMode=mode;
+  timeLeft=MODES[mode].duration; totalTime=MODES[mode].duration;
+  document.getElementById('modeLabel').textContent=MODES[mode].label;
+  document.querySelectorAll('#navigation .links button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); renderDisplay(); document.title='lofi pomodoro ✿';
+}
+
+function resetTimer() {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  document.getElementById('timerAdjust').style.display='flex';
+  fadeOutAudio(); timeLeft=totalTime; renderDisplay(); document.title='lofi pomodoro ✿';
+}
+
+function skipSession() {
+  clearInterval(intervalId); running=false;
+  document.getElementById('playBtn').textContent='▶ Start';
+  document.getElementById('timerAdjust').style.display='flex';
+  document.title='lofi pomodoro ✿'; handleEnd();
+}
+
+// ══════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  // don't fire shortcuts when typing in inputs/textareas
+  if(['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
+  if(e.code==='Space'){ e.preventDefault(); togglePlay(); }
+  if(e.key==='r'||e.key==='R') resetTimer();
+  if(e.key==='s'||e.key==='S') skipSession();
+});
+
+// ══════════════════════════════════════════════
+//  BELL
+// ══════════════════════════════════════════════
 function playBell() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [0, 0.45, 0.9].forEach(t => {
-      const osc = ctx.createOscillator(), gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, ctx.currentTime + t);
-      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + t + 0.4);
-      gain.gain.setValueAtTime(0.55, ctx.currentTime + t);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.55);
-      osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + 0.6);
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,0.45,0.9].forEach(t=>{
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination); osc.type='sine';
+      osc.frequency.setValueAtTime(880,ctx.currentTime+t);
+      osc.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+t+0.4);
+      gain.gain.setValueAtTime(0.55,ctx.currentTime+t);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.55);
+      osc.start(ctx.currentTime+t); osc.stop(ctx.currentTime+t+0.6);
     });
-  } catch(e) {}
+  } catch(e){}
 }
 
-// ── toast ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════
 let toastTimer;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ── modal helpers ─────────────────────────────────────────
+// ══════════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════════
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// close on backdrop click for all modals
-['loginModal','signupModal','forgotModal','accountModal','codeModal'].forEach(id => {
-  document.getElementById(id).addEventListener('click', function(e) {
-    if (e.target === this) {
-      this.classList.remove('open');
-      if (id === 'codeModal') ; // nothing extra needed
-    }
-  });
+['loginModal','signupModal','forgotModal','accountModal','statsModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
 });
 
-// ── auth ──────────────────────────────────────────────────
-// Users stored as: lofi_users = { username: { email, passwordHash } }
-// Session: lofi_session = { username, email }
-
-function hashPass(p) {
-  let h = 5381;
-  for (let i = 0; i < p.length; i++) h = ((h << 5) + h) ^ p.charCodeAt(i);
-  return (h >>> 0).toString(36);
-}
-function getUsers()     { return JSON.parse(localStorage.getItem('lofi_users')   || '{}'); }
-function saveUsers(u)   { localStorage.setItem('lofi_users', JSON.stringify(u)); }
-function getSession()   { return JSON.parse(localStorage.getItem('lofi_session') || 'null'); }
-function saveSession(s) { localStorage.setItem('lofi_session', JSON.stringify(s)); }
+// ══════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════
+function hashPass(p){ let h=5381; for(let i=0;i<p.length;i++) h=((h<<5)+h)^p.charCodeAt(i); return(h>>>0).toString(36); }
+function getUsers()     { return JSON.parse(localStorage.getItem('lofi_users')||'{}'); }
+function saveUsers(u)   { localStorage.setItem('lofi_users',JSON.stringify(u)); }
+function getSession()   { return JSON.parse(localStorage.getItem('lofi_session')||'null'); }
+function saveSession(s) { localStorage.setItem('lofi_session',JSON.stringify(s)); }
 function clearSession() { localStorage.removeItem('lofi_session'); }
 
 function openLogin()   { clearMsg('liMsg'); openModal('loginModal'); }
 function openSignup()  { clearMsg('suMsg'); openModal('signupModal'); }
-function openAccount() {
-  const s = getSession();
-  if (s) {
-    document.getElementById('accUsername').textContent = s.username;
-    document.getElementById('accEmail').textContent    = s.email;
-    openModal('accountModal');
-  }
-}
-function switchToForgot() { closeModal('loginModal');  clearMsg('fpMsg'); openModal('forgotModal'); }
-function switchToLogin()  { closeModal('forgotModal'); clearMsg('liMsg'); openModal('loginModal');  }
+function openAccount() { const s=getSession(); if(s){ document.getElementById('accUsername').textContent=s.username; document.getElementById('accEmail').textContent=s.email; openModal('accountModal'); } }
+function switchToForgot(){ closeModal('loginModal'); clearMsg('fpMsg'); openModal('forgotModal'); }
+function switchToLogin() { closeModal('forgotModal'); clearMsg('liMsg'); openModal('loginModal'); }
 
-function clearMsg(id) { const el = document.getElementById(id); if(el){el.textContent=''; el.className='auth-msg';} }
-function setMsg(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = 'auth-msg ' + (type||''); }
+function clearMsg(id){ const el=document.getElementById(id); if(el){el.textContent='';el.className='auth-msg';} }
+function setMsg(id,msg,type){ const el=document.getElementById(id); el.textContent=msg; el.className='auth-msg '+(type||''); }
 
-function doLogin() {
-  const username = document.getElementById('liUser').value.trim();
-  const pass     = document.getElementById('liPass').value;
-  if (!username || !pass) return setMsg('liMsg','Please fill in all fields.','err');
-  const users = getUsers();
-  if (!users[username]) return setMsg('liMsg','No account found for that username.','err');
-  if (users[username].passwordHash !== hashPass(pass)) return setMsg('liMsg','Incorrect password.','err');
-  // TODO (Supabase): supabase.auth.signInWithPassword({ email: users[username].email, password: pass })
-  const s = { username, email: users[username].email };
+function doLogin(){
+  const username=document.getElementById('liUser').value.trim();
+  const pass=document.getElementById('liPass').value;
+  if(!username||!pass) return setMsg('liMsg','Please fill in all fields.','err');
+  const users=getUsers();
+  if(!users[username]) return setMsg('liMsg','No account found for that username.','err');
+  if(users[username].passwordHash!==hashPass(pass)) return setMsg('liMsg','Incorrect password.','err');
+  const s={username,email:users[username].email};
   saveSession(s); updateAcctBtns(s);
-  setMsg('liMsg','Welcome back, ' + username + '! ✿','ok');
-  setTimeout(() => closeModal('loginModal'), 1200);
+  setMsg('liMsg','Welcome back, '+username+'! ✿','ok');
+  setTimeout(()=>closeModal('loginModal'),1200);
 }
 
-function doSignup() {
-  const username = document.getElementById('suUser').value.trim();
-  const email    = document.getElementById('suEmail').value.trim().toLowerCase();
-  const pass     = document.getElementById('suPass').value;
-  if (!username || !email || !pass) return setMsg('suMsg','Please fill in all fields.','err');
-  if (pass.length < 6) return setMsg('suMsg','Password must be at least 6 characters.','err');
-  if (!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
-  const users = getUsers();
-  if (users[username]) return setMsg('suMsg','That username is already taken.','err');
-  if (Object.values(users).some(u => u.email === email)) return setMsg('suMsg','Email already in use.','err');
-  users[username] = { email, passwordHash: hashPass(pass) };
-  saveUsers(users);
-  // TODO (Supabase): supabase.auth.signUp({ email, password: pass, options: { data: { username } } })
-  const s = { username, email };
-  saveSession(s); updateAcctBtns(s);
-  setMsg('suMsg','Welcome, ' + username + '! ✿','ok');
-  setTimeout(() => closeModal('signupModal'), 1400);
+function doSignup(){
+  const username=document.getElementById('suUser').value.trim();
+  const email=document.getElementById('suEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('suPass').value;
+  if(!username||!email||!pass) return setMsg('suMsg','Please fill in all fields.','err');
+  if(pass.length<6) return setMsg('suMsg','Password must be at least 6 characters.','err');
+  if(!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
+  const users=getUsers();
+  if(users[username]) return setMsg('suMsg','That username is already taken.','err');
+  if(Object.values(users).some(u=>u.email===email)) return setMsg('suMsg','Email already in use.','err');
+  users[username]={email,passwordHash:hashPass(pass)}; saveUsers(users);
+  const s={username,email}; saveSession(s); updateAcctBtns(s);
+  setMsg('suMsg','Welcome, '+username+'! ✿','ok');
+  setTimeout(()=>closeModal('signupModal'),1400);
 }
 
-function doForgot() {
-  const email = document.getElementById('fpEmail').value.trim().toLowerCase();
-  if (!email) return setMsg('fpMsg','Please enter your email.','err');
-  const users = getUsers();
-  const entry = Object.entries(users).find(([,v]) => v.email === email);
-  if (!entry) return setMsg('fpMsg','No account found with that email.','err');
-  // TODO (Supabase): supabase.auth.resetPasswordForEmail(email) — sends real reset link
-  const tempPass = 'reset' + Math.random().toString(36).slice(2, 8);
-  users[entry[0]].passwordHash = hashPass(tempPass);
-  saveUsers(users);
-  setMsg('fpMsg', 'Temp code: ' + tempPass + ' — login with username "' + entry[0] + '" and this code.', 'ok');
+function doForgot(){
+  const email=document.getElementById('fpEmail').value.trim().toLowerCase();
+  if(!email) return setMsg('fpMsg','Please enter your email.','err');
+  const users=getUsers();
+  const entry=Object.entries(users).find(([,v])=>v.email===email);
+  if(!entry) return setMsg('fpMsg','No account found with that email.','err');
+  const tempPass='reset'+Math.random().toString(36).slice(2,8);
+  users[entry[0]].passwordHash=hashPass(tempPass); saveUsers(users);
+  setMsg('fpMsg','Temp code: '+tempPass+' — login with username "'+entry[0]+'" and this code.','ok');
 }
 
-function doLogout() {
-  // TODO (Supabase): supabase.auth.signOut()
-  clearSession(); updateAcctBtns(null); closeModal('accountModal');
-  showToast('Signed out ✿');
+function doLogout(){ clearSession(); updateAcctBtns(null); closeModal('accountModal'); showToast('Signed out ✿'); }
+
+function updateAcctBtns(s){
+  const wrap=document.getElementById('auth-btns'),lbl=document.getElementById('acct-label');
+  if(s){wrap.classList.add('logged-in');lbl.textContent=s.username;}
+  else{wrap.classList.remove('logged-in');lbl.textContent='';}
 }
 
-function updateAcctBtns(s) {
-  const wrap = document.getElementById('auth-btns');
-  const lbl  = document.getElementById('acct-label');
-  if (s) { wrap.classList.add('logged-in');    lbl.textContent = s.username; }
-  else   { wrap.classList.remove('logged-in'); lbl.textContent = ''; }
-}
+(function(){ const s=getSession(); if(s) updateAcctBtns(s); })();
 
-// restore session on load
-(function() { const s = getSession(); if (s) updateAcctBtns(s); })();
-
-// ── code viewer ───────────────────────────────────────────
-function openCodeModal() {
-  document.getElementById('codeArea').textContent = document.documentElement.outerHTML;
-  document.getElementById('codeModal').classList.add('open');
-}
-function closeCodeModal() {
-  document.getElementById('codeModal').classList.remove('open');
-}
+// ══════════════════════════════════════════════
+//  CODE VIEWER
+// ══════════════════════════════════════════════
+function openCodeModal() { document.getElementById('codeArea').textContent=document.documentElement.outerHTML; document.getElementById('codeModal').classList.add('open'); }
+function closeCodeModal() { document.getElementById('codeModal').classList.remove('open'); }
 function copyCode() {
-  navigator.clipboard.writeText(document.documentElement.outerHTML).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => { btn.textContent = '📋 Copy All'; }, 2000);
-  }).catch(() => showToast('Select all text manually'));
+  navigator.clipboard.writeText(document.documentElement.outerHTML).then(()=>{
+    const btn=document.getElementById('copyBtn'); btn.textContent='✅ Copied!';
+    setTimeout(()=>{btn.textContent='📋 Copy All';},2000);
+  }).catch(()=>showToast('Select all text manually'));
+}
+document.getElementById('codeModal').addEventListener('click',function(e){if(e.target===this)closeCodeModal();});
+
+// ══════════════════════════════════════════════
+//  STUDY WITH ME — Ably Pub/Sub
+//  To swap to Supabase later: replace the
+//  ablyPublish() and ablySubscribe() functions
+//  with supabase.channel().send() / .on()
+// ══════════════════════════════════════════════
+const ABLY_KEY = 'ZkO1yw.Hkft8A:YNglhTqiq_8cqtSYgilN_JgS1EWE_sZrCECMNl4D4Jk';
+const ROOM_PREFIX = 'lofi-room-';
+const BROADCAST_INTERVAL = 3000; // ms between state broadcasts
+
+let ablyClient    = null;
+let ablyChannel   = null;
+let myRoomCode    = null;
+let myPeerId      = null;
+let myDisplayName = '';
+let peers         = {};   // peerId -> { name, timeLeft, mode, running, task, ts }
+let broadcastTimer = null;
+let roomOpen      = false;
+
+// emoji avatars pool
+const AVATARS = ['🍅','☕','🌿','🎯','⚡','🌸','🏔️','🦉','🌙','🎵','📚','🔥'];
+
+function genCode() {
+  const words = ['FOCUS','STUDY','GRIND','FLOW','DEEP','ZONE','WORK','CALM'];
+  return words[Math.floor(Math.random()*words.length)] + '-' + Math.floor(1000+Math.random()*9000);
+}
+function genPeerId() { return 'p-' + Math.random().toString(36).slice(2,10); }
+function myAvatar()  { if(!myPeerId) return '🍅'; const i=myPeerId.charCodeAt(2)%AVATARS.length; return AVATARS[i]; }
+
+// ── open/close modal ──────────────────────────
+function openRoomModal() {
+  document.getElementById('roomModal').classList.add('open');
+  if (myRoomCode) showRoomPanel();
+  else showRoomSetup();
+}
+function closeRoomModal() {
+  document.getElementById('roomModal').classList.remove('open');
+}
+document.getElementById('roomModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRoomModal();
+});
+
+function showRoomSetup() {
+  document.getElementById('roomSetup').style.display = 'flex';
+  document.getElementById('roomPanel').classList.remove('visible');
+}
+function showRoomPanel() {
+  document.getElementById('roomSetup').style.display = 'none';
+  document.getElementById('roomPanel').classList.add('visible');
+  document.getElementById('roomCodeDisplay').textContent = myRoomCode;
+  const url = window.location.href.split('?')[0] + '?room=' + myRoomCode + '&name=' + encodeURIComponent(myDisplayName);
+  document.getElementById('roomInviteUrl').value = url;
+  renderPeers();
 }
 
-// ── init ──────────────────────────────────────────────────
+// ── create / join ─────────────────────────────
+async function createRoom() {
+  const name = document.getElementById('roomDisplayName').value.trim();
+  if (!name) { setRoomMsg('roomSetupMsg','Please enter a display name.'); return; }
+  myDisplayName = name;
+  myPeerId  = genPeerId();
+  myRoomCode = genCode();
+  setRoomMsg('roomSetupMsg','Creating room…');
+  await connectAbly(myRoomCode);
+  showRoomPanel();
+  updateRoomNavBtn(true);
+}
+
+async function joinRoom() {
+  const name = document.getElementById('roomDisplayName').value.trim();
+  const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+  if (!name) { setRoomMsg('roomSetupMsg','Please enter a display name.'); return; }
+  if (!code)  { setRoomMsg('roomSetupMsg','Please enter a room code.'); return; }
+  myDisplayName = name;
+  myPeerId  = genPeerId();
+  myRoomCode = code;
+  setRoomMsg('roomSetupMsg','Joining room…');
+  await connectAbly(myRoomCode);
+  showRoomPanel();
+  updateRoomNavBtn(true);
+}
+
+// ── ably connect ──────────────────────────────
+async function connectAbly(code) {
+  if (ablyClient) { try { ablyClient.close(); } catch(e){} }
+  peers = {};
+  ablyClient = new Ably.Realtime({ key: ABLY_KEY, clientId: myPeerId });
+  await new Promise(res => {
+    ablyClient.connection.on('connected', res);
+    ablyClient.connection.on('failed', res);
+  });
+  ablyChannel = ablyClient.channels.get(ROOM_PREFIX + code);
+
+  // subscribe to peer broadcasts
+  ablyChannel.subscribe('state', msg => {
+    const d = msg.data;
+    if (d.peerId === myPeerId) return; // ignore own echo
+    peers[d.peerId] = { ...d, ts: Date.now() };
+    renderPeers();
+    // prune stale peers (gone > 12s without broadcast)
+    clearTimeout(peers[d.peerId]._pruneTimer);
+    peers[d.peerId]._pruneTimer = setTimeout(() => {
+      delete peers[d.peerId]; renderPeers();
+    }, 12000);
+  });
+
+  // subscribe to leave events
+  ablyChannel.subscribe('leave', msg => {
+    const id = msg.data.peerId;
+    if (peers[id]) { clearTimeout(peers[id]._pruneTimer); delete peers[id]; renderPeers(); }
+  });
+
+  // start broadcasting own state
+  startBroadcast();
+  broadcastState(); // immediate first publish
+}
+
+// ── broadcast ─────────────────────────────────
+function broadcastState() {
+  if (!ablyChannel || !myPeerId) return;
+  ablyChannel.publish('state', {
+    peerId:   myPeerId,
+    name:     myDisplayName,
+    avatar:   myAvatar(),
+    timeLeft: timeLeft,
+    totalTime:totalTime,
+    mode:     currentMode,
+    running:  running,
+    task:     (document.getElementById('taskInput')||{}).value || '',
+  });
+}
+
+function startBroadcast() {
+  clearInterval(broadcastTimer);
+  broadcastTimer = setInterval(broadcastState, BROADCAST_INTERVAL);
+}
+
+// ── leave room ────────────────────────────────
+async function leaveRoom() {
+  if (ablyChannel) {
+    ablyChannel.publish('leave', { peerId: myPeerId });
+    ablyChannel.unsubscribe();
+  }
+  if (ablyClient) { try { ablyClient.close(); } catch(e){} ablyClient = null; }
+  clearInterval(broadcastTimer);
+  myRoomCode = null; myPeerId = null; peers = {};
+  updateRoomNavBtn(false);
+  showRoomSetup();
+  setRoomMsg('roomSetupMsg','');
+}
+
+// ── render peers ──────────────────────────────
+function renderPeers() {
+  const list = document.getElementById('peersList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  // my own card first
+  const myCard = makePeerCard({
+    peerId:   myPeerId,
+    name:     myDisplayName,
+    avatar:   myAvatar(),
+    timeLeft: timeLeft,
+    totalTime:totalTime,
+    mode:     currentMode,
+    running:  running,
+    task:     (document.getElementById('taskInput')||{}).value || '',
+  }, true);
+  list.appendChild(myCard);
+
+  // other peers
+  Object.values(peers).forEach(p => list.appendChild(makePeerCard(p, false)));
+
+  // update panel msg
+  const count = Object.keys(peers).length;
+  setRoomMsg('roomPanelMsg', count === 0
+    ? 'Waiting for others to join…'
+    : count + ' other' + (count !== 1 ? 's' : '') + ' in the room');
+}
+
+function makePeerCard(p, isMe) {
+  const div = document.createElement('div');
+  div.className = 'peer-card' + (isMe ? ' is-me' : '');
+
+  const m = Math.floor(p.timeLeft/60), s = p.timeLeft%60;
+  const timeStr = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const statusClass = !p.running ? 'idle' : (p.mode==='focus' ? 'focus' : 'break');
+  const modeLabel = p.mode === 'focus' ? 'Focus' : p.mode === 'short' ? 'Short Break' : 'Long Break';
+
+  div.innerHTML = `
+    <div class="peer-avatar">${p.avatar||'🍅'}</div>
+    <div class="peer-info">
+      <div class="peer-name">
+        ${p.name}${isMe ? '<span class="peer-me-tag">you</span>' : ''}
+      </div>
+      <div class="peer-task">${p.task ? '🎯 ' + p.task : (p.running ? 'In session' : 'Not started')}</div>
+    </div>
+    <div class="peer-timer">
+      <div class="peer-time">${timeStr}</div>
+      <div class="peer-mode">${modeLabel}</div>
+    </div>
+    <div class="peer-status-dot ${statusClass}"></div>
+  `;
+  return div;
+}
+
+// ── helpers ───────────────────────────────────
+function setRoomMsg(id, msg) { const el=document.getElementById(id); if(el) el.textContent=msg; }
+
+function copyInvite() {
+  const url = document.getElementById('roomInviteUrl').value;
+  navigator.clipboard.writeText(url).then(() => {
+    setRoomMsg('roomPanelMsg','Link copied! Share it with your study buddies ✿');
+    setTimeout(() => {
+      const count = Object.keys(peers).length;
+      setRoomMsg('roomPanelMsg', count === 0 ? 'Waiting for others to join…' : count + ' other' + (count!==1?'s':'') + ' in the room');
+    }, 2000);
+  });
+}
+
+function updateRoomNavBtn(inRoom) {
+  const btn = document.getElementById('roomNavBtn');
+  if (!btn) return;
+  btn.textContent = inRoom ? '👥 Room: ' + myRoomCode : '👥 Study With Me';
+  btn.style.borderColor = inRoom ? 'var(--primary)' : 'var(--accent)';
+}
+
+// auto-join from URL param (e.g. someone clicked invite link)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const roomParam = params.get('room');
+  const nameParam = params.get('name');
+  if (roomParam) {
+    document.getElementById('roomCodeInput').value = roomParam;
+    if (nameParam) document.getElementById('roomDisplayName').value = decodeURIComponent(nameParam);
+  }
+})();
+
+// broadcast when timer state changes (hook into existing tick)
+const _origTick = tick;
+// re-broadcast on play/pause/mode changes — we hook broadcastState
+// into togglePlay, setMode, resetTimer, skipSession via a wrapper
+// hook room broadcast into timer controls
+const _origTogglePlay = togglePlay;
+function togglePlay() { _origTogglePlay(); _afterAction(); }
+const _origReset = resetTimer;
+function resetTimer() { _origReset(); _afterAction(); }
+const _origSkip = skipSession;
+function skipSession() { _origSkip(); _afterAction(); }
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
 updateRing();
 renderDisplay();
+updateSidebar();
+renderHeatmap();
+
 </script>
 </body>
 </html>
