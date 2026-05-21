@@ -3434,6 +3434,8 @@ let mpOppScore = 0;
 let mpQuestions = [];
 let mpCurrentQ = 0;
 let mpActive = false;
+let mpYouAnswered = false;
+let mpOppAnswered = false;
 
 // Initialize Ably
 function initAbly() {
@@ -3492,10 +3494,8 @@ function createMPRoom() {
     }
   });
   
-  mpChannel.subscribe('quiz-start', (msg) => {
-    mpQuestions = msg.data.questions;
-    startMPGame();
-  });
+  // HOST SHOULD NOT LISTEN TO quiz-start (that's for joiner only)
+  // Host generates questions locally in startMPQuiz()
   
   mpChannel.subscribe('answer', (msg) => {
     mpOppScore = msg.data.score;
@@ -3558,29 +3558,48 @@ function joinMPRoom() {
     }
   });
   
-  // Listen for quiz start
-  mpChannel.subscribe('quiz-start', (msg) => {
-    console.log('Received quiz-start message:', msg.data);
-    
-    // Generate same questions using the seed
-    const bank = getActiveBank();
-    const filtered = bank.filter(q => {
-      if (activeDomains.size === 0) return true;
-      return activeDomains.has(q.domain);
+  // Listen for quiz start - ONLY SUBSCRIBE ONCE
+  let quizStartSubscribed = false;
+  if (!quizStartSubscribed) {
+    mpChannel.subscribe('quiz-start', (msg) => {
+      console.log('JOINER: Received quiz-start message:', msg.data);
+      
+      // Generate same questions using the seed - FILTER OUT MULTI-SELECT
+      const bank = getActiveBank();
+      const filtered = bank.filter(q => {
+        // Remove multi-select questions
+        if (q.multi) return false;
+        // Apply domain filter
+        if (activeDomains.size === 0) return true;
+        return activeDomains.has(q.domain);
+      });
+      
+      const seed = msg.data.seed;
+      const shuffled = [...filtered];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(seededRandom(seed + i) * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      
+      mpQuestions = shuffled.slice(0, msg.data.questionCount);
+      console.log('JOINER: Generated questions:', mpQuestions.length);
+      console.log('JOINER: First question:', mpQuestions[0].q);
+      
+      // Verify questions array is valid
+      if (!mpQuestions || mpQuestions.length === 0) {
+        console.error('JOINER: Failed to generate questions!');
+        alert('Error: Failed to load questions. Please try again.');
+        return;
+      }
+      
+      // Wait a tiny bit then start
+      setTimeout(() => {
+        console.log('JOINER: Now starting game...');
+        startMPGame();
+      }, 500);
     });
-    
-    const seed = msg.data.seed;
-    const shuffled = [...filtered];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(seededRandom(seed + i) * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    
-    mpQuestions = shuffled.slice(0, msg.data.questionCount);
-    console.log('Joiner generated questions. First:', mpQuestions[0].q);
-    
-    startMPGame();
-  });
+    quizStartSubscribed = true;
+  }
   
   // Listen for opponent answers
   mpChannel.subscribe('answer', (msg) => {
@@ -3639,16 +3658,19 @@ function startMPQuiz() {
   
   console.log('Starting MP Quiz...');
   
-  // Get 10 random questions from current exam
+  // Get questions from current exam - FILTER OUT MULTI-SELECT
   const bank = getActiveBank();
   console.log('Question bank size:', bank.length);
   
   const filtered = bank.filter(q => {
+    // Remove multi-select questions
+    if (q.multi) return false;
+    // Apply domain filter if active
     if (activeDomains.size === 0) return true;
     return activeDomains.has(q.domain);
   });
   
-  console.log('Filtered questions:', filtered.length);
+  console.log('Filtered questions (no multi-select):', filtered.length);
   
   // Use room code as seed for consistent shuffle across both players
   const seed = mpRoomCode.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -3662,17 +3684,21 @@ function startMPQuiz() {
   
   mpQuestions = shuffled.slice(0, 10);
   
-  console.log('MP Questions selected:', mpQuestions.length);
-  console.log('First question:', mpQuestions[0].q);
+  console.log('HOST: MP Questions selected:', mpQuestions.length);
+  console.log('HOST: First question:', mpQuestions[0].q);
   
-  // Send START signal with just the seed (not full questions to save bandwidth)
+  // Send START signal with just the seed
   mpChannel.publish('quiz-start', {
     seed: seed,
     questionCount: 10
   });
   
-  // Start game immediately
-  setTimeout(startMPGame, 500);
+  // Wait a bit to ensure joiner gets message and sets up
+  console.log('HOST: Waiting 1 second for joiner to receive...');
+  setTimeout(() => {
+    console.log('HOST: Now starting game...');
+    startMPGame();
+  }, 1000);
 }
 
 // Simple seeded random function
@@ -3682,18 +3708,45 @@ function seededRandom(seed) {
 }
 
 function startMPGame() {
+  // Safety check
+  if (!mpQuestions || mpQuestions.length === 0) {
+    console.error('ERROR: mpQuestions not set! Cannot start game.');
+    console.error('mpQuestions:', mpQuestions);
+    alert('Error: Questions not loaded. Please refresh and try again.');
+    return;
+  }
+  
   console.log('startMPGame called. Questions:', mpQuestions.length);
+  console.log('First Q will be:', mpQuestions[0].q);
   
   mpActive = true;
   mpCurrentQ = 0;
   mpYourScore = 0;
   mpOppScore = 0;
+  mpYouAnswered = false;
+  mpOppAnswered = false;
   
   // ALWAYS listen for opponent answers (both host and joiner)
   mpChannel.subscribe('answer', (msg) => {
     console.log('Received opponent answer:', msg.data);
+    
+    // Update opponent score
     mpOppScore = msg.data.score;
     updateMPScoreboard();
+    
+    // Mark opponent as answered
+    if (msg.data.questionIndex === mpCurrentQ) {
+      mpOppAnswered = true;
+      
+      // Update status
+      const statusDiv = document.getElementById('mp-question-status');
+      if (statusDiv && mpYouAnswered) {
+        statusDiv.textContent = '✓ Both answered! Next question...';
+      }
+      
+      // Check if both answered
+      checkBothAnswered();
+    }
   });
   
   // Hide lobby, show game
@@ -3712,12 +3765,23 @@ function startMPGame() {
 }
 
 function loadMPQuestion() {
-  console.log('loadMPQuestion called. Current Q:', mpCurrentQ, 'Total:', mpQuestions.length);
+  console.log('loadMPQuestion called. Current Q:', mpCurrentQ, 'Total:', mpQuestions ? mpQuestions.length : 'UNDEFINED');
+  
+  // Safety check
+  if (!mpQuestions || mpQuestions.length === 0) {
+    console.error('ERROR: mpQuestions not available in loadMPQuestion!');
+    alert('Error: Questions not loaded. Please refresh.');
+    return;
+  }
   
   if (mpCurrentQ >= mpQuestions.length) {
     showMPResults();
     return;
   }
+  
+  // Reset answered flags for new question
+  mpYouAnswered = false;
+  mpOppAnswered = false;
   
   const q = mpQuestions[mpCurrentQ];
   console.log('Loading question:', q.q);
@@ -3734,6 +3798,10 @@ function loadMPQuestion() {
   if (domain) domain.textContent = `${(currentExam === 'c1' ? DOMAINS_C1 : DOMAINS)[q.domain]} • ${(currentExam === 'c1' ? OBJECTIVES_C1 : OBJECTIVES)[q.obj]}`;
   if (question) question.textContent = q.q;
   
+  // Clear status message
+  const statusDiv = document.getElementById('mp-question-status');
+  if (statusDiv) statusDiv.textContent = '';
+  
   // Build options
   if (options) {
     options.innerHTML = '';
@@ -3747,6 +3815,7 @@ function loadMPQuestion() {
       const btn = document.createElement('button');
       btn.className = 'opt';
       btn.textContent = q.opts[origIdx];
+      if (pos === newCorrectPos) btn.classList.add('correct'); // Mark for highlighting later
       btn.onclick = () => answerMPQuestion(pos === newCorrectPos);
       options.appendChild(btn);
     });
@@ -3756,33 +3825,76 @@ function loadMPQuestion() {
 }
 
 function answerMPQuestion(isCorrect) {
-  const currentIndex = mpCurrentQ;
+  // Mark that you've answered
+  mpYouAnswered = true;
   
   if (isCorrect) {
     mpYourScore++;
   }
   
-  // Publish YOUR answer to opponent
-  mpChannel.publish('answer', {
-    questionIndex: currentIndex,
-    score: mpYourScore,
-    isCorrect: isCorrect
+  // Disable all buttons
+  const opts = document.querySelectorAll('#mp-options .opt');
+  opts.forEach(opt => {
+    opt.disabled = true;
+    // Highlight if this was the correct answer
+    if (opt.textContent === document.querySelector('#mp-options .opt.correct')?.textContent) {
+      opt.style.background = isCorrect ? 'var(--correct)' : 'var(--wrong)';
+    }
   });
   
-  console.log('Answered Q' + currentIndex + '. Correct:', isCorrect, 'Your score:', mpYourScore);
+  // Publish YOUR answer to opponent
+  mpChannel.publish('answer', {
+    questionIndex: mpCurrentQ,
+    score: mpYourScore,
+    isCorrect: isCorrect,
+    answered: true
+  });
   
-  // Disable buttons
-  const opts = document.querySelectorAll('#mp-options .opt');
-  opts.forEach(opt => opt.disabled = true);
+  console.log('You answered Q' + mpCurrentQ + '. Correct:', isCorrect, 'Your score:', mpYourScore);
+  console.log('Waiting for opponent...');
   
   // Update your own scoreboard
   updateMPScoreboard();
   
-  // Next question after brief delay
-  setTimeout(() => {
-    mpCurrentQ++;
-    loadMPQuestion();
-  }, 1000);
+  // Show waiting message
+  const statusDiv = document.getElementById('mp-question-status');
+  if (!statusDiv) {
+    const status = document.createElement('div');
+    status.id = 'mp-question-status';
+    status.style.textAlign = 'center';
+    status.style.padding = '15px';
+    status.style.marginTop = '15px';
+    status.style.fontSize = '1.1rem';
+    status.style.fontWeight = '600';
+    status.style.color = 'var(--primary)';
+    document.getElementById('mp-quiz-display').appendChild(status);
+  }
+  document.getElementById('mp-question-status').textContent = '⏳ Waiting for opponent...';
+  
+  // Check if both players have answered
+  checkBothAnswered();
+}
+
+function checkBothAnswered() {
+  console.log('Check both answered. You:', mpYouAnswered, 'Opp:', mpOppAnswered);
+  
+  if (mpYouAnswered && mpOppAnswered) {
+    console.log('Both answered! Moving to next question...');
+    
+    // Reset answered flags
+    mpYouAnswered = false;
+    mpOppAnswered = false;
+    
+    // Remove waiting message
+    const statusDiv = document.getElementById('mp-question-status');
+    if (statusDiv) statusDiv.textContent = '';
+    
+    // Move to next question
+    setTimeout(() => {
+      mpCurrentQ++;
+      loadMPQuestion();
+    }, 1500);
+  }
 }
 
 function updateMPScoreboard() {
