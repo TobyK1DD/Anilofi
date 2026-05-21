@@ -3498,10 +3498,8 @@ function createMPRoom() {
   // HOST SHOULD NOT LISTEN TO quiz-start (that's for joiner only)
   // Host generates questions locally in startMPQuiz()
   
-  mpChannel.subscribe('answer', (msg) => {
-    mpOppScore = msg.data.score;
-    updateMPScoreboard();
-  });
+  // Set up answer listener (once)
+  setupMPAnswerListener();
   
   mpChannel.subscribe('player-left', (msg) => {
     if (mpActive) {
@@ -3602,11 +3600,8 @@ function joinMPRoom() {
     quizStartSubscribed = true;
   }
   
-  // Listen for opponent answers
-  mpChannel.subscribe('answer', (msg) => {
-    mpOppScore = msg.data.score;
-    updateMPScoreboard();
-  });
+  // Set up answer listener (once)
+  setupMPAnswerListener();
   
   // Listen for host leaving
   mpChannel.subscribe('player-left', (msg) => {
@@ -3728,6 +3723,23 @@ function startMPGame() {
   mpOppAnswered = false;
   mpOppAnsweredQuestions = new Set(); // Reset tracker
   
+  // Hide lobby, show game
+  document.getElementById('mp-lobby').style.display = 'none';
+  document.getElementById('mp-game').style.display = 'block';
+  
+  console.log('MP-game display set to block');
+  
+  // Update scoreboard
+  document.getElementById('mp-opp-name').textContent = mpOpponentName;
+  updateMPScoreboard();
+  
+  // Load first question
+  console.log('About to load first question...');
+  loadMPQuestion();
+}
+
+// Set up answer listener ONCE when joining/creating room
+function setupMPAnswerListener() {
   // ALWAYS listen for opponent answers (both host and joiner)
   mpChannel.subscribe('answer', (msg) => {
     console.log('Received opponent answer:', msg.data);
@@ -3762,20 +3774,6 @@ function startMPGame() {
       console.log('Ignored - opponent answered Q' + msg.data.questionIndex + ', we are on Q' + mpCurrentQ);
     }
   });
-  
-  // Hide lobby, show game
-  document.getElementById('mp-lobby').style.display = 'none';
-  document.getElementById('mp-game').style.display = 'block';
-  
-  console.log('MP-game display set to block');
-  
-  // Update scoreboard
-  document.getElementById('mp-opp-name').textContent = mpOpponentName;
-  updateMPScoreboard();
-  
-  // Load first question
-  console.log('About to load first question...');
-  loadMPQuestion();
 }
 
 function loadMPQuestion() {
