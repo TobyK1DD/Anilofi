@@ -3910,6 +3910,7 @@ function checkBothAnswered() {
 }
 
 function updateMPScoreboard() {
+  console.log('updateMPScoreboard: mpYourScore=', mpYourScore, 'mpOppScore=', mpOppScore);
   document.getElementById('mp-your-score').textContent = mpYourScore;
   document.getElementById('mp-opp-score').textContent = mpOppScore;
 }
