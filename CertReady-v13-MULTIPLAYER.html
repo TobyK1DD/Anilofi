@@ -3730,13 +3730,14 @@ function startMPGame() {
   mpChannel.subscribe('answer', (msg) => {
     console.log('Received opponent answer:', msg.data);
     
-    // Update opponent score
+    // Update opponent score (always)
     mpOppScore = msg.data.score;
     updateMPScoreboard();
     
-    // Mark opponent as answered
+    // Only mark as answered if it's for the CURRENT question
     if (msg.data.questionIndex === mpCurrentQ) {
       mpOppAnswered = true;
+      console.log('Opponent answered current question Q' + mpCurrentQ);
       
       // Update status
       const statusDiv = document.getElementById('mp-question-status');
@@ -3746,6 +3747,8 @@ function startMPGame() {
       
       // Check if both answered
       checkBothAnswered();
+    } else {
+      console.log('Ignored - opponent answered Q' + msg.data.questionIndex + ', we are on Q' + mpCurrentQ);
     }
   });
   
