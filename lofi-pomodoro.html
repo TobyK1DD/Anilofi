@@ -6,7 +6,7 @@
 <title>lofi pomodoro ✿</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+<script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1332,78 +1332,122 @@ function showRoomPanel() {
 // ── create / join ─────────────────────────────
 async function createRoom() {
   const name = document.getElementById('roomDisplayName').value.trim();
-  if (!name) { setRoomMsg('roomSetupMsg','Please enter a display name.'); return; }
+  if (!name) { setRoomMsg('roomSetupMsg', 'Please enter a display name.'); return; }
   myDisplayName = name;
-  myPeerId  = genPeerId();
+  myPeerId   = genPeerId();
   myRoomCode = genCode();
-  setRoomMsg('roomSetupMsg','Creating room…');
-  await connectAbly(myRoomCode);
-  showRoomPanel();
-  updateRoomNavBtn(true);
+  setRoomMsg('roomSetupMsg', 'Creating room…');
+  try {
+    await connectAbly(myRoomCode);
+    showRoomPanel();
+    updateRoomNavBtn(true);
+    setRoomMsg('roomSetupMsg', '');
+  } catch(e) {
+    myRoomCode = null; myPeerId = null;
+    setRoomMsg('roomSetupMsg', 'Could not connect. Try again.');
+  }
 }
 
 async function joinRoom() {
   const name = document.getElementById('roomDisplayName').value.trim();
   const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
-  if (!name) { setRoomMsg('roomSetupMsg','Please enter a display name.'); return; }
-  if (!code)  { setRoomMsg('roomSetupMsg','Please enter a room code.'); return; }
+  if (!name) { setRoomMsg('roomSetupMsg', 'Please enter a display name.'); return; }
+  if (!code)  { setRoomMsg('roomSetupMsg', 'Please enter a room code.'); return; }
   myDisplayName = name;
-  myPeerId  = genPeerId();
+  myPeerId   = genPeerId();
   myRoomCode = code;
-  setRoomMsg('roomSetupMsg','Joining room…');
-  await connectAbly(myRoomCode);
-  showRoomPanel();
-  updateRoomNavBtn(true);
+  setRoomMsg('roomSetupMsg', 'Joining room…');
+  try {
+    await connectAbly(myRoomCode);
+    showRoomPanel();
+    updateRoomNavBtn(true);
+    setRoomMsg('roomSetupMsg', '');
+  } catch(e) {
+    myRoomCode = null; myPeerId = null;
+    setRoomMsg('roomSetupMsg', 'Could not connect. Check the code and try again.');
+  }
 }
 
 // ── ably connect ──────────────────────────────
 async function connectAbly(code) {
-  if (ablyClient) { try { ablyClient.close(); } catch(e){} }
+  if (ablyClient) {
+    try { ablyClient.close(); } catch(e){}
+    ablyClient = null; ablyChannel = null;
+  }
   peers = {};
-  ablyClient = new Ably.Realtime({ key: ABLY_KEY, clientId: myPeerId });
-  await new Promise(res => {
-    ablyClient.connection.on('connected', res);
-    ablyClient.connection.on('failed', res);
-  });
-  ablyChannel = ablyClient.channels.get(ROOM_PREFIX + code);
 
-  // subscribe to peer broadcasts
-  ablyChannel.subscribe('state', msg => {
-    const d = msg.data;
-    if (d.peerId === myPeerId) return; // ignore own echo
-    peers[d.peerId] = { ...d, ts: Date.now() };
-    renderPeers();
-    // prune stale peers (gone > 12s without broadcast)
-    clearTimeout(peers[d.peerId]._pruneTimer);
-    peers[d.peerId]._pruneTimer = setTimeout(() => {
-      delete peers[d.peerId]; renderPeers();
-    }, 12000);
-  });
+  return new Promise((resolve, reject) => {
+    // v1 Ably SDK — correct constructor
+    ablyClient = new Ably.Realtime({
+      key:      ABLY_KEY,
+      clientId: myPeerId,
+    });
 
-  // subscribe to leave events
-  ablyChannel.subscribe('leave', msg => {
-    const id = msg.data.peerId;
-    if (peers[id]) { clearTimeout(peers[id]._pruneTimer); delete peers[id]; renderPeers(); }
-  });
+    ablyClient.connection.on('connected', () => {
+      ablyChannel = ablyClient.channels.get(ROOM_PREFIX + code);
 
-  // start broadcasting own state
-  startBroadcast();
-  broadcastState(); // immediate first publish
+      // subscribe to peer state broadcasts
+      ablyChannel.subscribe('state', msg => {
+        const d = msg.data;
+        if (!d || d.peerId === myPeerId) return;
+        if (peers[d.peerId] && peers[d.peerId]._pruneTimer) {
+          clearTimeout(peers[d.peerId]._pruneTimer);
+        }
+        peers[d.peerId] = { ...d, ts: Date.now() };
+        peers[d.peerId]._pruneTimer = setTimeout(() => {
+          delete peers[d.peerId]; renderPeers();
+        }, 12000);
+        renderPeers();
+      });
+
+      // subscribe to leave events
+      ablyChannel.subscribe('leave', msg => {
+        if (!msg.data) return;
+        const id = msg.data.peerId;
+        if (peers[id]) {
+          clearTimeout(peers[id]._pruneTimer);
+          delete peers[id];
+          renderPeers();
+        }
+      });
+
+      startBroadcast();
+      // small delay so channel is fully attached before first publish
+      setTimeout(() => { broadcastState(); resolve(); }, 400);
+    });
+
+    ablyClient.connection.on('failed', err => {
+      setRoomMsg('roomSetupMsg', 'Connection failed — check your internet.');
+      reject(err);
+    });
+
+    ablyClient.connection.on('disconnected', () => {
+      setRoomMsg('roomPanelMsg', 'Reconnecting…');
+    });
+
+    ablyClient.connection.on('connected', () => {
+      setRoomMsg('roomPanelMsg', '');
+    });
+  });
 }
 
 // ── broadcast ─────────────────────────────────
 function broadcastState() {
-  if (!ablyChannel || !myPeerId) return;
-  ablyChannel.publish('state', {
-    peerId:   myPeerId,
-    name:     myDisplayName,
-    avatar:   myAvatar(),
-    timeLeft: timeLeft,
-    totalTime:totalTime,
-    mode:     currentMode,
-    running:  running,
-    task:     (document.getElementById('taskInput')||{}).value || '',
-  });
+  if (!ablyChannel || !myPeerId || !myRoomCode) return;
+  // only publish if channel is attached
+  if (ablyChannel.state !== 'attached') return;
+  try {
+    ablyChannel.publish('state', {
+      peerId:    myPeerId,
+      name:      myDisplayName,
+      avatar:    myAvatar(),
+      timeLeft:  timeLeft,
+      totalTime: totalTime,
+      mode:      currentMode,
+      running:   running,
+      task:      (document.getElementById('taskInput')||{}).value || '',
+    });
+  } catch(e) {}
 }
 
 function startBroadcast() {
@@ -1413,16 +1457,24 @@ function startBroadcast() {
 
 // ── leave room ────────────────────────────────
 async function leaveRoom() {
-  if (ablyChannel) {
-    ablyChannel.publish('leave', { peerId: myPeerId });
-    ablyChannel.unsubscribe();
-  }
-  if (ablyClient) { try { ablyClient.close(); } catch(e){} ablyClient = null; }
   clearInterval(broadcastTimer);
+  if (ablyChannel) {
+    try {
+      if (ablyChannel.state === 'attached') {
+        ablyChannel.publish('leave', { peerId: myPeerId });
+      }
+      ablyChannel.unsubscribe();
+    } catch(e) {}
+    ablyChannel = null;
+  }
+  if (ablyClient) {
+    try { ablyClient.close(); } catch(e) {}
+    ablyClient = null;
+  }
   myRoomCode = null; myPeerId = null; peers = {};
   updateRoomNavBtn(false);
   showRoomSetup();
-  setRoomMsg('roomSetupMsg','');
+  setRoomMsg('roomSetupMsg', '');
 }
 
 // ── render peers ──────────────────────────────
