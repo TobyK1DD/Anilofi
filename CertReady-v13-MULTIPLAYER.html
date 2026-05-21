@@ -3436,6 +3436,7 @@ let mpCurrentQ = 0;
 let mpActive = false;
 let mpYouAnswered = false;
 let mpOppAnswered = false;
+let mpOppAnsweredQuestions = new Set(); // Track which questions opponent already answered
 
 // Initialize Ably
 function initAbly() {
@@ -3725,10 +3726,17 @@ function startMPGame() {
   mpOppScore = 0;
   mpYouAnswered = false;
   mpOppAnswered = false;
+  mpOppAnsweredQuestions = new Set(); // Reset tracker
   
   // ALWAYS listen for opponent answers (both host and joiner)
   mpChannel.subscribe('answer', (msg) => {
     console.log('Received opponent answer:', msg.data);
+    
+    // Check if we already processed this question
+    if (mpOppAnsweredQuestions.has(msg.data.questionIndex)) {
+      console.log('DUPLICATE IGNORED - already processed Q' + msg.data.questionIndex);
+      return;
+    }
     
     // Update opponent score (always)
     mpOppScore = msg.data.score;
@@ -3737,6 +3745,7 @@ function startMPGame() {
     // Only mark as answered if it's for the CURRENT question
     if (msg.data.questionIndex === mpCurrentQ) {
       mpOppAnswered = true;
+      mpOppAnsweredQuestions.add(msg.data.questionIndex); // Mark as processed
       console.log('Opponent answered current question Q' + mpCurrentQ);
       
       // Update status
