@@ -3908,6 +3908,11 @@ function updateMPScoreboard() {
 function showMPResults() {
   mpActive = false;
   
+  console.log('=== FINAL RESULTS ===');
+  console.log('Your final score:', mpYourScore);
+  console.log('Opponent final score:', mpOppScore);
+  console.log('Questions total:', mpQuestions.length);
+  
   // Hide game UI
   document.getElementById('mp-game').style.display = 'none';
   document.getElementById('quiz-card').style.display = 'none';
@@ -3920,13 +3925,17 @@ function showMPResults() {
   const youWon = mpYourScore > mpOppScore;
   const tie = mpYourScore === mpOppScore;
   
+  console.log('Winner determination: youWon =', youWon, 'tie =', tie);
+  
   document.getElementById('mp-winner-text').textContent = tie ? '🤝' : (youWon ? '🏆' : '😔');
   document.getElementById('mp-result-title').textContent = tie ? "It's a Tie!" : (youWon ? "You Won!" : "You Lost!");
   
-  // Show scores
+  // Show scores - USE SEPARATE VARIABLES!
   document.getElementById('mp-final-you').textContent = `${mpYourScore}/${mpQuestions.length}`;
   document.getElementById('mp-final-opp').textContent = `${mpOppScore}/${mpQuestions.length}`;
   document.getElementById('mp-final-opp-name').textContent = mpOpponentName + ':';
+  
+  console.log('Displayed: You=' + mpYourScore + ', Opponent=' + mpOppScore);
 }
 
 function playAgainMP() {
