@@ -3437,6 +3437,7 @@ let mpActive = false;
 let mpYouAnswered = false;
 let mpOppAnswered = false;
 let mpOppAnsweredQuestions = new Set(); // Track which questions opponent already answered
+let mpOppAnswers = new Map(); // Store opponent answers keyed by questionIndex
 
 // Initialize Ably
 function initAbly() {
@@ -3722,6 +3723,7 @@ function startMPGame() {
   mpYouAnswered = false;
   mpOppAnswered = false;
   mpOppAnsweredQuestions.clear(); // Clear the Set instead of creating new one
+  mpOppAnswers.clear(); // Clear stored opponent answers
   
   // Hide lobby, show game
   document.getElementById('mp-lobby').style.display = 'none';
@@ -3740,38 +3742,35 @@ function startMPGame() {
 
 // Set up answer listener ONCE when joining/creating room
 function setupMPAnswerListener() {
-  // ALWAYS listen for opponent answers (both host and joiner)
   mpChannel.subscribe('answer', (msg) => {
-    console.log('Received opponent answer:', msg.data);
+    const data = msg.data;
     
-    // Check if we already processed this question
-    if (mpOppAnsweredQuestions.has(msg.data.questionIndex)) {
-      console.log('DUPLICATE IGNORED - already processed Q' + msg.data.questionIndex);
-      return; // EXIT before updating anything!
+    // CRITICAL: Ignore our own messages (Ably delivers to publisher too!)
+    const myId = mpIsHost ? 'host' : 'joiner';
+    if (data.senderId === myId) {
+      console.log('IGNORED - own loopback Q' + data.questionIndex);
+      return;
     }
     
-    // Mark as processed immediately to block future duplicates
-    mpOppAnsweredQuestions.add(msg.data.questionIndex);
+    console.log('Received opponent answer:', data);
+    const qi = data.questionIndex;
     
-    // Update opponent score (only if not duplicate!)
-    mpOppScore = msg.data.score;
+    // Store in Map (handles duplicates cleanly - keeps latest)
+    mpOppAnswers.set(qi, data);
+    mpOppScore = data.score;
     updateMPScoreboard();
     
-    // Only mark as answered if it's for the CURRENT question
-    if (msg.data.questionIndex === mpCurrentQ) {
+    // If this is the current question, mark answered and check
+    if (qi === mpCurrentQ) {
       mpOppAnswered = true;
       console.log('Opponent answered current question Q' + mpCurrentQ);
-      
-      // Update status
       const statusDiv = document.getElementById('mp-question-status');
       if (statusDiv && mpYouAnswered) {
         statusDiv.textContent = '✓ Both answered! Next question...';
       }
-      
-      // Check if both answered
       checkBothAnswered();
     } else {
-      console.log('Ignored - opponent answered Q' + msg.data.questionIndex + ', we are on Q' + mpCurrentQ);
+      console.log('Stored answer for Q' + qi + ' (on Q' + mpCurrentQ + ')');
     }
   });
 }
@@ -3794,6 +3793,14 @@ function loadMPQuestion() {
   // Reset answered flags for new question
   mpYouAnswered = false;
   mpOppAnswered = false;
+  
+  // Check if opponent already answered this question before we got here
+  if (mpOppAnswers.has(mpCurrentQ)) {
+    const stored = mpOppAnswers.get(mpCurrentQ);
+    console.log('Opponent pre-answered Q' + mpCurrentQ + ' (score: ' + stored.score + ')');
+    mpOppScore = stored.score;
+    mpOppAnswered = true;
+  }
   
   const q = mpQuestions[mpCurrentQ];
   console.log('Loading question:', q.q);
@@ -3865,7 +3872,8 @@ function answerMPQuestion(isCorrect) {
     questionIndex: mpCurrentQ,
     score: mpYourScore,
     isCorrect: isCorrect,
-    answered: true
+    answered: true,
+    senderId: mpIsHost ? 'host' : 'joiner'  // So opponent can filter their own messages
   });
   
   console.log('You answered Q' + mpCurrentQ + '. Correct:', isCorrect, 'Your score:', mpYourScore);
