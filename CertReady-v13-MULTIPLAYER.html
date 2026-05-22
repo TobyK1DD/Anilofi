@@ -3721,7 +3721,7 @@ function startMPGame() {
   mpOppScore = 0;
   mpYouAnswered = false;
   mpOppAnswered = false;
-  mpOppAnsweredQuestions = new Set(); // Reset tracker
+  mpOppAnsweredQuestions.clear(); // Clear the Set instead of creating new one
   
   // Hide lobby, show game
   document.getElementById('mp-lobby').style.display = 'none';
@@ -3863,12 +3863,11 @@ function answerMPQuestion(isCorrect) {
   });
   
   console.log('You answered Q' + mpCurrentQ + '. Correct:', isCorrect, 'Your score:', mpYourScore);
-  console.log('Waiting for opponent...');
   
   // Update your own scoreboard
   updateMPScoreboard();
   
-  // Show waiting message
+  // Show status message based on opponent state
   const statusDiv = document.getElementById('mp-question-status');
   if (!statusDiv) {
     const status = document.createElement('div');
@@ -3881,7 +3880,15 @@ function answerMPQuestion(isCorrect) {
     status.style.color = 'var(--primary)';
     document.getElementById('mp-quiz-display').appendChild(status);
   }
-  document.getElementById('mp-question-status').textContent = '⏳ Waiting for opponent...';
+  
+  // Only show waiting if opponent hasn't answered yet
+  if (!mpOppAnswered) {
+    console.log('Waiting for opponent...');
+    document.getElementById('mp-question-status').textContent = '⏳ Waiting for opponent...';
+  } else {
+    console.log('Opponent already answered, advancing soon...');
+    document.getElementById('mp-question-status').textContent = '✓ Both answered! Next question...';
+  }
   
   // Check if both players have answered
   checkBothAnswered();
