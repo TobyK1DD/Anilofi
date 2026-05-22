@@ -3837,6 +3837,12 @@ function loadMPQuestion() {
 }
 
 function answerMPQuestion(isCorrect) {
+  // Guard: prevent answering twice
+  if (mpYouAnswered) {
+    console.log('IGNORED - already answered this question');
+    return;
+  }
+  
   // Mark that you've answered
   mpYouAnswered = true;
   
