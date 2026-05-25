@@ -1847,7 +1847,7 @@ function showAuthMsg(id, text, type='error') {
 
 // --- Login (username → lookup email → Supabase auth) ---
 async function doLogin() {
-  const username = document.getElementById('login-username').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const username = document.getElementById('login-username').value.trim();
   const password = document.getElementById('login-password').value;
   if (!username || !password) { showAuthMsg('login-msg','Please enter your username and password.'); return; }
   const btn = document.querySelector('#panel-login .auth-btn');
@@ -1857,7 +1857,7 @@ async function doLogin() {
   const { data: profile, error: lookupErr } = await _supabase
     .from('profiles')
     .select('email')
-    .eq('username', username)
+    .ilike('username', username)
     .single();
 
   if (lookupErr || !profile?.email) {
