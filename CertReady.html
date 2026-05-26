@@ -58,6 +58,11 @@ button:hover,.links a:hover,.Button:hover{background:var(--bg);color:var(--text)
 .auth-tab.active{background:var(--primary);color:var(--btn-text)}
 .auth-panel{display:none}
 .auth-panel.active{display:block}
+.pwd-wrap{position:relative;margin-bottom:12px}
+.pwd-wrap .auth-field{margin-bottom:0;padding-right:42px}
+.pwd-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;opacity:.35;padding:4px;color:var(--text);line-height:0;border-radius:4px;user-select:none;-webkit-user-select:none}
+.pwd-toggle:hover{opacity:.6}
+.pwd-toggle:active{opacity:.9}
 .auth-field{width:100%;padding:11px 14px;border-radius:9px;border:2px solid var(--accent);background:var(--bg);color:var(--text);font-family:"Sour Gummy",sans-serif;font-size:.98rem;margin-bottom:12px;outline:none;transition:border-color .2s}
 .auth-field:focus{border-color:var(--primary)}
 .auth-field.error{border-color:var(--wrong)}
@@ -384,7 +389,10 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       <div class="auth-panel active" id="panel-login">
         <div class="auth-msg" id="login-msg"></div>
         <input class="auth-field" type="text" id="login-username" placeholder="Username" maxlength="30" autocomplete="username"/>
-        <input class="auth-field" type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
+        <div class="pwd-wrap">
+          <input class="auth-field" type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
+          <button type="button" class="pwd-toggle" onmousedown="revealPwd('login-password')" onmouseup="hidePwd('login-password')" onmouseleave="hidePwd('login-password')" ontouchstart="revealPwd('login-password')" ontouchend="hidePwd('login-password')" tabindex="-1" aria-label="Hold to reveal password"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
         <button class="forgot-link" onclick="switchTab('forgot')" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;margin-bottom:8px;padding:0;font-family:inherit">Forgot password?</button>
         <button class="auth-btn" onclick="doLogin()">Sign In →</button>
       </div>
@@ -394,7 +402,10 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
         <div class="auth-msg" id="signup-msg"></div>
         <input class="auth-field" type="text" id="signup-username" placeholder="Username (no spaces)" maxlength="30" autocomplete="username"/>
         <input class="auth-field" type="email" id="signup-email" placeholder="Email address" autocomplete="email"/>
-        <input class="auth-field" type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password"/>
+        <div class="pwd-wrap">
+          <input class="auth-field" type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password"/>
+          <button type="button" class="pwd-toggle" onmousedown="revealPwd('signup-password')" onmouseup="hidePwd('signup-password')" onmouseleave="hidePwd('signup-password')" ontouchstart="revealPwd('signup-password')" ontouchend="hidePwd('signup-password')" tabindex="-1" aria-label="Hold to reveal password"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
         <button class="auth-btn" onclick="doSignup()">Create Account →</button>
         
       </div>
@@ -411,9 +422,18 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       <!-- CHANGE PASSWORD PANEL (shown when logged in) -->
       <div class="auth-panel" id="panel-changepwd">
         <div class="auth-msg" id="change-pwd-msg"></div>
-        <input class="auth-field" type="password" id="cpwd-current" placeholder="Current password" autocomplete="current-password"/>
-        <input class="auth-field" type="password" id="cpwd-new" placeholder="New password (min 6 characters)" autocomplete="new-password"/>
-        <input class="auth-field" type="password" id="cpwd-confirm" placeholder="Confirm new password" autocomplete="new-password"/>
+        <div class="pwd-wrap">
+          <input class="auth-field" type="password" id="cpwd-current" placeholder="Current password" autocomplete="current-password"/>
+          <button type="button" class="pwd-toggle" onmousedown="revealPwd('cpwd-current')" onmouseup="hidePwd('cpwd-current')" onmouseleave="hidePwd('cpwd-current')" ontouchstart="revealPwd('cpwd-current')" ontouchend="hidePwd('cpwd-current')" tabindex="-1" aria-label="Hold to reveal password"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="pwd-wrap">
+          <input class="auth-field" type="password" id="cpwd-new" placeholder="New password (min 6 characters)" autocomplete="new-password"/>
+          <button type="button" class="pwd-toggle" onmousedown="revealPwd('cpwd-new')" onmouseup="hidePwd('cpwd-new')" onmouseleave="hidePwd('cpwd-new')" ontouchstart="revealPwd('cpwd-new')" ontouchend="hidePwd('cpwd-new')" tabindex="-1" aria-label="Hold to reveal password"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="pwd-wrap">
+          <input class="auth-field" type="password" id="cpwd-confirm" placeholder="Confirm new password" autocomplete="new-password"/>
+          <button type="button" class="pwd-toggle" onmousedown="revealPwd('cpwd-confirm')" onmouseup="hidePwd('cpwd-confirm')" onmouseleave="hidePwd('cpwd-confirm')" ontouchstart="revealPwd('cpwd-confirm')" ontouchend="hidePwd('cpwd-confirm')" tabindex="-1" aria-label="Hold to reveal password"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
         <button class="auth-btn" onclick="doChangePassword()">Update Password →</button>
         <button class="auth-btn secondary" onclick="closeAccountScreen()" style="margin-top:8px">← Back</button>
       </div>
@@ -1838,6 +1858,15 @@ function switchTab(tab) {
   });
 }
 
+function revealPwd(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (field) field.type = 'text';
+}
+function hidePwd(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (field) field.type = 'password';
+}
+
 function showAuthMsg(id, text, type='error') {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1847,32 +1876,37 @@ function showAuthMsg(id, text, type='error') {
 
 // --- Login (username → lookup email → Supabase auth) ---
 async function doLogin() {
-  const username = document.getElementById('login-username').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const username = document.getElementById('login-username').value.trim();
   const password = document.getElementById('login-password').value;
   if (!username || !password) { showAuthMsg('login-msg','Please enter your username and password.'); return; }
   const btn = document.querySelector('#panel-login .auth-btn');
   btn.textContent = 'Signing in…'; btn.disabled = true;
 
   // Look up email by username from profiles table
+  console.log('Looking up username:', username);
   const { data: profile, error: lookupErr } = await _supabase
     .from('profiles')
     .select('email')
-    .eq('username', username)
+    .ilike('username', username)
     .single();
+
+  console.log('Profile lookup result:', profile, 'Error:', lookupErr);
 
   if (lookupErr || !profile?.email) {
     btn.textContent = 'Sign In →'; btn.disabled = false;
-    showAuthMsg('login-msg', 'No account found for that username.');
+    showAuthMsg('login-msg', lookupErr ? 'Error: ' + lookupErr.message : 'No account found for that username.');
     return;
   }
 
   // Sign in with email + password
+  console.log('Signing in with email:', profile.email);
   const { data, error } = await _supabase.auth.signInWithPassword({
     email: profile.email,
     password
   });
+  console.log('Sign in result:', data, 'Error:', error);
   btn.textContent = 'Sign In →'; btn.disabled = false;
-  if (error) { showAuthMsg('login-msg', 'Incorrect password.'); return; }
+  if (error) { showAuthMsg('login-msg', 'Sign in failed: ' + error.message); return; }
   await loadProfile(data.user);
 }
 
