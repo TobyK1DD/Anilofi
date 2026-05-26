@@ -58,10 +58,6 @@ button:hover,.links a:hover,.Button:hover{background:var(--bg);color:var(--text)
 .auth-tab.active{background:var(--primary);color:var(--btn-text)}
 .auth-panel{display:none}
 .auth-panel.active{display:block}
-.pwd-wrap{position:relative;margin-bottom:12px}
-.pwd-wrap .auth-field{margin-bottom:0;padding-right:42px}
-.pwd-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;opacity:.45;font-size:1rem;padding:4px;color:var(--text);line-height:1}
-.pwd-toggle:hover{opacity:.8}
 .auth-field{width:100%;padding:11px 14px;border-radius:9px;border:2px solid var(--accent);background:var(--bg);color:var(--text);font-family:"Sour Gummy",sans-serif;font-size:.98rem;margin-bottom:12px;outline:none;transition:border-color .2s}
 .auth-field:focus{border-color:var(--primary)}
 .auth-field.error{border-color:var(--wrong)}
@@ -388,10 +384,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       <div class="auth-panel active" id="panel-login">
         <div class="auth-msg" id="login-msg"></div>
         <input class="auth-field" type="text" id="login-username" placeholder="Username" maxlength="30" autocomplete="username"/>
-        <div class="pwd-wrap">
-          <input class="auth-field" type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
-          <button type="button" class="pwd-toggle" onclick="togglePwd('login-password', this)" tabindex="-1" aria-label="Show password">👁</button>
-        </div>
+        <input class="auth-field" type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
         <button class="forgot-link" onclick="switchTab('forgot')" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:.85rem;margin-bottom:8px;padding:0;font-family:inherit">Forgot password?</button>
         <button class="auth-btn" onclick="doLogin()">Sign In →</button>
       </div>
@@ -401,10 +394,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
         <div class="auth-msg" id="signup-msg"></div>
         <input class="auth-field" type="text" id="signup-username" placeholder="Username (no spaces)" maxlength="30" autocomplete="username"/>
         <input class="auth-field" type="email" id="signup-email" placeholder="Email address" autocomplete="email"/>
-        <div class="pwd-wrap">
-          <input class="auth-field" type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password"/>
-          <button type="button" class="pwd-toggle" onclick="togglePwd('signup-password', this)" tabindex="-1" aria-label="Show password">👁</button>
-        </div>
+        <input class="auth-field" type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password"/>
         <button class="auth-btn" onclick="doSignup()">Create Account →</button>
         
       </div>
@@ -421,18 +411,9 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       <!-- CHANGE PASSWORD PANEL (shown when logged in) -->
       <div class="auth-panel" id="panel-changepwd">
         <div class="auth-msg" id="change-pwd-msg"></div>
-        <div class="pwd-wrap">
-          <input class="auth-field" type="password" id="cpwd-current" placeholder="Current password" autocomplete="current-password"/>
-          <button type="button" class="pwd-toggle" onclick="togglePwd('cpwd-current', this)" tabindex="-1" aria-label="Show password">👁</button>
-        </div>
-        <div class="pwd-wrap">
-          <input class="auth-field" type="password" id="cpwd-new" placeholder="New password (min 6 characters)" autocomplete="new-password"/>
-          <button type="button" class="pwd-toggle" onclick="togglePwd('cpwd-new', this)" tabindex="-1" aria-label="Show password">👁</button>
-        </div>
-        <div class="pwd-wrap">
-          <input class="auth-field" type="password" id="cpwd-confirm" placeholder="Confirm new password" autocomplete="new-password"/>
-          <button type="button" class="pwd-toggle" onclick="togglePwd('cpwd-confirm', this)" tabindex="-1" aria-label="Show password">👁</button>
-        </div>
+        <input class="auth-field" type="password" id="cpwd-current" placeholder="Current password" autocomplete="current-password"/>
+        <input class="auth-field" type="password" id="cpwd-new" placeholder="New password (min 6 characters)" autocomplete="new-password"/>
+        <input class="auth-field" type="password" id="cpwd-confirm" placeholder="Confirm new password" autocomplete="new-password"/>
         <button class="auth-btn" onclick="doChangePassword()">Update Password →</button>
         <button class="auth-btn secondary" onclick="closeAccountScreen()" style="margin-top:8px">← Back</button>
       </div>
@@ -1857,15 +1838,6 @@ function switchTab(tab) {
   });
 }
 
-function togglePwd(fieldId, btn) {
-  const field = document.getElementById(fieldId);
-  if (!field) return;
-  const isHidden = field.type === 'password';
-  field.type = isHidden ? 'text' : 'password';
-  btn.textContent = isHidden ? '🙈' : '👁';
-  btn.style.opacity = isHidden ? '0.7' : '0.45';
-}
-
 function showAuthMsg(id, text, type='error') {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1875,37 +1847,32 @@ function showAuthMsg(id, text, type='error') {
 
 // --- Login (username → lookup email → Supabase auth) ---
 async function doLogin() {
-  const username = document.getElementById('login-username').value.trim();
+  const username = document.getElementById('login-username').value.trim().toLowerCase().replace(/\s+/g,'_');
   const password = document.getElementById('login-password').value;
   if (!username || !password) { showAuthMsg('login-msg','Please enter your username and password.'); return; }
   const btn = document.querySelector('#panel-login .auth-btn');
   btn.textContent = 'Signing in…'; btn.disabled = true;
 
   // Look up email by username from profiles table
-  console.log('Looking up username:', username);
   const { data: profile, error: lookupErr } = await _supabase
     .from('profiles')
     .select('email')
-    .ilike('username', username)
+    .eq('username', username)
     .single();
-
-  console.log('Profile lookup result:', profile, 'Error:', lookupErr);
 
   if (lookupErr || !profile?.email) {
     btn.textContent = 'Sign In →'; btn.disabled = false;
-    showAuthMsg('login-msg', lookupErr ? 'Error: ' + lookupErr.message : 'No account found for that username.');
+    showAuthMsg('login-msg', 'No account found for that username.');
     return;
   }
 
   // Sign in with email + password
-  console.log('Signing in with email:', profile.email);
   const { data, error } = await _supabase.auth.signInWithPassword({
     email: profile.email,
     password
   });
-  console.log('Sign in result:', data, 'Error:', error);
   btn.textContent = 'Sign In →'; btn.disabled = false;
-  if (error) { showAuthMsg('login-msg', 'Sign in failed: ' + error.message); return; }
+  if (error) { showAuthMsg('login-msg', 'Incorrect password.'); return; }
   await loadProfile(data.user);
 }
 
