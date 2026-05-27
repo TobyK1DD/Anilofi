@@ -99,6 +99,21 @@ body.darkmode .auth-msg.success-msg{color:#a5d6a7}
 .mode-card h3{font-size:1.1rem;margin-bottom:8px}
 .mode-card p{font-size:.82rem;opacity:.75;line-height:1.4}
 
+/* ---- FREE TIER FEATURES ---- */
+.free-pill{display:inline-block;border-radius:6px;padding:2px 9px;font-size:.71rem;font-weight:700;margin-top:6px;border:1px solid}
+.free-pill.available{background:rgba(76,175,80,.12);color:#2e7d52;border-color:rgba(76,175,80,.35)}
+.free-pill.done{background:rgba(128,128,128,.1);color:var(--text);border-color:var(--accent);opacity:.6}
+.free-pill.locked{background:rgba(231,76,60,.08);color:#c0392b;border-color:rgba(231,76,60,.25)}
+.blur-wrap{filter:blur(5px);pointer-events:none;user-select:none}
+.blur-overlay-wrap{position:relative;overflow:hidden;border-radius:8px}
+.blur-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center;padding:16px}
+.free-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center}
+.free-modal.show{display:flex}
+.free-modal-card{background:var(--bg-soft);border:1px solid var(--accent);border-radius:16px;padding:28px 24px;max-width:360px;width:90%;text-align:center}
+.free-modal-card h3{font-size:1.1rem;margin-bottom:8px}
+.free-modal-card p{font-size:.88rem;opacity:.75;margin-bottom:18px;line-height:1.5}
+.free-lightning-banner{text-align:center;font-size:.8rem;padding:5px 12px;background:rgba(246,193,78,.12);border:1px solid rgba(246,193,78,.3);border-radius:8px;margin-bottom:8px;display:none}
+#free-lightning-banner.show{display:block}
 /* ---- PREMIUM EXTRA STATS ---- */
 .prem-panel{background:var(--bg-soft);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;margin-bottom:14px;display:none}
 .prem-panel h3{font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:7px}
@@ -542,6 +557,18 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
         <p>Create a room code and race against a friend — same questions, real-time competition!</p>
         <div style="margin-top:8px;display:inline-block;background:#9c27b0;color:#fff;border-radius:6px;padding:3px 10px;font-size:.73rem;font-weight:700;">LIVE</div>
       </div>
+      <div class="mode-card" id="mode-daily">
+        <div class="icon">📅</div>
+        <h3>Daily Question</h3>
+        <p>One fresh question every day, free forever. Keeps your streak alive between study sessions.</p>
+        <div class="free-pill available" id="daily-pill">✓ Available today</div>
+      </div>
+      <div class="mode-card" id="mode-quick5">
+        <div class="icon">⚡</div>
+        <h3>Quick 5-Question Quiz</h3>
+        <p>Five random questions, no timer pressure — a daily mini-session that won't eat your question limit.</p>
+        <div class="free-pill available" id="quick5-pill">✓ Available today</div>
+      </div>
     </div>
   </div>
 
@@ -592,11 +619,28 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
 
     <!-- Domain breakdown — Premium only -->
     <div class="dash-panel" id="domain-panel-free" style="display:none">
-      <div style="text-align:center;padding:20px 16px">
-        <div style="font-size:2rem;margin-bottom:8px">🔒</div>
-        <div style="font-weight:600;font-size:1rem;margin-bottom:6px">Domain Performance Map</div>
-        <div style="opacity:.65;font-size:.88rem;margin-bottom:16px">See exactly which domains you're strong and weak in — broken down by CompTIA objective with a full radar chart.</div>
-        <button class="btn" onclick="requirePremium('Domain Performance Map shows your strength by CompTIA domain and objective. Upgrade to unlock advanced stats!')" style="background:var(--primary);color:var(--btn-text);border:none;padding:10px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:600">⭐ Unlock Advanced Stats</button>
+      <h3>🎯 Domain Performance</h3>
+      <div class="blur-overlay-wrap">
+        <div class="blur-wrap">
+          <div id="domain-bars-blur"></div>
+          <div style="text-align:center;margin-top:14px">
+            <svg viewBox="0 0 220 200" width="220" height="180" style="opacity:.75">
+              <line x1="110" y1="10" x2="110" y2="190" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/>
+              <line x1="15" y1="65" x2="205" y2="135" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/>
+              <line x1="205" y1="65" x2="15" y2="135" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/>
+              <polygon id="radar-blur-poly" points="110,30 175,70 165,145 110,170 55,145 45,70" fill="rgba(29,158,117,.25)" stroke="rgba(29,158,117,.7)" stroke-width="2"/>
+              <circle cx="110" cy="30" r="3" fill="#1d9e75"/><circle cx="175" cy="70" r="3" fill="#f6c14e"/>
+              <circle cx="165" cy="145" r="3" fill="#1d9e75"/><circle cx="110" cy="170" r="3" fill="#e74c3c"/>
+              <circle cx="55" cy="145" r="3" fill="#f6c14e"/><circle cx="45" cy="70" r="3" fill="#1d9e75"/>
+            </svg>
+          </div>
+        </div>
+        <div class="blur-overlay" style="background:rgba(var(--bg-overlay-rgb,240,244,248),.82);backdrop-filter:blur(3px)">
+          <div style="font-size:1.6rem;margin-bottom:6px">🔒</div>
+          <div style="font-weight:700;font-size:.95rem;margin-bottom:5px">Unlock Domain Performance</div>
+          <div style="font-size:.8rem;opacity:.75;margin-bottom:14px">See exactly which domains you're strong and weak in, with a full radar chart.</div>
+          <button class="btn" onclick="requirePremium('Domain Performance Map shows your strength by CompTIA domain and objective. Upgrade to unlock advanced stats!')" style="background:var(--primary);color:var(--btn-text);border:none;padding:9px 20px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600">⭐ Upgrade to Premium</button>
+        </div>
       </div>
     </div>
     <div class="dash-panel" id="domain-panel-premium" style="display:none">
@@ -699,6 +743,32 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
     </div>
   </div>
 
+
+  <!-- FREE LIGHTNING LIMIT BANNER -->
+  <div class="free-lightning-banner" id="free-lightning-banner">
+    ⚡ Free preview: <strong id="free-lightning-remaining">15</strong> questions remaining today
+  </div>
+
+  <!-- DAILY DONE MODAL -->
+  <div class="free-modal" id="daily-done-modal">
+    <div class="free-modal-card">
+      <div style="font-size:2rem;margin-bottom:8px" id="daily-done-icon">🎉</div>
+      <h3 id="daily-done-title">Daily question complete!</h3>
+      <p id="daily-done-msg">Come back tomorrow for your next question. Your streak is safe!</p>
+      <button class="btn" onclick="closeDailyDoneModal()" style="width:100%;margin-bottom:8px">Back to Menu</button>
+    </div>
+  </div>
+
+  <!-- FREE LIGHTNING DONE MODAL -->
+  <div class="free-modal" id="free-lightning-done-modal">
+    <div class="free-modal-card">
+      <div style="font-size:2rem;margin-bottom:8px">⚡</div>
+      <h3 id="fld-title">Free preview complete!</h3>
+      <p id="fld-msg">You've used your free Lightning Round for today. Come back tomorrow for another 15 questions, or upgrade for unlimited rounds!</p>
+      <button class="btn" onclick="requirePremium('Upgrade for unlimited Lightning Rounds!')" style="width:100%;margin-bottom:8px;background:var(--primary);color:var(--btn-text);border:none">⭐ Upgrade for Unlimited</button>
+      <button class="btn" onclick="document.getElementById('free-lightning-done-modal').classList.remove('show');showModeScreen()" style="width:100%;background:transparent;border:1px solid var(--accent)">Back to Menu</button>
+    </div>
+  </div>
 
   <!-- WEAK AREAS BANNER -->
   <div class="weak-banner" id="weak-banner">
@@ -1887,6 +1957,9 @@ const SUPABASE_URL = 'https://bllxvirgcrpngspmkbtt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbHh2aXJnY3JwbmdzcG1rYnR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2Njk4NjIsImV4cCI6MjA5NTI0NTg2Mn0.dMKkl2a5tN-nNo_G8emXFXM4oSfJwFtuGaUvmNkAXpo';
 const LEMON_CHECKOUT_URL = 'https://certready.lemonsqueezy.com/checkout/buy/d56b6dae-9973-450b-ab16-ea3a96615717';
 const FREE_QUESTION_LIMIT = 30;
+const FREE_LIGHTNING_LIMIT = 15;
+let freeLightningCount = 0;
+let dailyAnsweredCorrect = false;
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -2263,6 +2336,122 @@ document.addEventListener('DOMContentLoaded', () => {
 // =====================================================================
 //  MODE SCREEN
 // =====================================================================
+// =====================================================================
+//  FREE TIER HELPERS
+// =====================================================================
+function getTodayKey() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function getDailyQuestion(exam) {
+  var bank = exam === 'c1' ? LOCAL_QUESTIONS_C1 : LOCAL_QUESTIONS;
+  var dateNum = parseInt(getTodayKey().replace(/-/g,''));
+  return bank[dateNum % bank.length];
+}
+
+function isDailyDone() {
+  return userData && userData.dailyQ && userData.dailyQ.date === getTodayKey() && userData.dailyQ.answered;
+}
+
+function isFreeLightningUsedToday() {
+  return userData && userData.freeLightningDate === getTodayKey();
+}
+
+function isQuickQuizDoneToday() {
+  return userData && userData.quickQuizDate === getTodayKey();
+}
+
+function updateModeCardBadges() {
+  var dailyPill = document.getElementById('daily-pill');
+  var quick5Pill = document.getElementById('quick5-pill');
+  var lightningCard = document.getElementById('mode-lightning');
+  if (dailyPill) {
+    if (isDailyDone()) {
+      dailyPill.textContent = '✓ Done today — come back tomorrow';
+      dailyPill.className = 'free-pill done';
+    } else {
+      dailyPill.textContent = '✓ Available today';
+      dailyPill.className = 'free-pill available';
+    }
+  }
+  if (quick5Pill) {
+    if (isQuickQuizDoneToday()) {
+      quick5Pill.textContent = '✓ Done today — come back tomorrow';
+      quick5Pill.className = 'free-pill done';
+    } else {
+      quick5Pill.textContent = '✓ Available today';
+      quick5Pill.className = 'free-pill available';
+    }
+  }
+  // Show "1 free round" badge on lightning card for free users
+  var lPill = document.getElementById('lightning-free-pill');
+  if (!isPremium && lightningCard) {
+    if (!lPill) {
+      lPill = document.createElement('div');
+      lPill.id = 'lightning-free-pill';
+      lPill.className = 'free-pill';
+      lightningCard.appendChild(lPill);
+    }
+    if (isFreeLightningUsedToday()) {
+      lPill.textContent = 'Free round used — come back tomorrow';
+      lPill.className = 'free-pill done';
+    } else {
+      lPill.textContent = '⚡ 1 free 15-question round per day';
+      lPill.className = 'free-pill available';
+    }
+  } else if (isPremium && lPill) {
+    lPill.remove();
+  }
+}
+
+function buildQuickQuiz() {
+  batchIndex = 0;
+  batchResults = [];
+  if (!userData.srs) userData.srs = {};
+  var pool = getActiveBank().filter(function(q){ return activeDomains.has(q.domain); });
+  if (!pool.length) { loadingEl.style.display='block'; loadingEl.innerHTML='<p>No questions available for selected domains.</p>'; return; }
+  // Prefer unseen questions
+  var unseen = pool.filter(function(q){ return !userData.answered[q.id]; });
+  var src = unseen.length >= 5 ? unseen : pool;
+  var shuffled = src.slice().sort(function(){ return Math.random()-.5; });
+  batchQuestions = shuffled.slice(0,5);
+  updateBatchProgress();
+  loadBatchQuestion();
+}
+
+function drawBlurredDomainBars() {
+  var barsEl = document.getElementById('domain-bars-blur');
+  if (!barsEl) return;
+  barsEl.innerHTML = '';
+  var domainNames = dashExam === 'c1'
+    ? {1:'Mobile Devices',2:'Networking',3:'Hardware',4:'Virtualisation & Cloud',5:'HW & Network Troubleshooting'}
+    : {1:'Operating Systems',2:'Security',3:'Software Troubleshooting',4:'Operational Procedures'};
+  var bank = dashExam === 'c1' ? LOCAL_QUESTIONS_C1 : LOCAL_QUESTIONS;
+  var ans = userData.answered || {};
+  var domStats = {};
+  Object.keys(domainNames).forEach(function(d){ domStats[d]={correct:0,total:0}; });
+  bank.forEach(function(q){
+    var d = String(q.domain);
+    if (domStats[d] && ans[q.id] !== undefined){ domStats[d].total++; if(ans[q.id]==='correct') domStats[d].correct++; }
+  });
+  var fakePcts = {1:62,2:45,3:78,4:55,5:70};
+  var hasAny = false;
+  Object.keys(domainNames).forEach(function(d){
+    var stat = domStats[d];
+    var pct = stat.total ? Math.round((stat.correct/stat.total)*100) : fakePcts[d]||60;
+    hasAny = hasAny || stat.total > 0;
+    var colour = pct>=70?'#4caf50':pct>=50?'#f6c14e':'#e74c3c';
+    var row = document.createElement('div'); row.className='dom-bar-row';
+    row.innerHTML='<div class="dom-bar-label"><span>'+domainNames[d]+'</span><span style="color:'+colour+'">'+pct+'%</span></div><div class="dom-bar-track"><div class="dom-bar-fill" style="width:'+pct+'%;background:'+colour+'"></div></div>';
+    barsEl.appendChild(row);
+  });
+}
+
+function closeDailyDoneModal() {
+  document.getElementById('daily-done-modal').classList.remove('show');
+  showModeScreen();
+}
+
 function showModeScreen() {
   modeScreen.style.display = 'block';
   document.getElementById('dashboard-screen').style.display = 'none';
@@ -2272,13 +2461,43 @@ function showModeScreen() {
   document.getElementById('mode-welcome').textContent = `${examLabel} — Choose your session type:`;
   updateBookmarkCount();
   showWeakBanner();
+  updateModeCardBadges();
 }
 
 document.getElementById('mode-practice').addEventListener('click', () => startMode('practice'));
 document.getElementById('mode-30').addEventListener('click', () => startMode('batch'));
 document.getElementById('mode-lightning').addEventListener('click', () => {
-  if (!requirePremium('Lightning Round is a premium feature — upgrade to unlock rapid-fire practice!')) return;
+  if (isPremium) { startMode('lightning'); return; }
+  // Free: one 15-question session per day
+  if (isFreeLightningUsedToday()) {
+    var modal = document.getElementById('free-lightning-done-modal');
+    document.getElementById('fld-title').textContent = 'Round already used today';
+    document.getElementById('fld-msg').textContent = "You've used your free Lightning Round for today. Come back tomorrow for another 15 questions, or upgrade for unlimited!";
+    modal.classList.add('show');
+    return;
+  }
+  freeLightningCount = 0;
+  userData.freeLightningDate = getTodayKey();
+  if (currentUser && !isGuestSession) saveUserData(currentUser, userData);
   startMode('lightning');
+});
+document.getElementById('mode-daily').addEventListener('click', () => {
+  if (isDailyDone()) {
+    var m = document.getElementById('daily-done-modal');
+    document.getElementById('daily-done-icon').textContent = '📅';
+    document.getElementById('daily-done-title').textContent = 'Already answered today!';
+    document.getElementById('daily-done-msg').textContent = "You've already completed your daily question. Come back tomorrow!";
+    m.classList.add('show');
+    return;
+  }
+  startMode('daily');
+});
+document.getElementById('mode-quick5').addEventListener('click', () => {
+  if (isQuickQuizDoneToday()) {
+    alert("You've already completed your Quick Quiz for today — come back tomorrow!");
+    return;
+  }
+  startMode('quick5');
 });
 document.getElementById('mode-bookmarked').addEventListener('click', () => startMode('bookmarked'));
 
@@ -2294,6 +2513,23 @@ function startMode(mode) {
   } else if (mode === 'batch') {
     showQuizUI('batch');
     buildBatch();
+  } else if (mode === 'quick5') {
+    showQuizUI('batch');
+    userData.quickQuizDate = getTodayKey();
+    if (currentUser && !isGuestSession) saveUserData(currentUser, userData);
+    buildQuickQuiz();
+  } else if (mode === 'daily') {
+    showQuizUI('lightning');
+    lightningStats = {total:0, correct:0, wrong:0};
+    dailyAnsweredCorrect = false;
+    updateLightningStats();
+    // Show the banner-area with daily label
+    document.getElementById('qNumber').textContent = '📅 Daily Question';
+    // Hide the free lightning banner
+    var flb = document.getElementById('free-lightning-banner');
+    if (flb) flb.classList.remove('show');
+    var dq = getDailyQuestion(currentExam);
+    if (dq) { renderQuestion(dq); }
   } else if (mode === 'bookmarked') {
     showQuizUI('lightning');
     lightningStats = {total:0, correct:0, wrong:0};
@@ -2303,6 +2539,13 @@ function startMode(mode) {
     showQuizUI('lightning');
     lightningStats = {total:0, correct:0, wrong:0};
     updateLightningStats();
+    // Show free lightning banner for free users
+    var flb2 = document.getElementById('free-lightning-banner');
+    if (flb2 && !isPremium) {
+      flb2.classList.add('show');
+      var rem = document.getElementById('free-lightning-remaining');
+      if (rem) rem.textContent = FREE_LIGHTNING_LIMIT - freeLightningCount;
+    }
     loadNextQuestion();
   }
 }
@@ -2491,6 +2734,7 @@ function handleSingleAnswer(chosenPos, correctPos, shuffled, q) {
   // Store user's chosen original index for review
   q._userAnswer = shuffled ? shuffled[chosenPos] : chosenPos;
   const isCorrect = chosenPos === correctPos;
+  if (sessionMode === 'daily') dailyAnsweredCorrect = isCorrect;
   const allBtns = optionsEl.querySelectorAll('.option-btn');
 
   allBtns.forEach((btn, pos) => {
@@ -2575,13 +2819,32 @@ nextBtn.addEventListener('click', () => {
     practiceIdx++;
     if (practiceIdx >= practiceQs.length) { showPracticeResults(); return; }
     renderPracticeQ();
-  } else if (sessionMode === 'batch') {
+  } else if (sessionMode === 'batch' || sessionMode === 'quick5') {
     batchIndex++;
     if (batchIndex >= batchQuestions.length) { showResults(); return; }
     renderBatchQuestion();
+  } else if (sessionMode === 'daily') {
+    // Save daily completion
+    userData.dailyQ = { date: getTodayKey(), answered: true, correct: dailyAnsweredCorrect };
+    if (currentUser && !isGuestSession) saveUserData(currentUser, userData);
+    // Show done modal
+    var m = document.getElementById('daily-done-modal');
+    document.getElementById('daily-done-icon').textContent = dailyAnsweredCorrect ? '🎉' : '💪';
+    document.getElementById('daily-done-title').textContent = dailyAnsweredCorrect ? 'Correct! Daily question complete!' : 'Daily question complete!';
+    document.getElementById('daily-done-msg').textContent = dailyAnsweredCorrect
+      ? 'Great work! Come back tomorrow for your next question. Your streak is safe!'
+      : 'Not quite — review the explanation above. Come back tomorrow for a fresh question!';
+    m.classList.add('show');
+    return;
   } else if (sessionMode === 'bookmarked') {
     loadBookmarkedQuestion();
   } else {
+    // Lightning — track free count
+    if (!isPremium && sessionMode === 'lightning') {
+      freeLightningCount++;
+      var rem2 = document.getElementById('free-lightning-remaining');
+      if (rem2) rem2.textContent = Math.max(0, FREE_LIGHTNING_LIMIT - freeLightningCount);
+    }
     loadNextQuestion();
   }
 });
@@ -2592,6 +2855,16 @@ nextBtn.addEventListener('click', () => {
 let recentLightningIds = [];
 
 async function loadNextQuestion() {
+  // Free lightning limit check
+  if (!isPremium && sessionMode === 'lightning' && freeLightningCount >= FREE_LIGHTNING_LIMIT) {
+    var modal = document.getElementById('free-lightning-done-modal');
+    document.getElementById('fld-title').textContent = 'Free preview complete!';
+    document.getElementById('fld-msg').textContent = "You've answered your 15 free questions for today. Come back tomorrow for another round, or upgrade for unlimited!";
+    modal.classList.add('show');
+    var flb = document.getElementById('free-lightning-banner');
+    if (flb) flb.classList.remove('show');
+    return;
+  }
   answered = false;
   selectedMulti = new Set();
   submitMulti.disabled = false;
@@ -3641,6 +3914,7 @@ function renderDashboard() {
   } else {
     if (freeDomainPanel) freeDomainPanel.style.display = 'block';
     if (premiumDomainPanel) premiumDomainPanel.style.display = 'none';
+    drawBlurredDomainBars();
     ['prem-heatmap','prem-readiness','prem-split','prem-weakobj','prem-srs','prem-streak'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.style.display = 'none';
