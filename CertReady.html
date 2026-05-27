@@ -422,7 +422,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
     <a href="#" id="home-link">🏠 Home</a>
     <a href="#" id="dashboard-link">📊 Progress</a>
     <a href="#" id="restart-link">🔄 Restart</a>
-    <a href="#" id="lightning-link">⚡ Lightning Round</a>
+    <a href="#" id="bookmarks-link">⭐ Bookmarks <span id="nav-bookmark-count" style="font-size:.75em;opacity:.65"></span></a>
     <a href="#" id="logout-link">👤 My Account</a>
   </div>
 </div>
@@ -545,12 +545,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
         <h3>Lightning Round</h3>
         <p>Infinite, continuous, non-repeating questions — no stops, no scores, just rapid-fire revision.</p>
       </div>
-      <div class="mode-card" id="mode-bookmarked">
-        <div class="icon">⭐</div>
-        <h3>Bookmarked Questions</h3>
-        <p>Practice only your bookmarked questions — perfect for reviewing tricky topics.</p>
-        <div style="margin-top:8px;font-size:.75rem;opacity:.65" id="bookmark-count">0 questions bookmarked</div>
-      </div>
+
       <div class="mode-card" id="mode-multiplayer">
         <div class="icon">👥</div>
         <h3>Study with a Friend</h3>
@@ -2499,7 +2494,11 @@ document.getElementById('mode-quick5').addEventListener('click', () => {
   }
   startMode('quick5');
 });
-document.getElementById('mode-bookmarked').addEventListener('click', () => startMode('bookmarked'));
+document.getElementById('bookmarks-link').addEventListener('click', e => {
+  e.preventDefault();
+  resultsScreen.style.display = 'none';
+  startMode('bookmarked');
+});
 
 function startMode(mode) {
   sessionMode = mode;
@@ -2554,7 +2553,8 @@ function startMode(mode) {
 function updateBookmarkCount() {
   if (!userData || !userData.bookmarked) return;
   const count = Object.keys(userData.bookmarked).length;
-  document.getElementById('bookmark-count').textContent = `${count} question${count !== 1 ? 's' : ''} bookmarked`;
+  const navBadge = document.getElementById('nav-bookmark-count');
+  if (navBadge) navBadge.textContent = count > 0 ? `(${count})` : '';
 }
 
 // =====================================================================
@@ -3186,11 +3186,6 @@ document.getElementById('restart-link').addEventListener('click', e => {
   e.preventDefault();
   if (sessionMode === 'batch') { resultsScreen.style.display='none'; showQuizUI('batch'); buildBatch(); }
   else { lightningStats={total:0,correct:0,wrong:0}; updateLightningStats(); loadNextQuestion(); }
-});
-document.getElementById('lightning-link').addEventListener('click', e => {
-  e.preventDefault();
-  resultsScreen.style.display = 'none';
-  startMode('lightning');
 });
 document.getElementById('home-link').addEventListener('click', e => {
   e.preventDefault();
