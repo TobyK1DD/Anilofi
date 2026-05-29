@@ -99,6 +99,20 @@ body.darkmode .auth-msg.success-msg{color:#a5d6a7}
 .mode-card h3{font-size:1.1rem;margin-bottom:8px}
 .mode-card p{font-size:.82rem;opacity:.75;line-height:1.4}
 
+/* ---- FLAG FOR REVIEW ---- */
+.flag-btn{position:absolute;top:14px;right:48px;background:none;border:none;font-size:1.3rem;cursor:pointer;opacity:.35;transition:opacity .2s,transform .2s;padding:4px;line-height:1;border-radius:6px}
+.flag-btn:hover{opacity:.7;transform:scale(1.15)}
+.flag-btn.flagged{opacity:1;filter:none;animation:flag-pop .25s ease}
+@keyframes flag-pop{0%{transform:scale(1)}50%{transform:scale(1.35)}100%{transform:scale(1)}}
+.flag-counter-pill{display:none;background:#e67e22;color:#fff;border-radius:20px;padding:2px 10px;font-size:.75rem;font-weight:700;margin-left:10px;vertical-align:middle}
+.flag-counter-pill.show{display:inline-block}
+#flagged-review-screen{display:none}
+.flagged-review-header{text-align:center;padding:10px 0 6px;font-size:.85rem;font-weight:600;color:#e67e22;letter-spacing:.02em}
+.flag-review-opt{border:2px solid var(--accent);border-radius:10px;padding:10px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s;font-size:.9rem}
+.flag-review-opt.was-chosen{border-color:#e74c3c;background:rgba(231,76,60,.08)}
+.flag-review-opt.newly-chosen{border-color:var(--primary);background:rgba(var(--primary-rgb,230,126,34),.1)}
+.flag-review-opt:hover{border-color:var(--primary);background:rgba(var(--primary-rgb,230,126,34),.07)}
+.flag-review-note{font-size:.78rem;color:var(--text);opacity:.6;text-align:center;margin-bottom:12px}
 /* ---- DAILY NOTIFICATION DOT ---- */
 .notif-dot{position:absolute;top:10px;right:10px;width:11px;height:11px;background:#e74c3c;border-radius:50%;border:2px solid var(--bg-soft);animation:pulse-dot 2s infinite}
 @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
@@ -411,6 +425,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
 </style>
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -836,6 +851,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
   <div id="progress-wrap" style="display:none">
     <div id="progress-bar-outer"><div id="progress-bar-inner"></div></div>
     <div id="progress-text"></div>
+    <span class="flag-counter-pill" id="flag-counter-pill">🚩 <span id="flag-counter-num">0</span> flagged</span>
   </div>
 
   <!-- LOADING -->
@@ -844,6 +860,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
   <!-- QUIZ CARD -->
   <div class="quiz-card" id="quiz-card" style="display:none">
     <button class="bookmark-btn" id="bookmark-btn" title="Bookmark this question">☆</button>
+    <button class="flag-btn" id="flag-btn" title="Flag for review" onclick="toggleFlag()">🚩</button>
     <div class="q-number" id="q-number"></div>
     <div>
       <span class="domain-badge" id="q-domain"></span>
@@ -855,6 +872,26 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
     <div class="result-msg" id="result-msg"></div>
     <div class="explanations" id="explanations"></div>
     <button class="Button" id="next-btn">Next Question ➜</button>
+  </div>
+
+  <!-- FLAGGED REVIEW SCREEN -->
+  <div id="flagged-review-screen">
+    <div class="flagged-review-header" id="flagged-review-header">🚩 Review Flagged Questions</div>
+    <div id="flagged-review-progress" style="text-align:center;font-size:.8rem;opacity:.6;margin-bottom:8px"></div>
+    <div class="quiz-card" style="display:block;position:relative">
+      <div class="flag-review-note" id="flag-review-note">Your previous answer is highlighted red. Click another option to change it.</div>
+      <div class="q-number" id="fr-qnum"></div>
+      <div><span class="domain-badge" id="fr-domain"></span></div>
+      <div class="question-text" id="fr-qtext"></div>
+      <div id="fr-options"></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn" id="fr-keep-btn" onclick="flagReviewNext()" style="flex:1;background:var(--bg-soft);border:1px solid var(--accent)">Keep answer &amp; Next</button>
+        <button class="btn" id="fr-change-btn" onclick="flagReviewConfirmChange()" style="flex:1;background:var(--primary);color:var(--btn-text);display:none">Confirm change &amp; Next</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      <button class="btn" onclick="abandonFlagReview()" style="font-size:.8rem;opacity:.6;background:none;border:none;cursor:pointer">Skip remaining &amp; see results</button>
+    </div>
   </div>
 
   <!-- RESULTS SCREEN -->
@@ -2354,6 +2391,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const LEMON_CHECKOUT_URL = 'https://certready.lemonsqueezy.com/checkout/buy/d56b6dae-9973-450b-ab16-ea3a96615717';
 const FREE_QUESTION_LIMIT = 30;
 const FREE_LIGHTNING_LIMIT = 15;
+let flaggedQuestions  = new Set(); // indices flagged in current session
+let flaggedQueue      = [];        // ordered list for review
+let flaggedReviewIdx  = 0;
+let flagReviewNewChoice = null;    // null = no change, else new option index
 let freeLightningCount = 0;
 let dailyAnsweredCorrect = false;
 
@@ -2759,6 +2800,185 @@ function isQuickQuizDoneToday() {
   return userData && userData.quickQuizDate === getTodayKey();
 }
 
+// =====================================================================
+//  FLAG FOR REVIEW
+// =====================================================================
+function toggleFlag() {
+  if (!['batch','practice','quick5'].includes(sessionMode)) return;
+  const idx = sessionMode === 'practice' ? practiceIdx : batchIndex;
+  const btn = document.getElementById('flag-btn');
+  if (flaggedQuestions.has(idx)) {
+    flaggedQuestions.delete(idx);
+    btn.classList.remove('flagged');
+    btn.title = 'Flag for review';
+  } else {
+    flaggedQuestions.add(idx);
+    btn.classList.add('flagged');
+    btn.title = 'Flagged  --  tap to unflag';
+  }
+  updateFlagPill();
+}
+
+function updateFlagPill() {
+  const pill = document.getElementById('flag-counter-pill');
+  const num  = document.getElementById('flag-counter-num');
+  const n = flaggedQuestions.size;
+  if (!pill) return;
+  if (n > 0 && ['batch','practice','quick5'].includes(sessionMode)) {
+    pill.classList.add('show');
+    num.textContent = n;
+  } else {
+    pill.classList.remove('show');
+  }
+}
+
+function updateFlagBtn() {
+  const btn = document.getElementById('flag-btn');
+  if (!btn) return;
+  const isFlagMode = ['batch','practice','quick5'].includes(sessionMode);
+  btn.style.display = isFlagMode ? 'block' : 'none';
+  const idx = sessionMode === 'practice' ? practiceIdx : batchIndex;
+  if (flaggedQuestions.has(idx)) {
+    btn.classList.add('flagged');
+    btn.title = 'Flagged  --  tap to unflag';
+  } else {
+    btn.classList.remove('flagged');
+    btn.title = 'Flag for review';
+  }
+}
+
+function launchConfetti() {
+  if (typeof confetti !== 'function') return;
+  // First burst from centre
+  confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 }, colors: ['#f6c14e','#4caf50','#3498db','#e74c3c','#9b59b6','#1abc9c'] });
+  // Side cannons after short delay
+  setTimeout(() => {
+    confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0, y: 0.6 } });
+    confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1, y: 0.6 } });
+  }, 300);
+}
+
+function resetFlags() {
+  flaggedQuestions.clear();
+  flaggedQueue = [];
+  flaggedReviewIdx = 0;
+  flagReviewNewChoice = null;
+  updateFlagPill();
+}
+
+function showFlaggedReview() {
+  // Build ordered queue from flagged indices
+  flaggedQueue = Array.from(flaggedQuestions).sort((a,b) => a-b);
+  flaggedReviewIdx = 0;
+  document.getElementById('flagged-review-screen').style.display = 'block';
+  quizCard.style.display = 'none';
+  progressWrap.style.display = 'none';
+  document.getElementById('flag-counter-pill').classList.remove('show');
+  renderFlaggedReviewQuestion();
+}
+
+function renderFlaggedReviewQuestion() {
+  if (flaggedReviewIdx >= flaggedQueue.length) {
+    endFlaggedReview();
+    return;
+  }
+  flagReviewNewChoice = null;
+  const keepBtn   = document.getElementById('fr-keep-btn');
+  const changeBtn = document.getElementById('fr-change-btn');
+  keepBtn.style.display = 'block';
+  changeBtn.style.display = 'none';
+
+  const queueIdx = flaggedQueue[flaggedReviewIdx];
+  const isPractice = sessionMode === 'practice';
+  const q  = isPractice ? practiceQs[queueIdx] : batchQuestions[queueIdx];
+  const prevResult = isPractice ? practiceResults[queueIdx] : batchResults[queueIdx];
+  const prevChosen = prevResult ? prevResult.chosen : -1;
+
+  document.getElementById('fr-qnum').textContent =
+    `Flagged Q${flaggedReviewIdx + 1} of ${flaggedQueue.length}`;
+  document.getElementById('fr-domain').textContent =
+    getActiveDomains()[q.domain] || 'Domain ' + q.domain;
+  document.getElementById('flagged-review-progress').textContent =
+    `Question ${queueIdx + 1} from your session`;
+  document.getElementById('fr-qtext').textContent = q.q;
+
+  const optsEl = document.getElementById('fr-options');
+  optsEl.innerHTML = '';
+
+  const opts = q.opts || [];
+  opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'flag-review-opt' + (i === prevChosen ? ' was-chosen' : '');
+    div.textContent = opt;
+    div.onclick = () => selectFlagReviewOpt(i, prevChosen, opts.length, optsEl, keepBtn, changeBtn);
+    optsEl.appendChild(div);
+  });
+}
+
+function selectFlagReviewOpt(newIdx, prevChosen, total, optsEl, keepBtn, changeBtn) {
+  // Update visual selection
+  const divs = optsEl.querySelectorAll('.flag-review-opt');
+  divs.forEach((d, i) => {
+    d.classList.remove('was-chosen', 'newly-chosen');
+    if (i === prevChosen && i !== newIdx) d.classList.add('was-chosen');
+    if (i === newIdx) d.classList.add('newly-chosen');
+  });
+  if (newIdx === prevChosen) {
+    // Clicking same as previous — treat as keep
+    flagReviewNewChoice = null;
+    keepBtn.style.display = 'block';
+    changeBtn.style.display = 'none';
+  } else {
+    flagReviewNewChoice = newIdx;
+    keepBtn.style.display = 'none';
+    changeBtn.style.display = 'block';
+  }
+}
+
+function flagReviewConfirmChange() {
+  if (flagReviewNewChoice === null) { flagReviewNext(); return; }
+  const queueIdx = flaggedQueue[flaggedReviewIdx];
+  const isPractice = sessionMode === 'practice';
+  const q = isPractice ? practiceQs[queueIdx] : batchQuestions[queueIdx];
+  const isCorrect = flagReviewNewChoice === q.correct;
+  const resultObj = { q, correct: isCorrect, chosen: flagReviewNewChoice };
+  if (isPractice) {
+    practiceResults[queueIdx] = resultObj;
+  } else {
+    batchResults[queueIdx] = resultObj;
+  }
+  flagReviewNext();
+}
+
+function flagReviewNext() {
+  flaggedReviewIdx++;
+  if (flaggedReviewIdx >= flaggedQueue.length) {
+    endFlaggedReview();
+  } else {
+    renderFlaggedReviewQuestion();
+  }
+}
+
+function endFlaggedReview() {
+  document.getElementById('flagged-review-screen').style.display = 'none';
+  resetFlags();
+  if (sessionMode === 'practice') {
+    showPracticeResults();
+  } else {
+    showResults();
+  }
+}
+
+function abandonFlagReview() {
+  document.getElementById('flagged-review-screen').style.display = 'none';
+  resetFlags();
+  if (sessionMode === 'practice') {
+    showPracticeResults();
+  } else {
+    showResults();
+  }
+}
+
 function updateDailyBadge() {
   var dot = document.getElementById('daily-notif-dot');
   if (isDailyDone()) {
@@ -2924,6 +3144,7 @@ function startMode(mode) {
   document.getElementById('dashboard-screen').style.display = 'none';
   var pr = document.getElementById('practice-results');
   if (pr) pr.style.display = 'none';
+  resetFlags();
   if (mode === 'practice') {
     showQuizUI('practice');
     buildPracticeExam();
@@ -3002,6 +3223,9 @@ function showQuizUI(mode) {
 }
 
 function hideQuizUI() {
+  const flagBtn = document.getElementById('flag-btn');
+  if (flagBtn) flagBtn.style.display = 'none';
+  updateFlagPill();
   statsBar.style.display = 'none';
   domainFilters.style.display = 'none';
   progressWrap.style.display = 'none';
@@ -3032,6 +3256,7 @@ function renderBatchQuestion() {
   const q = batchQuestions[batchIndex];
   updateBatchProgress();
   renderQuestion(q);
+  updateFlagBtn();
 }
 
 function updateBatchProgress() {
@@ -3087,6 +3312,8 @@ function renderQuestion(q) {
   submitMulti.textContent = 'Submit Answer';
   optionsEl.innerHTML = '';
 
+  // Show/hide flag button based on mode
+  updateFlagBtn();
   // Update bookmark button state
   updateBookmarkButton();
 
@@ -3235,11 +3462,17 @@ function buildExplanations(q, shuffled, wrongPos, correctPos, isMulti) {
 nextBtn.addEventListener('click', () => {
   if (sessionMode === 'practice') {
     practiceIdx++;
-    if (practiceIdx >= practiceQs.length) { showPracticeResults(); return; }
+    if (practiceIdx >= practiceQs.length) {
+      if (flaggedQuestions.size > 0) { showFlaggedReview(); } else { showPracticeResults(); }
+      return;
+    }
     renderPracticeQ();
   } else if (sessionMode === 'batch' || sessionMode === 'quick5') {
     batchIndex++;
-    if (batchIndex >= batchQuestions.length) { showResults(); return; }
+    if (batchIndex >= batchQuestions.length) {
+      if (flaggedQuestions.size > 0) { showFlaggedReview(); } else { showResults(); }
+      return;
+    }
     renderBatchQuestion();
   } else if (sessionMode === 'daily') {
     // Save daily completion
@@ -3357,6 +3590,7 @@ function showResults() {
   circle.textContent = pct+'%';
   circle.style.borderColor = pass ? '#4caf50' : pct>=50 ? '#f6c14e' : '#e74c3c';
   circle.style.color = pass ? '#4caf50' : pct>=50 ? '#e65100' : '#e74c3c';
+  if (pct === 100) launchConfetti();
 
   // Summary table
   const summary = document.getElementById('score-summary');
@@ -3775,6 +4009,7 @@ function renderPracticeQ() {
   document.getElementById('pt-qcount').textContent = (practiceIdx + 1) + ' / ' + practiceQs.length;
   qNumber.textContent = 'Q' + (practiceIdx + 1) + ' of ' + practiceQs.length;
   renderQuestion(practiceQs[practiceIdx]);
+  updateFlagBtn();
 }
 
 function startPracticeTimer() {
@@ -3798,7 +4033,7 @@ function updateTimerDisplay() {
 }
 
 function recordPracticeAnswer(q, isCorrect) {
-  practiceResults.push({ q: q, correct: isCorrect, userAnswer: q._userAnswer });
+  practiceResults.push({ q: q, correct: isCorrect, userAnswer: q._userAnswer, chosen: q._userAnswer });
   if (userData) {
     if (!userData.answered) userData.answered = {};
     userData.answered[q.id] = isCorrect ? 'correct' : 'wrong';
@@ -3845,6 +4080,7 @@ function showPracticeResults(timeUp) {
   var pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
   var scaled = 100 + Math.round((correct / (total || 1)) * 800);
   var pass = scaled >= 700;
+  if (pct === 100) launchConfetti();
   var usedSecs = 5400 - practiceSecsLeft;
   var usedMins = Math.floor(usedSecs / 60);
   var usedSecR = usedSecs % 60;
@@ -4229,7 +4465,7 @@ function recordAnswer(q, isCorrect) {
 
   // Batch tracking
   if (sessionMode === 'batch') {
-    batchResults.push({ q, correct: isCorrect, userAnswer: q._userAnswer });
+    batchResults.push({ q, correct: isCorrect, userAnswer: q._userAnswer, chosen: q._userAnswer });
   }
 }
 
