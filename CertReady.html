@@ -99,6 +99,17 @@ body.darkmode .auth-msg.success-msg{color:#a5d6a7}
 .mode-card h3{font-size:1.1rem;margin-bottom:8px}
 .mode-card p{font-size:.82rem;opacity:.75;line-height:1.4}
 
+/* ---- PWA INSTALL BANNER ---- */
+#pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9998;padding:14px 16px 20px;background:var(--bg-soft);border-top:1px solid var(--accent);box-shadow:0 -4px 24px rgba(0,0,0,.15);transform:translateY(110%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:14px;max-width:600px;margin:0 auto}
+#pwa-banner.show{transform:translateY(0)}
+.pwa-banner-icon{width:52px;height:52px;border-radius:12px;flex-shrink:0;object-fit:cover}
+.pwa-banner-text{flex:1;min-width:0}
+.pwa-banner-text strong{display:block;font-size:.95rem;margin-bottom:3px}
+.pwa-banner-text span{font-size:.8rem;opacity:.65;line-height:1.4}
+.pwa-banner-ios-steps{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:.78rem;opacity:.7;flex-wrap:wrap}
+.pwa-install-btn{flex-shrink:0;background:var(--primary);color:var(--btn-text);border:none;border-radius:10px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pwa-dismiss-btn{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:.4;padding:4px;line-height:1}
+.pwa-dismiss-btn:hover{opacity:.8}
 /* ---- FLAG FOR REVIEW ---- */
 .flag-btn{position:absolute;top:14px;right:48px;background:none;border:none;font-size:1.3rem;cursor:pointer;opacity:.35;transition:opacity .2s,transform .2s;padding:4px;line-height:1;border-radius:6px}
 .flag-btn:hover{opacity:.7;transform:scale(1.15)}
@@ -2846,6 +2857,97 @@ function updateFlagBtn() {
     btn.title = 'Flag for review';
   }
 }
+
+// =====================================================================
+//  PWA INSTALL BANNER
+// =====================================================================
+(function() {
+  const DISMISSED_KEY = 'certready_pwa_dismissed';
+  const INSTALLED_KEY = 'certready_pwa_installed';
+  let deferredPrompt = null;
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+  }
+
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  function wasDismissedRecently() {
+    const ts = parseInt(localStorage.getItem(DISMISSED_KEY) || '0', 10);
+    return Date.now() - ts < 7 * 24 * 60 * 60 * 1000; // 7 days
+  }
+
+  function setFaviconOnBanner() {
+    // Reuse the favicon data URL for the banner icon
+    const favicon = document.querySelector('link[rel="icon"][type="image/png"]');
+    const img = document.getElementById('pwa-banner-icon');
+    if (favicon && img) img.src = favicon.href;
+  }
+
+  function showBanner(platform) {
+    const banner = document.getElementById('pwa-banner');
+    const iosSteps = document.getElementById('pwa-ios-steps');
+    const installBtn = document.getElementById('pwa-install-btn');
+    const sub = document.getElementById('pwa-banner-sub');
+    if (!banner) return;
+
+    setFaviconOnBanner();
+
+    if (platform === 'ios') {
+      iosSteps.style.display = 'flex';
+      installBtn.style.display = 'none';
+      sub.style.display = 'none';
+    } else {
+      iosSteps.style.display = 'none';
+      installBtn.style.display = 'block';
+      sub.style.display = 'block';
+    }
+
+    setTimeout(() => banner.classList.add('show'), 100);
+  }
+
+  window.dismissPWABanner = function() {
+    const banner = document.getElementById('pwa-banner');
+    if (banner) banner.classList.remove('show');
+    localStorage.setItem(DISMISSED_KEY, Date.now().toString());
+  };
+
+  window.triggerPWAInstall = function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(result) {
+      if (result.outcome === 'accepted') {
+        localStorage.setItem(INSTALLED_KEY, '1');
+      }
+      deferredPrompt = null;
+      dismissPWABanner();
+    });
+  };
+
+  // Android/Chrome: capture the install prompt
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isStandalone() && !wasDismissedRecently()) {
+      setTimeout(function() { showBanner('android'); }, 3000);
+    }
+  });
+
+  // iOS Safari: show manual instructions
+  window.addEventListener('load', function() {
+    if (isIOS() && !isStandalone() && !wasDismissedRecently()) {
+      setTimeout(function() { showBanner('ios'); }, 3000);
+    }
+  });
+
+  // Hide banner if app is already installed and opened from home screen
+  if (isStandalone()) {
+    localStorage.setItem(INSTALLED_KEY, '1');
+  }
+})();
 
 function launchConfetti() {
   if (typeof confetti !== 'function') return;
@@ -5761,5 +5863,20 @@ function cleanupMP() {
 }
 
 </script>
+
+  <!-- PWA INSTALL BANNER -->
+  <div id="pwa-banner" role="dialog" aria-label="Install CertReady">
+    <button class="pwa-dismiss-btn" onclick="dismissPWABanner()" aria-label="Dismiss">✕</button>
+    <img class="pwa-banner-icon" id="pwa-banner-icon" src="" alt="CertReady"/>
+    <div class="pwa-banner-text">
+      <strong>Add CertReady to your home screen</strong>
+      <span id="pwa-banner-sub">Study anywhere, even offline. Looks and feels like a native app.</span>
+      <div class="pwa-banner-ios-steps" id="pwa-ios-steps" style="display:none">
+        Tap <strong>Share</strong> <span style="font-size:1.1em">⬆️</span> then <strong>Add to Home Screen</strong> <span style="font-size:1.1em">＋</span>
+      </div>
+    </div>
+    <button class="pwa-install-btn" id="pwa-install-btn" onclick="triggerPWAInstall()">Install</button>
+  </div>
+
 </body>
 </html>
