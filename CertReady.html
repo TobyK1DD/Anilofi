@@ -3181,7 +3181,7 @@ function buildQuickQuiz() {
   var shuffled = src.slice().sort(function(){ return Math.random()-.5; });
   batchQuestions = shuffled.slice(0,5);
   updateBatchProgress();
-  loadBatchQuestion();
+  renderBatchQuestion();
 }
 
 function drawBlurredDomainBars() {
@@ -3219,6 +3219,8 @@ function closeDailyDoneModal() {
 }
 
 function showModeScreen() {
+  var flb2 = document.getElementById('free-lightning-banner');
+  if (flb2) flb2.classList.remove('show');
   modeScreen.style.display = 'block';
   document.getElementById('dashboard-screen').style.display = 'none';
   hideQuizUI();
@@ -3286,6 +3288,9 @@ function startMode(mode) {
     buildBatch();
   } else if (mode === 'quick5') {
     showQuizUI('batch');
+    // Ensure all domains active for quick quiz
+    var qBank = getActiveBank();
+    activeDomains = new Set(qBank.map(function(q){ return q.domain; }));
     userData.quickQuizDate = getTodayKey();
     if (currentUser && !isGuestSession) saveUserData(currentUser, userData);
     buildQuickQuiz();
@@ -3300,7 +3305,11 @@ function startMode(mode) {
     var flb = document.getElementById('free-lightning-banner');
     if (flb) flb.classList.remove('show');
     var dq = getDailyQuestion(currentExam);
-    if (dq) { renderQuestion(dq); }
+    if (dq) {
+      loadingEl.style.display = 'none';
+      quizCard.style.display = 'block';
+      renderQuestion(dq);
+    }
   } else if (mode === 'bookmarked') {
     showQuizUI('lightning');
     lightningStats = {total:0, correct:0, wrong:0};
@@ -3359,6 +3368,8 @@ function hideQuizUI() {
   const flagBtn = document.getElementById('flag-btn');
   if (flagBtn) flagBtn.style.display = 'none';
   updateFlagPill();
+  var flb = document.getElementById('free-lightning-banner');
+  if (flb) flb.classList.remove('show');
   statsBar.style.display = 'none';
   domainFilters.style.display = 'none';
   progressWrap.style.display = 'none';
