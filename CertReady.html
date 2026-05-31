@@ -2712,7 +2712,7 @@ async function restorePremium() {
       showModeScreen();
     } else {
       if (restoreBtn) restoreBtn.textContent = 'Already purchased? Restore access';
-      alert('No premium purchase found for this account.\n\nIf you just purchased, wait 30 seconds and try again — the payment may still be processing.');
+      alert('No premium purchase found for this account.\n\nIf you just purchased, wait 30 seconds and try again  --  the payment may still be processing.');
     }
   } catch(e) {
     if (restoreBtn) restoreBtn.textContent = 'Already purchased? Restore access';
@@ -3057,7 +3057,7 @@ function selectFlagReviewOpt(newIdx, prevChosen, total, optsEl, keepBtn, changeB
     if (i === newIdx) d.classList.add('newly-chosen');
   });
   if (newIdx === prevChosen) {
-    // Clicking same as previous — treat as keep
+    // Clicking same as previous  --  treat as keep
     flagReviewNewChoice = null;
     keepBtn.style.display = 'block';
     changeBtn.style.display = 'none';
