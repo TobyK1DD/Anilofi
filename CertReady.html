@@ -1038,11 +1038,12 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
       </div>
     </div>
     <a id="paywall-checkout-btn" href="#" target="_blank"
-       style="display:block;background:var(--primary);color:var(--btn-text);padding:14px;border-radius:12px;font-weight:700;font-size:1.1rem;text-decoration:none;margin-bottom:10px;font-family:inherit">
-      Unlock Premium  --  £7.99
+       style="display:block;background:var(--primary);color:var(--btn-text);padding:14px;border-radius:12px;font-weight:700;font-size:1.1rem;text-decoration:none;margin-bottom:10px;font-family:system-ui,-apple-system,sans-serif;letter-spacing:.01em">
+      Unlock Premium &nbsp;·&nbsp; <span style="font-variant-numeric:tabular-nums;font-family:system-ui,-apple-system,sans-serif">£1.99</span>
     </a>
     <button onclick="closePaywall()" style="background:none;border:none;color:var(--text);opacity:.5;cursor:pointer;font-size:.9rem;font-family:inherit;padding:8px">Maybe later</button>
-    <div style="font-size:.75rem;opacity:.45;margin-top:10px">One-time payment · VAT included · Instant access</div>
+    <button onclick="restorePremium()" style="background:none;border:none;color:var(--primary);opacity:.8;cursor:pointer;font-size:.82rem;font-family:inherit;padding:4px;display:block;margin:0 auto;text-decoration:underline">Already purchased? Restore access</button>
+    <div style="font-size:.75rem;opacity:.45;margin-top:8px">One-time payment · VAT included · Instant access</div>
   </div>
 </div>
 
@@ -2687,6 +2688,36 @@ function showPaywall(featureText) {
   const checkoutUrl = LEMON_CHECKOUT_URL + (currentUserEmail ? `?checkout[email]=${encodeURIComponent(currentUserEmail)}` : '');
   document.getElementById('paywall-checkout-btn').href = checkoutUrl;
   document.getElementById('paywall-modal').style.display = 'flex';
+}
+
+async function restorePremium() {
+  if (!currentUser || isGuestSession) {
+    alert('Please log in first, then tap Restore access.');
+    return;
+  }
+  const restoreBtn = document.querySelector('[onclick="restorePremium()"]');
+  if (restoreBtn) restoreBtn.textContent = 'Checking...';
+  try {
+    const { data, error } = await _supabase
+      .from('profiles')
+      .select('is_premium')
+      .eq('id', (await _supabase.auth.getUser()).data.user.id)
+      .single();
+    if (error) throw error;
+    if (data && data.is_premium) {
+      isPremium = true;
+      userData.isPremium = true;
+      closePaywall();
+      alert('✅ Premium access restored! All features are now unlocked.');
+      showModeScreen();
+    } else {
+      if (restoreBtn) restoreBtn.textContent = 'Already purchased? Restore access';
+      alert('No premium purchase found for this account.\n\nIf you just purchased, wait 30 seconds and try again — the payment may still be processing.');
+    }
+  } catch(e) {
+    if (restoreBtn) restoreBtn.textContent = 'Already purchased? Restore access';
+    alert('Could not check purchase status. Please check your connection and try again.');
+  }
 }
 
 function closePaywall() {
