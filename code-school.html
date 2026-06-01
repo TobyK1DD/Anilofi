@@ -232,9 +232,125 @@ iframe{flex:1;border:none;background:#fff}
 .odot.on{background:var(--pri)}
 .onboard-row{display:flex;justify-content:space-between;align-items:center}
 .onboard-skip{background:none;border:none;font-family:'Sour Gummy',sans-serif;font-size:13px;color:var(--muted);cursor:pointer}
+
+/* ── CODEMIRROR 5 BASE OVERRIDES ── */
+.cm-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.cm-wrap .CodeMirror{
+  flex:1;height:100%;font-family:'Courier New',Courier,monospace;
+  font-size:12.5px;line-height:1.75;border-radius:0
+}
+.cm-wrap .CodeMirror-scroll{height:100%}
+.cm-wrap .CodeMirror-gutters{padding-right:4px}
+.ed-loading{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:13px;background:var(--cbg);
+  font-family:'Courier New',monospace
+}
+
+/* ── CM5 LIGHT THEME ── */
+.cm-s-cs-light.CodeMirror{background:#c2cfd4;color:#111}
+.cm-s-cs-light .CodeMirror-gutters{background:#b8c8ce;border-right:1px solid #aac6d3;color:#666}
+.cm-s-cs-light .CodeMirror-cursor{border-left:2px solid #f64e4e}
+.cm-s-cs-light .CodeMirror-selected{background:rgba(246,78,78,.15)}
+.cm-s-cs-light .CodeMirror-activeline-background{background:rgba(0,0,0,.05)}
+.cm-s-cs-light .CodeMirror-matchingbracket{outline:2px solid #f64e4e;color:inherit!important}
+.cm-s-cs-light .cm-keyword{color:#c7254e;font-weight:700}
+.cm-s-cs-light .cm-def{color:#6f42c1}
+.cm-s-cs-light .cm-string,.cm-s-cs-light .cm-string-2{color:#22863a}
+.cm-s-cs-light .cm-number{color:#005cc5}
+.cm-s-cs-light .cm-comment{color:#6a737d;font-style:italic}
+.cm-s-cs-light .cm-variable,.cm-s-cs-light .cm-variable-2{color:#111}
+.cm-s-cs-light .cm-tag{color:#22863a;font-weight:700}
+.cm-s-cs-light .cm-attribute{color:#6f42c1}
+.cm-s-cs-light .cm-property{color:#005cc5}
+.cm-s-cs-light .cm-operator{color:#c7254e}
+.cm-s-cs-light .cm-atom{color:#005cc5}
+.cm-s-cs-light .cm-builtin{color:#e36209}
+.cm-s-cs-light .cm-qualifier{color:#6f42c1}
+.cm-s-cs-light .cm-error{background:#f64e4e;color:#fff}
+
+/* ── CM5 DARK THEME ── */
+.cm-s-cs-dark.CodeMirror{background:#0d0d0d;color:#eff}
+.cm-s-cs-dark .CodeMirror-gutters{background:#111;border-right:1px solid #2a2a2a;color:#444}
+.cm-s-cs-dark .CodeMirror-cursor{border-left:2px solid #f78af2}
+.cm-s-cs-dark .CodeMirror-selected{background:rgba(247,138,242,.18)}
+.cm-s-cs-dark .CodeMirror-activeline-background{background:rgba(255,255,255,.03)}
+.cm-s-cs-dark .CodeMirror-matchingbracket{outline:2px solid #f78af2;color:inherit!important}
+.cm-s-cs-dark .cm-keyword{color:#f78af2;font-weight:700}
+.cm-s-cs-dark .cm-def{color:#c792ea}
+.cm-s-cs-dark .cm-string,.cm-s-cs-dark .cm-string-2{color:#80cbc4}
+.cm-s-cs-dark .cm-number{color:#f78c6c}
+.cm-s-cs-dark .cm-comment{color:#546e7a;font-style:italic}
+.cm-s-cs-dark .cm-variable,.cm-s-cs-dark .cm-variable-2{color:#eff}
+.cm-s-cs-dark .cm-tag{color:#80cbc4;font-weight:700}
+.cm-s-cs-dark .cm-attribute{color:#ffcb6b}
+.cm-s-cs-dark .cm-property{color:#80cbc4}
+.cm-s-cs-dark .cm-operator{color:#89ddff}
+.cm-s-cs-dark .cm-atom{color:#f78c6c}
+.cm-s-cs-dark .cm-builtin{color:#ffcb6b}
+.cm-s-cs-dark .cm-qualifier{color:#c792ea}
+.cm-s-cs-dark .cm-error{background:#f78af2;color:#000}
+
+/* ── AI HINT MODAL ── */
+.hint-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;
+  align-items:center;justify-content:center;z-index:350;padding:20px}
+.hint-box{background:var(--soft);border:3px solid var(--brd);border-radius:16px;
+  width:100%;max-width:500px;padding:28px}
+.hint-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.hint-header h3{color:var(--pri);font-size:17px}
+.hint-body{font-size:14px;line-height:1.8;color:var(--text);min-height:70px}
+.hint-loading{color:var(--muted);font-style:italic}
+.hint-footer{margin-top:18px;display:flex;justify-content:flex-end;gap:10px}
+
+/* ── COMPLETION CERTIFICATE ── */
+.cert-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;
+  align-items:center;justify-content:center;z-index:350;padding:20px;overflow-y:auto}
+.cert-wrap{background:#fff;border-radius:4px;width:100%;max-width:660px;
+  padding:48px 56px;text-align:center;position:relative;
+  border:12px solid #f64e4e;
+  box-shadow:0 0 0 3px #fff,0 0 0 6px #f64e4e,0 20px 60px rgba(0,0,0,.4)}
+.cert-corner{position:absolute;font-size:26px;line-height:1}
+.cert-corner.tl{top:12px;left:12px}.cert-corner.tr{top:12px;right:12px}
+.cert-corner.bl{bottom:12px;left:12px}.cert-corner.br{bottom:12px;right:12px}
+.cert-logo{font-size:1rem;font-weight:700;color:#f64e4e;letter-spacing:5px;
+  text-transform:uppercase;margin-bottom:4px}
+.cert-div{height:3px;background:linear-gradient(to right,transparent,#f64e4e,transparent);
+  margin:12px auto;width:80%}
+.cert-head{font-size:.8rem;color:#999;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.cert-title{font-size:2.2rem;font-weight:700;color:#222;margin-bottom:14px;line-height:1.2}
+.cert-sub{font-size:.85rem;color:#888;margin-bottom:4px}
+.cert-name{font-size:2rem;font-weight:700;color:#f64e4e;margin-bottom:14px;font-style:italic}
+.cert-desc{font-size:.9rem;color:#555;line-height:1.7;margin-bottom:20px}
+.cert-phases{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:20px}
+.cert-phase-tag{background:#fff5f5;border:2px solid #f64e4e;color:#c62828;
+  padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700}
+.cert-foot{display:flex;justify-content:space-between;padding-top:18px;
+  border-top:2px solid #eee;margin-top:20px}
+.cert-foot-block{text-align:left}
+.cert-foot-block:last-child{text-align:right}
+.cert-label{font-size:.65rem;color:#bbb;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.cert-val{font-size:.85rem;font-weight:700;color:#555}
+.cert-btns{display:flex;gap:10px;justify-content:center;margin-top:22px}
+@media print{
+  body>*{display:none!important}
+  .cert-modal,.cert-wrap{display:block!important}
+  .cert-modal{position:static;background:none;padding:0;overflow:visible}
+  .cert-wrap{box-shadow:none;max-width:100%;border-radius:0;page-break-inside:avoid}
+  .cert-btns{display:none!important}
+}
 .onboard-skip:hover{color:var(--pri)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.min.js"></script>
 </head>
 <body>
 <div id="auth-screen">
@@ -262,6 +378,51 @@ iframe{flex:1;border:none;background:#fff}
   </div>
 </div>
 <div id="toast"></div>
+
+<!-- Certificate modal -->
+<div id="cert-modal" class="cert-modal hidden">
+  <div class="cert-wrap">
+    <span class="cert-corner tl">⚡</span><span class="cert-corner tr">⚡</span>
+    <span class="cert-corner bl">⚡</span><span class="cert-corner br">⚡</span>
+    <div class="cert-logo">Code School</div>
+    <div class="cert-div"></div>
+    <div class="cert-head">Certificate of Completion</div>
+    <div class="cert-title">This certifies that</div>
+    <div class="cert-name" id="cert-name"></div>
+    <div class="cert-desc">has successfully completed all phases of Code School,<br>mastering HTML, CSS, and JavaScript from the ground up.</div>
+    <div class="cert-phases" id="cert-phases"></div>
+    <div class="cert-div"></div>
+    <div class="cert-foot">
+      <div class="cert-foot-block">
+        <div class="cert-label">Date Awarded</div>
+        <div class="cert-val" id="cert-date"></div>
+      </div>
+      <div class="cert-foot-block">
+        <div class="cert-label">Certificate ID</div>
+        <div class="cert-val" id="cert-id"></div>
+      </div>
+    </div>
+    <div class="cert-btns">
+      <button class="btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      <button class="btn sec" onclick="document.getElementById('cert-modal').classList.add('hidden')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Hint modal -->
+<div id="hint-modal" class="hint-modal hidden">
+  <div class="hint-box">
+    <div class="hint-header">
+      <h3>💡 AI Hint</h3>
+      <button class="btn ico sec" onclick="document.getElementById('hint-modal').classList.add('hidden')" style="font-size:16px">✕</button>
+    </div>
+    <div class="hint-body" id="hint-body"><span class="hint-loading">Getting a hint from Claude…</span></div>
+    <div class="hint-footer">
+      <button class="btn sec sml" onclick="document.getElementById('hint-modal').classList.add('hidden')">Close</button>
+      <button class="btn sml" onclick="getAIHint()">Try again ↺</button>
+    </div>
+  </div>
+</div>
 <!-- Achievement toast -->
 <div id="ach-toast" class="ach-toast">
   <span id="ach-icon" class="ach-icon-big"></span>
@@ -364,7 +525,9 @@ iframe{flex:1;border:none;background:#fff}
             <button class="run-btn" onclick="runPv()">▶ Run</button>
             <button class="reset-btn" onclick="resetCode()" title="Reset to starter code (Ctrl+Shift+R)">↺</button>
           </div>
-          <textarea class="ed" id="led" spellcheck="false" oninput="onInput('lv')"></textarea>
+          <div id="led-loading" class="ed-loading">Loading editor…</div>
+          <textarea class="ed" id="led" spellcheck="false" oninput="onInput('lv')" style="display:none"></textarea>
+          <div id="led-cm" class="cm-wrap"></div>
         </div>
         <div class="ps">
           <div class="phdr"><span>👁 Live Preview</span><span style="font-size:11px;opacity:.6">auto-updates</span></div>
@@ -383,7 +546,9 @@ iframe{flex:1;border:none;background:#fff}
             <button class="run-btn" onclick="runPv()">▶ Run</button>
             <button class="reset-btn" onclick="resetCode()" title="Reset to starter code (Ctrl+Shift+R)">↺</button>
           </div>
-          <textarea class="ed" id="ped" spellcheck="false" oninput="onInput('pv')"></textarea>
+          <div id="ped-loading" class="ed-loading">Loading editor…</div>
+          <textarea class="ed" id="ped" spellcheck="false" oninput="onInput('pv')" style="display:none"></textarea>
+          <div id="ped-cm" class="cm-wrap"></div>
         </div>
         <div class="ps">
           <div class="phdr"><span>👁 Live Preview</span><span style="font-size:11px;opacity:.6">auto-updates</span></div>
@@ -590,18 +755,28 @@ function buildDoc(h,c,j){
 let pvTimer;
 function schedPv(){clearTimeout(pvTimer);pvTimer=setTimeout(runPv,500)}
 function runPv(){const f=document.getElementById(S.view==='pv'?'pif':'lif');if(f)f.srcdoc=buildDoc(S.code.html,S.code.css,S.code.js);}
-function saveTab(){const e=document.getElementById(S.view==='pv'?'ped':'led');if(e)S.code[S.tab[S.view]]=e.value;}
+function saveTab(){
+  const _sv=S.view;
+  if(cmEditors[_sv]){S.code[S.tab[_sv]]=cmEditors[_sv].getValue();}
+  else{const e=document.getElementById(_sv==='pv'?'ped':'led');if(e)S.code[S.tab[_sv]]=e.value;}
+}
 function setTab(tab,view){
   saveTab();S.tab[view]=tab;
   const vEl=document.getElementById(view);if(vEl)vEl.querySelectorAll('.tb-btn').forEach(b=>b.classList.toggle('on',b.textContent.toLowerCase()===tab));
-  const e=document.getElementById(view==='pv'?'ped':'led');if(e){e.value=S.code[tab];e.className='ed';}
+  const _ta2=document.getElementById(view==='pv'?'ped':'led');if(_ta2)_ta2.value=S.code[tab];
+  if(cmEditors[view]){
+    cmEditors[view].setOption('mode',CM5_MODE[tab]||'javascript');
+    cmEditors[view].setValue(S.code[tab]||'');
+    setTimeout(()=>cmEditors[view].refresh(),0);
+  }
 }
 function onInput(view){const e=document.getElementById(view==='pv'?'ped':'led');if(e){S.code[S.tab[view]]=e.value;schedPv();}}
 function loadEditor(view){
   S.tab[view]='html';const vEl=document.getElementById(view);
   if(vEl)vEl.querySelectorAll('.tb-btn').forEach(b=>b.classList.toggle('on',b.textContent.toLowerCase()==='html'));
-  const e=document.getElementById(view==='pv'?'ped':'led');
-  if(e){e.value=S.code.html;e.className='ed';setupEditorKeys(e,view);}
+  const _ta=document.getElementById(view==='pv'?'ped':'led');
+  if(_ta){_ta.value=S.code.html;}
+  initCMEditor(view);
   runPv();
 }
 function renderSB(){
@@ -644,7 +819,9 @@ function renderHome(){
           <span class="continue-lesson">All available lessons complete. More coming soon.</span>
         </div>
       </div>`;
-  let h=`<h1>Welcome back, ${esc(S.currentUser||'there')}! 👋</h1>
+  const _certOk=checkCertificateEligible();
+  const _certBnr=_certOk?`<div class="continue-card" style="background:linear-gradient(135deg,#1a472a,#2e7d32)" onclick="showCertificate()"><div class="continue-info"><span class="continue-tag">🎓 All phases complete!</span><span class="continue-lesson">Claim your Code School certificate</span></div><button class="btn" onclick="event.stopPropagation();showCertificate()">View Certificate 🏆</button></div>`:'';
+  let h=`<h1>Welcome back, ${esc(S.currentUser||'there')}! 👋</h1>${_certBnr}
   ${_cc}
   <p class="h-intro">Your complete roadmap from zero to building real web apps and websites.</p>
   <div class="overall-bar">
@@ -683,6 +860,7 @@ function renderLesson(){
   <div class="lact">
     ${!isDone?`<button class="btn" onclick="markDone()">✓ Mark Complete</button>`:''}
     ${l.quiz?`<button class="btn sec" onclick="startQuiz('${l.id}')">🧠 Test Yourself</button>`:''}
+    <button class=\"btn sec\" onclick=\"openHintModal()\">💡 AI Hint</button>
     ${next?.type==='lesson'?`<button class="btn sec" onclick="goLesson('${next.lesson.id}')">Next: ${esc(next.lesson.title)} →</button>`:''}
     ${next?.type==='project'?`<button class="btn sec" onclick="goProject('${next.phase.id}')">🏆 Go to Project →</button>`:''}
   </div>`;
@@ -732,7 +910,7 @@ function markDone(){
   }
 }
 function toggleSB(){S.sbOpen=!S.sbOpen;document.getElementById('sb').classList.toggle('closed',!S.sbOpen);}
-function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);document.getElementById('dark-btn').textContent=S.dark?'☀️':'🌙';saveProgress();}
+function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);document.getElementById('dark-btn').textContent=S.dark?'☀️':'🌙';saveProgress();reinitCMTheme();}
 (function(){
   const sess=getSession();
   if(sess?.username){const users=getUsers();if(users[sess.username]){hideAuthScreen();loadUserSession(sess.username);return;}}
@@ -793,8 +971,8 @@ function resetCode() {
   if (!src || !src.code) return;
   if (!confirm('Reset to starter code? Your changes will be lost.')) return;
   S.code = {html: src.code.html, css: src.code.css, js: src.code.js};
-  const e = document.getElementById(S.view === 'pv' ? 'ped' : 'led');
-  if (e) e.value = S.code[S.tab[S.view]];
+  const _rta=document.getElementById(S.view==='pv'?'ped':'led');if(_rta)_rta.value=S.code[S.tab[S.view]];
+  if(cmEditors[S.view])cmEditors[S.view].setValue(S.code[S.tab[S.view]]);
   runPv();
   showToast('↺ Reset to starter code');
 }
@@ -940,6 +1118,7 @@ function checkAchievements() {
   if (newUnlocks.length) {
     setUserData(S.currentUser, d);
     newUnlocks.forEach((a, i) => setTimeout(() => showAchievementToast(a), i * 2500));
+    if(newUnlocks.some(a=>a.id==='graduate'))setTimeout(()=>{renderHome();showToast('🎓 Certificate unlocked!');},3500);
   }
 }
 
@@ -1019,6 +1198,162 @@ function closeOnboard() {
   if (S.done.size === 0) {
     const first = PHASES[0] && PHASES[0].lessons[0];
     if (first) setTimeout(() => goLesson(first.id), 200);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════
+// CODEMIRROR 5
+// ═══════════════════════════════════════════════════════
+const cmEditors = {};
+const CM5_MODE  = { html:'htmlmixed', css:'css', js:'javascript' };
+const CM5_READY = typeof CodeMirror !== 'undefined';
+
+function initCMEditor(view) {
+  if (typeof CodeMirror === 'undefined') { showFallbackEditor(view); return; }
+
+  const wrapId    = view === 'pv' ? 'ped-cm'      : 'led-cm';
+  const loadId    = view === 'pv' ? 'ped-loading'  : 'led-loading';
+  const taId      = view === 'pv' ? 'ped'          : 'led';
+  const wrap      = document.getElementById(wrapId);
+  const loadEl    = document.getElementById(loadId);
+  const ta        = document.getElementById(taId);
+  if (!wrap) return;
+
+  // Destroy existing editor
+  if (cmEditors[view]) {
+    try { cmEditors[view].toTextArea(); } catch(e) {}
+    delete cmEditors[view];
+  }
+  wrap.innerHTML = '';
+
+  const tab = S.tab[view];
+  const ed  = CodeMirror(wrap, {
+    value:              S.code[tab] || '',
+    mode:               CM5_MODE[tab] || 'javascript',
+    theme:              S.dark ? 'cs-dark' : 'cs-light',
+    lineNumbers:        true,
+    autoCloseBrackets:  true,
+    matchBrackets:      true,
+    styleActiveLine:    true,
+    indentUnit:         2,
+    tabSize:            2,
+    indentWithTabs:     false,
+    electricChars:      true,
+    extraKeys: {
+      'Tab':        (cm) => cm.replaceSelection('  '),
+      'Shift-Tab':  'indentLess',
+      'Ctrl-Enter': () => runPv(),
+      'Cmd-Enter':  () => runPv(),
+    },
+  });
+
+  ed.on('change', (cm) => {
+    S.code[S.tab[view]] = cm.getValue();
+    if (ta) ta.value = S.code[S.tab[view]];
+    schedPv();
+  });
+
+  ed.setSize('100%', '100%');
+  cmEditors[view] = ed;
+
+  if (loadEl) loadEl.style.display = 'none';
+  if (ta)     ta.style.display     = 'none';
+  wrap.style.display = 'flex';
+  setTimeout(() => ed.refresh(), 10);
+}
+
+function showFallbackEditor(view) {
+  const ids = view === 'pv'
+    ? { ta:'ped', cm:'ped-cm', ld:'ped-loading' }
+    : { ta:'led', cm:'led-cm', ld:'led-loading' };
+  const ta = document.getElementById(ids.ta);
+  const cm = document.getElementById(ids.cm);
+  const ld = document.getElementById(ids.ld);
+  if (ta) ta.style.display = '';
+  if (cm) cm.style.display = 'none';
+  if (ld) ld.style.display = 'none';
+  if (ta && !ta._ks) setupEditorKeys(ta, view);
+}
+
+function reinitCMTheme() {
+  ['lv','pv'].forEach(v => {
+    if (cmEditors[v]) {
+      cmEditors[v].setOption('theme', S.dark ? 'cs-dark' : 'cs-light');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CERTIFICATE
+// ═══════════════════════════════════════════════════════
+function checkCertificateEligible() {
+  if (!S.currentUser) return false;
+  return ['html','css','js','jsadv','tools','build'].every(id => {
+    const ph = PHASES.find(p => p.id === id);
+    return ph && ph.lessons.every(l => S.done.has(l.id));
+  });
+}
+
+function showCertificate() {
+  const name   = S.currentUser;
+  const date   = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const certId = 'CS-' + btoa(name + date).replace(/[^A-Z0-9]/gi,'').slice(0,10).toUpperCase();
+  document.getElementById('cert-name').textContent = name;
+  document.getElementById('cert-date').textContent = date;
+  document.getElementById('cert-id').textContent   = certId;
+  const phases = PHASES.filter(p => !p.comingSoon && p.id !== 'debug' && p.lessons.length);
+  document.getElementById('cert-phases').innerHTML =
+    phases.map(p => '<span class="cert-phase-tag">' + p.icon + ' ' + p.title + '</span>').join('');
+  document.getElementById('cert-modal').classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI HINT
+// ═══════════════════════════════════════════════════════
+function openHintModal() {
+  document.getElementById('hint-modal').classList.remove('hidden');
+  document.getElementById('hint-body').innerHTML = '<span class="hint-loading">Getting a hint from Claude…</span>';
+  getAIHint();
+}
+
+async function getAIHint() {
+  const l = lsOf(S.lessonId);
+  if (!l) return;
+  document.getElementById('hint-body').innerHTML = '<span class="hint-loading">Getting a hint from Claude…</span>';
+
+  const view = S.view;
+  const tab  = S.tab[view] || 'html';
+  const code = cmEditors[view]
+    ? cmEditors[view].getValue()
+    : (document.getElementById(view === 'pv' ? 'ped' : 'led') || {}).value || '';
+
+  const prompt =
+    'You are a friendly tutor helping a beginner learn ' + tab.toUpperCase() + '.\n' +
+    'Lesson: "' + l.title + '"\n' +
+    'Challenge: ' + l.ch.desc + '\n\n' +
+    'Their current ' + tab.toUpperCase() + ' code:\n```\n' + code.slice(0, 800) + '\n```\n\n' +
+    'Give a SHORT hint (2-3 sentences max) that nudges them in the right direction WITHOUT giving away the answer. ' +
+    'Be encouraging and specific to their code if possible. If code is empty, hint at the first step only.';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        model:      'claude-sonnet-4-20250514',
+        max_tokens: 250,
+        messages:   [{ role:'user', content: prompt }],
+      }),
+    });
+    if (!res.ok) throw new Error('Status ' + res.status);
+    const data = await res.json();
+    const text = data.content && data.content[0] && data.content[0].text;
+    document.getElementById('hint-body').innerHTML =
+      text ? text.replace(/\n/g,'<br>') : 'No hint available — try reviewing the lesson content above!';
+  } catch(e) {
+    document.getElementById('hint-body').innerHTML =
+      '⚠️ Could not fetch hint — check your internet connection, or re-read the lesson content above for clues!';
   }
 }
 
