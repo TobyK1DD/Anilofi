@@ -508,7 +508,7 @@ iframe{flex:1;border:none;background:#fff}
 </div>
 <header>
   <button class="ham" onclick="toggleSB()">☰</button>
-  <div id="logo" onclick="goHome()">⚡ Code School</div>
+  <div id="logo" onclick="goHome()">⚡ Code School <span style="font-size:10px;opacity:.4">v3</span></div>
   <span id="hdr-sub"></span>
   <div id="xp-area" class="xp-area">
     <span id="rank-badge" class="rank-badge" title="Your rank"></span>
@@ -813,6 +813,15 @@ function renderSB(){
   document.getElementById('sb').innerHTML=h;
 }
 function renderHome(){
+  try { _renderHomeInner(); } catch(err) {
+    document.getElementById('home').innerHTML =
+      '<div style="padding:30px;background:#ffebee;border-radius:12px;margin:20px;color:#c62828">' +
+      '<h2>⚠️ renderHome error</h2><pre style="white-space:pre-wrap;font-size:13px">' +
+      err.message + '\n\n' + (err.stack||'').slice(0,500) + '</pre>' +
+      '<p style="margin-top:12px">Please screenshot this and send it.</p></div>';
+  }
+}
+function _renderHomeInner(){
   const allLessons=PHASES.filter(p=>!p.comingSoon).flatMap(p=>p.lessons);
   const totalDone=allLessons.filter(l=>S.done.has(l.id)).length;
   const totalAll=allLessons.length;
@@ -1398,4 +1407,4 @@ async function getAIHint() {
 
 </script>
 </body>
-</html>
+</html>}
