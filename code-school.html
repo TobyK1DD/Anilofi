@@ -825,6 +825,40 @@ function buildDoc(h,c,j){
 }
 let pvTimer;
 function schedPv(){clearTimeout(pvTimer);pvTimer=setTimeout(runPv,500)}
+function checkDebugFix(){
+  const ld=getLessonData(S.lessonId);
+  const testCode=ld&&ld.test;
+  if(!testCode){showToast('No test for this challenge yet.');return;}
+  const html=(cmEditors.html?cmEditors.html.getValue():(S.code.html||''));
+  const css =(cmEditors.css ?cmEditors.css.getValue() :(S.code.css ||''));
+  const js  =(cmEditors.js  ?cmEditors.js.getValue()  :(S.code.js  ||''));
+  const resultEl=document.getElementById('dbg-result');
+  if(!resultEl)return;
+  try{
+    const testFn=new Function('html','css','js','"use strict";\n'+testCode);
+    const result=testFn(html,css,js);
+    resultEl.classList.remove('hidden','pass','fail');
+    if(result&&result.pass){
+      resultEl.className='dbg-result pass';
+      resultEl.innerHTML='&#x2705; Bug fixed! Great work &mdash; you spotted and solved it.';
+      if(S.lessonId&&!S.done.has(S.lessonId)){S.done.add(S.lessonId);saveProgress();renderSB();}
+      setTimeout(()=>showToast('&#x1F389; Debug challenge complete! +XP'),300);
+    }else{
+      resultEl.className='dbg-result fail';
+      resultEl.innerHTML='&#x274C; Not quite. '+(result&&result.msg?result.msg:'Check your fix and try again.');
+    }
+  }catch(e){
+    resultEl.className='dbg-result fail';
+    resultEl.classList.remove('hidden');
+    resultEl.innerHTML='&#x26A0;&#xFE0F; Test error: '+e.message;
+  }
+}
+function _toggleDebugBtn(show){
+  const btn=document.getElementById('chk-btn');
+  const res=document.getElementById('dbg-result');
+  if(btn)btn.style.display=show?'':'none';
+  if(res){if(show)res.classList.remove('hidden');else res.className='dbg-result hidden';}
+}
 function runPv(){const f=document.getElementById(S.view==='pv'?'pif':'lif');if(f)f.srcdoc=buildDoc(S.code.html,S.code.css,S.code.js);}
 function saveTab(){
   const _sv=S.view;
@@ -1018,6 +1052,19 @@ document.addEventListener('touchmove',e=>{if(_resizing&&e.touches[0])_doResize(e
 document.addEventListener('mouseup',()=>{_resizing=false;document.body.style.userSelect='';});
 document.addEventListener('touchend',()=>{_resizing=false;document.body.style.userSelect='';});
 function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);document.getElementById('dark-btn').textContent=S.dark?'☀️':'🌙';saveProgress();reinitCMTheme();}
+// ═══════════════════════════════════════════════════════════════════
+// XP + RANKS
+// ═══════════════════════════════════════════════════════════════════
+const RANKS = [
+  {min:0,    label:'🌱 Seedling',  col:'#8bc34a'},
+  {min:500,  label:'⚡ Coder',     col:'#03a9f4'},
+  {min:1500, label:'🔥 Builder',   col:'#ff9800'},
+  {min:3000, label:'💎 Developer', col:'#9c27b0'},
+  {min:6000, label:'🚀 Engineer',  col:'#f64e4e'},
+];
+function getRank(xp) { return [...RANKS].reverse().find(r => xp >= r.min) || RANKS[0]; }
+function getNext(xp)  { return RANKS.find(r => r.min > xp) || null; }
+
 (function(){
   const sess=getSession();
   if(sess?.username){const users=getUsers();if(users[sess.username]){hideAuthScreen();loadUserSession(sess.username);return;}}
@@ -1097,18 +1144,6 @@ function findNextLesson() {
   return null;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// XP + RANKS
-// ═══════════════════════════════════════════════════════════════════
-const RANKS = [
-  {min:0,    label:'🌱 Seedling',  col:'#8bc34a'},
-  {min:500,  label:'⚡ Coder',     col:'#03a9f4'},
-  {min:1500, label:'🔥 Builder',   col:'#ff9800'},
-  {min:3000, label:'💎 Developer', col:'#9c27b0'},
-  {min:6000, label:'🚀 Engineer',  col:'#f64e4e'},
-];
-function getRank(xp) { return [...RANKS].reverse().find(r => xp >= r.min) || RANKS[0]; }
-function getNext(xp)  { return RANKS.find(r => r.min > xp) || null; }
 
 function addXP(amount) {
   if (!S.currentUser) return;
