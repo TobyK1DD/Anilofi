@@ -680,7 +680,7 @@ function doSignup(){
 function doLogout(){
   saveProgress();setSession(null);S.currentUser=null;S.done=new Set();S.dark=false;S.view='home';
   document.body.classList.remove('dark');document.getElementById('dark-btn').textContent='🌙';
-  document.getElementById('hdr-sub').textContent='';showV('home');showAuthScreen();
+  document.getElementById('hdr-sub').textContent='';document.getElementById('acct-area').style.display='none';showV('home');showAuthScreen();
 }
 function loadUserSession(u){
   S.currentUser=u;const d=getUserData(u);
@@ -691,7 +691,18 @@ function loadUserSession(u){
   updateStreak();
   renderXPDisplay();
   if(!d.onboarded){const d2=getUserData(u);d2.onboarded=true;setUserData(u,d2);setTimeout(showOnboarding,500);}
-  renderSB();renderHome();
+  showV('home');
+  try {
+    renderSB();
+    renderHome();
+  } catch(err) {
+    console.error('renderHome/renderSB error:', err);
+    const el = document.getElementById('home');
+    if(el) el.innerHTML = '<div style="padding:28px;background:#ffebee;border-radius:12px;color:#b71c1c">' +
+      '<h2>⚠️ Something went wrong loading the home screen</h2>' +
+      '<pre style="font-size:12px;white-space:pre-wrap;margin-top:8px">' + err.message + '\n' + (err.stack||'').slice(0,300) + '</pre>' +
+      '<p style="margin-top:12px">Please screenshot this and report it.</p></div>';
+  }
 }
 function saveProgress(){
   if(!S.currentUser)return;
@@ -821,6 +832,7 @@ function loadEditor(view){
 function renderSB(){
   let h='';
   for(const ph of PHASES){
+    if(!ph.lessons||!ph.lessons.length)continue;
     const done=ph.lessons.filter(l=>S.done.has(l.id)).length;const tot=ph.lessons.length;
     const open=S.expandedPhase===ph.id;const pct=tot>0?(done/tot)*100:0;
     h+=`<div><button class="ph-btn" ${ph.comingSoon?'disabled':''} onclick="togglePh('${ph.id}')">
