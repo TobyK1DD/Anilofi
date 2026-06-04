@@ -374,6 +374,19 @@ iframe{flex:1;border:none;background:#fff}
   .cert-btns{display:none!important}
 }
 .onboard-skip:hover{color:var(--pri)}
+
+/* ── COPY CODE BUTTON ─────────────────────────────────────────── */
+.cb-wrap{position:relative}.cb-copy{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer;opacity:0;transition:opacity .15s;font-family:inherit}.cb-wrap:hover .cb-copy{opacity:1}.cb-copy.copied{background:#2e7d32}
+/* ── PERSONAL NOTES ───────────────────────────────────────────── */
+.notes-area{margin:16px 0 4px;padding:14px 18px;background:var(--soft);border-radius:10px;border:2px solid transparent;transition:border-color .15s}.notes-area:focus-within{border-color:var(--pri)}.notes-label{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}.notes-label span{opacity:.55;font-weight:400}.notes-ta{width:100%;min-height:72px;max-height:220px;resize:vertical;background:transparent;border:none;outline:none;font-family:inherit;font-size:13.5px;color:var(--text);line-height:1.65;padding:0}.notes-ta::placeholder{opacity:.4}
+/* ── FLAG FOR REVIEW ──────────────────────────────────────────── */
+.flag-btn{background:transparent;border:1px solid var(--acc);border-radius:7px;padding:4px 10px;font-size:13px;cursor:pointer;color:var(--text);transition:all .15s;font-family:inherit}.flag-btn:hover,.flag-btn.flagged{background:#fff3e0;border-color:#ff9800;color:#e65100}.flag-btn.flagged{font-weight:700}.flag-item{padding:8px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-radius:7px;transition:background .1s;color:var(--text)}.flag-item:hover{background:var(--soft)}.flag-section{margin-top:10px;border-top:1px solid var(--acc);padding-top:8px}.flag-section-title{font-size:11px;font-weight:700;color:var(--sub);padding:4px 14px 2px;text-transform:uppercase;letter-spacing:.05em}
+/* ── READING TIME ─────────────────────────────────────────────── */
+.read-time{font-size:11px;opacity:.5;margin-left:4px}
+/* ── SEARCH ───────────────────────────────────────────────────── */
+.search-btn{background:transparent;border:none;font-size:17px;cursor:pointer;padding:4px 8px;color:var(--text);transition:opacity .15s}.search-btn:hover{opacity:.7}.search-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;flex-direction:column;align-items:center;padding-top:80px}.search-box{width:min(560px,92vw);background:var(--card);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}.search-input{width:100%;padding:16px 20px;font-size:16px;border:none;outline:none;background:transparent;color:var(--text);font-family:inherit;border-bottom:2px solid var(--acc)}.search-results{max-height:360px;overflow-y:auto}.search-hit{padding:12px 20px;cursor:pointer;border-bottom:1px solid var(--soft);transition:background .1s}.search-hit:hover{background:var(--soft)}.search-hit-title{font-weight:600;font-size:14px;color:var(--text)}.search-hit-meta{font-size:12px;color:var(--sub);margin-top:2px}.search-hit mark{background:#fff3cd;border-radius:2px;padding:0 2px;color:#333}.search-empty{padding:24px;text-align:center;color:var(--sub);font-size:14px}
+/* ── FLASHCARD MODE ───────────────────────────────────────────── */
+.rev-btn{background:transparent;border:1px solid var(--acc);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--text);font-family:inherit;transition:all .15s}.rev-btn:hover{background:var(--soft);border-color:var(--pri);color:var(--pri)}.fc-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:950;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}.fc-box{width:min(580px,95vw);background:var(--card);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.4);padding:32px;position:relative;text-align:center}.fc-phase{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--pri);margin-bottom:8px}.fc-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:24px}.fc-question{font-size:15px;color:var(--sub);margin-bottom:20px}.fc-reveal{background:var(--pri);color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s}.fc-reveal:hover{transform:scale(1.03)}.fc-recap{text-align:left;margin-top:20px;display:none}.fc-recap li{padding:6px 0;border-bottom:1px solid var(--soft);font-size:14px;line-height:1.6;list-style:none;padding-left:18px;position:relative}.fc-recap li::before{content:"✓";position:absolute;left:0;color:var(--pri);font-weight:700}.fc-nav{display:flex;align-items:center;justify-content:space-between;margin-top:24px}.fc-nav button{background:var(--soft);border:1px solid var(--acc);border-radius:8px;padding:8px 18px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--text)}.fc-nav button:hover{background:var(--acc)}.fc-prog{font-size:13px;color:var(--sub);font-weight:600}.fc-close{position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:20px;cursor:pointer;color:var(--sub)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
@@ -544,6 +557,8 @@ iframe{flex:1;border:none;background:#fff}
   <button class="btn sml sec" onclick="toggleCheat()" style="flex-shrink:0">📖 Cheat Sheet</button>
   <div id="acct-area" class="hdr-acct" style="display:none">
     <span class="acct-name" id="acct-name"></span>
+    <button class="search-btn" onclick="openSearch()" title="Search lessons (/)">🔍</button>
+    <button class="rev-btn" onclick="openRevision()" title="Flashcard revision">🃏 Revise</button>
     <button class="btn sml sec" onclick="doLogout()">Log out</button>
   </div>
   <button class="btn ico sec" id="dark-btn" onclick="toggleDark()">🌙</button>
@@ -901,6 +916,20 @@ function renderSB(){
       ${ph.project?`<button class="pj-btn ${S.phaseId===ph.id&&S.view==='pv'?'on':''}" onclick="goProject('${ph.id}')">🏆 Project</button>`:''}</div>`:''}
     </div>`;
   }
+  // Flagged lessons section
+  const _flags = getUserData(S.currentUser||'').flagged||[];
+  if(_flags.length){
+    h += '<div class="flag-section"><div class="flag-section-title">🚩 Flagged for review</div>';
+    _flags.forEach(fid => {
+      const fl = lsOf(fid); if(!fl) return;
+      const fph = phOf(fid);
+      h += `<div class="flag-item" onclick="goLesson('${fid}')">
+        <span>${fph?.icon||'📌'}</span>
+        <span>${esc(fl.title)}</span>
+      </div>`;
+    });
+    h += '</div>';
+  }
   document.getElementById('sb').innerHTML=h;
 }
 function renderHome(){
@@ -959,10 +988,20 @@ function renderLesson(){
     ${isDone?'<span class="dtag">✓ Complete</span>':''}
     ${l.quiz?`<span class="qtag" style="background:${best===100?'var(--green)':best!=null?'#e65100':'var(--acc)'};color:${best!=null?'#fff':'var(--text)'}">${best!=null?'Quiz: '+best+'%':'Quiz available'}</span>`:''}
   </div><h2 class="lh">${esc(l.title)}</h2>`;
+  // Flag button + reading time
+  const _flagged = (getUserData(S.currentUser).flagged||[]).includes(l.id);
+  const _words   = _content.reduce((n,b)=>n+(b.v||'').replace(/<[^>]+>/g,'').split(/\s+/).length,0);
+  const _mins    = Math.max(1, Math.round(_words/180));
+  h += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+    <button class="flag-btn${_flagged?' flagged':''}" id="flag-btn" onclick="toggleFlag('${l.id}')">
+      ${_flagged?'🚩 Flagged':'🏳 Flag for review'}
+    </button>
+    <span class="read-time">~${_mins} min read</span>
+  </div>`;
   if(VIDEOS[l.id]){const v=VIDEOS[l.id];h+=`<div class="vid-block"><button class="vid-toggle" onclick="toggleVid(this)"><span class="vid-icon">▶️</span><div class="vid-info"><div class="vid-title">${esc(v.title)}</div><div class="vid-by">${esc(v.by)} &middot; ${esc(v.dur)}</div></div><span class="vid-chev">▼</span></button><div class="vid-frame" data-id="${esc(v.id)}"></div></div>`;}
   for(const b of _content){
     if(b.t==='p')h+=`<p class="lt">${b.v}</p>`;
-    else if(b.t==='c')h+=`<pre class="cb">${esc(b.v)}</pre>`;
+    else if(b.t==='c')h+=`<div class="cb-wrap"><pre class="cb">${esc(b.v)}</pre><button class="cb-copy" onclick="copyCb(this)" title="Copy code">Copy</button></div>`;
     else if(b.t==='t')h+=`<div class="tip">${b.v}</div>`;
     else if(b.t==='h')h+=`<h3 class="lsub">${b.v}</h3>`;
     else if(b.t==='note')h+=`<div class="lnote"><span class="lnote-ic">📌</span><div>${b.v}</div></div>`;
@@ -979,6 +1018,12 @@ function renderLesson(){
     <button class=\"btn sec\" onclick=\"openHintModal()\">💡 AI Hint</button>
     ${next?.type==='lesson'?`<button class="btn sec" onclick="goLesson('${next.lesson.id}')">Next: ${esc(next.lesson.title)} →</button>`:''}
     ${next?.type==='project'?`<button class="btn sec" onclick="goProject('${next.phase.id}')">🏆 Go to Project →</button>`:''}
+  </div>`;
+  // Personal notes
+  const _savedNote = localStorage.getItem('CS_NOTE_'+S.currentUser+'_'+l.id)||'';
+  h += `<div class="notes-area">
+    <div class="notes-label">📝 My Notes <span id="note-saved"></span></div>
+    <textarea class="notes-ta" id="lesson-notes" placeholder="Write your own explanation here — the Feynman technique: if you can explain it simply, you understand it…" oninput="saveNote('${l.id}',this.value)">${esc(_savedNote)}</textarea>
   </div>`;
   document.getElementById('lcontent').innerHTML=h;
 }
@@ -1500,6 +1545,165 @@ async function getAIHint() {
   }
 }
 
+
+// ── COPY CODE ─────────────────────────────────────────────────────────────
+function copyCb(btn){
+  const pre=btn.previousElementSibling;
+  const txt=pre?pre.textContent:'';
+  const doFallback=()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);};
+  const ok=()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);};
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(ok).catch(()=>{doFallback();ok();});}
+  else{doFallback();ok();}
+}
+
+// ── PERSONAL NOTES ────────────────────────────────────────────────────────
+let _noteTimer=null;
+function saveNote(lid,val){
+  clearTimeout(_noteTimer);
+  _noteTimer=setTimeout(()=>{
+    localStorage.setItem('CS_NOTE_'+(S.currentUser||'_guest')+'_'+lid,val);
+    const el=document.getElementById('note-saved');
+    if(el){el.textContent='Saved ✓';setTimeout(()=>{if(el)el.textContent='';},1500);}
+  },600);
+}
+
+// ── FLAG FOR REVIEW ───────────────────────────────────────────────────────
+function toggleFlag(lid){
+  if(!S.currentUser)return;
+  const d=getUserData(S.currentUser);
+  d.flagged=d.flagged||[];
+  const idx=d.flagged.indexOf(lid);
+  if(idx>-1)d.flagged.splice(idx,1);else d.flagged.push(lid);
+  setUserData(S.currentUser,d);
+  const btn=document.getElementById('flag-btn');
+  const now=d.flagged.includes(lid);
+  if(btn){btn.textContent=now?'🚩 Flagged':'🏳 Flag for review';btn.className='flag-btn'+(now?' flagged':'');}
+  renderSB();
+  showToast(now?'🚩 Flagged for review':'Removed from flagged');
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────
+function openSearch(){
+  document.getElementById('search-overlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('search-input').focus(),50);
+}
+function closeSearch(){
+  const ov=document.getElementById('search-overlay');
+  if(ov)ov.classList.add('hidden');
+  const inp=document.getElementById('search-input');
+  if(inp)inp.value='';
+  const res=document.getElementById('search-results');
+  if(res)res.innerHTML='<div class="search-empty">Start typing to search all lessons</div>';
+}
+function doSearch(q){
+  const res=document.getElementById('search-results');
+  const term=q.trim().toLowerCase();
+  if(term.length<2){res.innerHTML='<div class="search-empty">Type at least 2 characters to search</div>';return;}
+  const hits=[];
+  const hl=s=>s.replace(new RegExp('('+term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+  for(const ph of PHASES){
+    if(ph.comingSoon)continue;
+    for(const l of (ph.lessons||[])){
+      const tm=l.title.toLowerCase().includes(term);
+      const ld=getLessonData(l.id);
+      const body=(ld.content||[]).map(b=>(b.v||'').replace(/<[^>]+>/g,'')).join(' ');
+      const bm=body.toLowerCase().includes(term);
+      if(tm||bm){
+        const pos=body.toLowerCase().indexOf(term);
+        const ctx=bm?body.slice(Math.max(0,pos-40),pos+80):'';
+        hits.push({id:l.id,title:l.title,phase:ph.title,icon:ph.icon,ctx,hl});
+      }
+    }
+  }
+  if(!hits.length){res.innerHTML='<div class="search-empty">No results for "'+q+'"</div>';return;}
+  res.innerHTML=hits.slice(0,10).map(h=>`<div class="search-hit" onclick="closeSearch();goLesson('${h.id}')"><div class="search-hit-title">${h.hl(h.title)}</div><div class="search-hit-meta">${h.icon||'📌'} ${h.phase}${h.ctx?' · '+h.hl(h.ctx.trim())+'…':''}</div></div>`).join('');
+}
+
+// ── FLASHCARDS / REVISION ─────────────────────────────────────────────────
+let _fcCards=[],_fcIdx=0,_fcRevealed=false;
+function openRevision(){
+  _fcCards=[];
+  for(const ph of PHASES){
+    if(ph.comingSoon)continue;
+    for(const l of (ph.lessons||[])){
+      if(!S.done.has(l.id))continue;
+      const ld=getLessonData(l.id);
+      const recap=(ld.content||[]).find(b=>b.t==='recap');
+      if(!recap)continue;
+      _fcCards.push({id:l.id,title:l.title,phase:ph.title,icon:ph.icon||'📌',recap:recap.v});
+    }
+  }
+  if(!_fcCards.length){showToast('Complete some lessons first — then come back to revise! 📚');return;}
+  for(let i=_fcCards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[_fcCards[i],_fcCards[j]]=[_fcCards[j],_fcCards[i]];}
+  _fcIdx=0;
+  document.getElementById('fc-overlay').classList.remove('hidden');
+  _renderCard();
+}
+function closeRevision(){document.getElementById('fc-overlay').classList.add('hidden');}
+function _renderCard(){
+  const card=_fcCards[_fcIdx];_fcRevealed=false;
+  document.getElementById('fc-phase').textContent=card.icon+' '+card.phase;
+  document.getElementById('fc-title').textContent=card.title;
+  document.getElementById('fc-prog').textContent=(_fcIdx+1)+' / '+_fcCards.length;
+  const ul=document.getElementById('fc-recap');
+  ul.style.display='none';ul.innerHTML='';
+  document.querySelector('.fc-reveal').style.display='';
+  document.querySelector('.fc-question').textContent='What do you remember from this lesson?';
+}
+function revealCard(){
+  const items=_fcCards[_fcIdx].recap.split('|').map(s=>s.trim()).filter(Boolean);
+  const ul=document.getElementById('fc-recap');
+  ul.innerHTML=items.map(i=>`<li>${i}</li>`).join('');
+  ul.style.display='block';
+  document.querySelector('.fc-reveal').style.display='none';
+  document.querySelector('.fc-question').textContent='Here\'s what this lesson covered:';
+  _fcRevealed=true;
+}
+function fcNav(dir){_fcIdx=(_fcIdx+dir+_fcCards.length)%_fcCards.length;_renderCard();}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement.tagName;
+  const inCM=!!document.activeElement.closest('.CodeMirror');
+  if(tag==='INPUT'||tag==='TEXTAREA'||inCM)return;
+  const fcOpen=!document.getElementById('fc-overlay').classList.contains('hidden');
+  const srOpen=!document.getElementById('search-overlay').classList.contains('hidden');
+  if(e.key==='Escape'){closeSearch();closeRevision();}
+  if(e.key==='/'&&!srOpen&&!fcOpen){e.preventDefault();openSearch();}
+  if(fcOpen){
+    if(e.key==='ArrowRight')fcNav(1);
+    if(e.key==='ArrowLeft')fcNav(-1);
+    if((e.key===' '||e.key==='Enter')&&!_fcRevealed){e.preventDefault();revealCard();}
+  }
+});
+
 </script>
+
+<!-- Search overlay -->
+<div id="search-overlay" class="search-overlay hidden" onclick="if(event.target===this)closeSearch()">
+  <div class="search-box">
+    <input class="search-input" id="search-input" placeholder="Search lessons, topics, code…" oninput="doSearch(this.value)" autocomplete="off">
+    <div class="search-results" id="search-results">
+      <div class="search-empty">Start typing to search all lessons</div>
+    </div>
+  </div>
+</div>
+
+<!-- Flashcard overlay -->
+<div id="fc-overlay" class="fc-overlay hidden">
+  <div class="fc-box">
+    <button class="fc-close" onclick="closeRevision()">✕</button>
+    <div class="fc-phase" id="fc-phase"></div>
+    <div class="fc-title" id="fc-title"></div>
+    <div class="fc-question">What do you remember from this lesson?</div>
+    <button class="fc-reveal" onclick="revealCard()">Show Recap ↓</button>
+    <ul class="fc-recap" id="fc-recap"></ul>
+    <div class="fc-nav">
+      <button onclick="fcNav(-1)">← Prev</button>
+      <span class="fc-prog" id="fc-prog"></span>
+      <button onclick="fcNav(1)">Next →</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
