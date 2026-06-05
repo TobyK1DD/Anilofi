@@ -449,7 +449,7 @@
     /* ===================== LOAD POSTS ===================== */
     async function loadPosts() {
       const { data, error } = await db
-        .from('posts')
+        .from('blog_posts')
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -633,17 +633,6 @@
       return urls;
     }
 
-    /* ===================== SLUG HELPER ===================== */
-    function slugify(str) {
-      return str
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        + '-' + Date.now();
-    }
-
     /* ===================== SAVE / DELETE POST ===================== */
     async function savePost() {
       const title   = document.getElementById('f-title').value.trim();
@@ -662,15 +651,14 @@
         const images = await resolveImages();
 
         if (editingId) {
-          const { error } = await db.from('posts')
+          const { error } = await db.from('blog_posts')
             .update({ title, content, tags, images })
             .eq('id', editingId);
           if (error) throw error;
           toast('Post updated ✓');
         } else {
-          const slug = slugify(title);
-          const { error } = await db.from('posts')
-            .insert([{ title, content, tags, images, slug }]);
+          const { error } = await db.from('blog_posts')
+            .insert([{ title, content, tags, images }]);
           if (error) throw error;
           toast('Post published ✓');
         }
@@ -687,7 +675,7 @@
 
     async function deletePost(id) {
       if (!confirm('Delete this post permanently?')) return;
-      const { error } = await db.from('posts').delete().eq('id', id);
+      const { error } = await db.from('blog_posts').delete().eq('id', id);
       if (error) { toast('Delete failed: ' + error.message); return; }
       toast('Post deleted');
       await loadPosts();
