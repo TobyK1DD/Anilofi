@@ -8,10 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="Main.css" />
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
-    /* =====================
-       BLOG OVERRIDES & EXTRAS
-    ===================== */
     body {
       min-height: 100vh;
       height: auto;
@@ -19,9 +18,7 @@
       padding-bottom: 80px;
     }
 
-    /* =====================
-       STICKY HEADER
-    ===================== */
+    /* ===================== HEADER ===================== */
     .blog-header {
       position: sticky;
       top: 0;
@@ -33,7 +30,6 @@
       justify-content: space-between;
       padding: 14px 24px;
     }
-
     .site-wordmark {
       font-family: "Sour Gummy", sans-serif;
       font-size: 1.7rem;
@@ -43,17 +39,8 @@
       text-decoration: none;
       line-height: 1;
     }
-
-    .site-wordmark span {
-      color: var(--text);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .site-wordmark span { color: var(--text); }
+    .header-right { display: flex; align-items: center; gap: 10px; }
     .admin-chip {
       font-size: 11px;
       font-weight: 900;
@@ -65,37 +52,17 @@
       color: #000;
       border: 2px solid var(--border);
     }
+    #change-darkmode { position: static; width: 42px; height: 42px; }
+    #new-post-btn { font-size: 15px; padding: 8px 18px; }
+    #admin-btn { width: 42px; height: 42px; padding: 0; font-size: 1.1rem; border-radius: 50%; }
 
-    /* override fixed positioning from Main.css on darkmode button */
-    #change-darkmode {
-      position: static;
-      width: 42px;
-      height: 42px;
-    }
-
-    #new-post-btn {
-      font-size: 15px;
-      padding: 8px 18px;
-    }
-
-    #admin-btn {
-      width: 42px;
-      height: 42px;
-      padding: 0;
-      font-size: 1.1rem;
-      border-radius: 50%;
-    }
-
-    /* =====================
-       HERO BANNER
-    ===================== */
+    /* ===================== HERO ===================== */
     .blog-hero {
       background: var(--bg-soft);
       border-bottom: 3px solid var(--border);
       padding: 48px 24px 44px;
       text-align: center;
     }
-
     .hero-tag {
       display: inline-block;
       font-size: 11px;
@@ -109,7 +76,6 @@
       padding: 3px 10px;
       margin-bottom: 16px;
     }
-
     .hero-heading {
       font-size: clamp(2.4rem, 6vw, 4rem);
       font-weight: 900;
@@ -118,51 +84,24 @@
       margin-bottom: 10px;
       font-family: "Sour Gummy", sans-serif;
     }
+    .hero-heading em { color: var(--primary); font-style: normal; }
+    .hero-sub { font-size: 1rem; opacity: 0.6; max-width: 420px; margin: 0 auto; line-height: 1.5; }
 
-    .hero-heading em {
-      color: var(--primary);
-      font-style: normal;
-    }
-
-    .hero-sub {
-      font-size: 1rem;
-      opacity: 0.6;
-      max-width: 420px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
-
-    /* =====================
-       POSTS FEED
-    ===================== */
-    .posts-wrapper {
-      max-width: 860px;
-      margin: 48px auto;
-      padding: 0 20px;
-    }
-
+    /* ===================== FEED ===================== */
+    .posts-wrapper { max-width: 860px; margin: 48px auto; padding: 0 20px; }
     .posts-count {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      opacity: 0.5;
-      margin-bottom: 28px;
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; opacity: 0.5; margin-bottom: 28px;
     }
-
     .no-posts {
-      text-align: center;
-      padding: 80px 20px;
-      border: 3px dashed var(--border);
-      border-radius: 8px;
+      text-align: center; padding: 80px 20px;
+      border: 3px dashed var(--border); border-radius: 8px;
       background: var(--bg-soft);
     }
-
     .no-posts p { opacity: 0.55; font-size: 1rem; line-height: 1.7; }
+    .loading-state { text-align: center; padding: 60px 20px; opacity: 0.5; font-size: 1rem; }
 
-    /* =====================
-       POST CARD
-    ===================== */
+    /* ===================== POST CARD ===================== */
     .post-card {
       background: var(--bg-soft);
       border: 3px solid var(--border);
@@ -171,487 +110,201 @@
       overflow: hidden;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-
-    .post-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-    }
-
+    .post-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
     .post-hero-img {
-      width: 100%;
-      max-height: 380px;
-      object-fit: cover;
-      display: block;
-      cursor: pointer;
-      border-bottom: 3px solid var(--border);
-      transition: opacity 0.15s;
+      width: 100%; max-height: 380px; object-fit: cover; display: block;
+      cursor: pointer; border-bottom: 3px solid var(--border); transition: opacity 0.15s;
     }
-
     .post-hero-img:hover { opacity: 0.9; }
-
-    .post-body {
-      padding: 26px 28px 22px;
-    }
-
-    .post-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .post-date {
-      font-family: monospace;
-      font-size: 12px;
-      opacity: 0.55;
-      letter-spacing: 0.5px;
-    }
-
+    .post-body { padding: 26px 28px 22px; }
+    .post-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .post-date { font-family: monospace; font-size: 12px; opacity: 0.55; letter-spacing: 0.5px; }
     .post-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-
     .tag {
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: var(--primary);
-      color: #000;
-      border: 2px solid var(--border);
+      font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+      padding: 3px 8px; border-radius: 4px; background: var(--primary);
+      color: #000; border: 2px solid var(--border);
     }
-
     .post-title {
-      font-size: clamp(1.3rem, 3vw, 1.75rem);
-      font-weight: 900;
-      line-height: 1.15;
-      color: var(--text);
-      margin-bottom: 16px;
-      font-family: "Sour Gummy", sans-serif;
+      font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 900; line-height: 1.15;
+      color: var(--text); margin-bottom: 16px; font-family: "Sour Gummy", sans-serif;
     }
-
-    .post-content {
-      font-size: 1rem;
-      line-height: 1.75;
-      color: var(--text);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    /* =====================
-       POST IMAGE GALLERY
-    ===================== */
-    .post-gallery {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 20px;
-    }
-
+    .post-content { font-size: 1rem; line-height: 1.75; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+    .post-gallery { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 20px; }
     .post-gallery img {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 2px solid var(--border);
-      cursor: pointer;
-      display: block;
-      transition: opacity 0.15s;
+      width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px;
+      border: 2px solid var(--border); cursor: pointer; display: block; transition: opacity 0.15s;
     }
-
     .post-gallery img:hover { opacity: 0.85; }
-
-    .post-gallery img:only-child {
-      grid-column: 1 / -1;
-      aspect-ratio: 16 / 9;
-    }
-
-    /* =====================
-       ADMIN ACTIONS ON CARD
-    ===================== */
-    .post-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 2px solid var(--accent);
-    }
-
+    .post-gallery img:only-child { grid-column: 1/-1; aspect-ratio: 16/9; }
+    .post-actions { display: flex; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 2px solid var(--accent); }
     .post-actions button { font-size: 14px; padding: 7px 16px; }
-
-    .btn-danger {
-      background: transparent;
-      color: var(--primary);
-      border: 3px solid var(--primary);
-    }
-
-    .btn-danger:hover {
-      background: var(--primary);
-      color: #000;
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text);
-      border: 3px solid var(--border);
-    }
-
+    .btn-danger { background: transparent; color: var(--primary); border: 3px solid var(--primary); }
+    .btn-danger:hover { background: var(--primary); color: #000; }
+    .btn-ghost { background: transparent; color: var(--text); border: 3px solid var(--border); }
     .btn-ghost:hover { background: var(--accent); }
 
-    /* =====================
-       MODAL BASE
-    ===================== */
+    /* ===================== MODAL BASE ===================== */
     .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.78);
-      z-index: 200;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 30px 16px;
-      overflow-y: auto;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78); z-index: 200;
+      justify-content: center; align-items: flex-start;
+      padding: 30px 16px; overflow-y: auto;
     }
-
     .modal-overlay.open { display: flex; }
-
     .modal-box {
-      background: var(--bg-soft);
-      border: 3px solid var(--border);
-      border-radius: 8px;
-      padding: 32px;
-      width: 100%;
-      max-width: 680px;
-      margin: auto;
+      background: var(--bg-soft); border: 3px solid var(--border);
+      border-radius: 8px; padding: 32px; width: 100%; max-width: 680px; margin: auto;
     }
-
     .modal-heading {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin-bottom: 26px;
-      font-family: "Sour Gummy", sans-serif;
+      font-size: 1.4rem; font-weight: 900; color: var(--primary);
+      margin-bottom: 26px; font-family: "Sour Gummy", sans-serif;
     }
-
-    /* =====================
-       FORM CONTROLS
-    ===================== */
     .form-row { margin-bottom: 20px; }
-
     .form-row label {
-      display: block;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      opacity: 0.65;
-      margin-bottom: 8px;
-      color: var(--text);
+      display: block; font-size: 11px; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.65;
+      margin-bottom: 8px; color: var(--text);
     }
-
     .form-row input[type="text"],
+    .form-row input[type="email"],
     .form-row input[type="password"],
     .form-row textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border: 3px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Sour Gummy", sans-serif;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-      resize: vertical;
+      width: 100%; padding: 12px 14px; border: 3px solid var(--border);
+      border-radius: 8px; background: var(--bg); color: var(--text);
+      font-family: "Sour Gummy", sans-serif; font-size: 1rem;
+      transition: border-color 0.2s; resize: vertical;
     }
-
     .form-row textarea { min-height: 220px; }
+    .form-row input:focus, .form-row textarea:focus { outline: none; border-color: var(--primary); }
 
-    .form-row input:focus,
-    .form-row textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-
-    /* =====================
-       IMAGE UPLOAD ZONE
-    ===================== */
+    /* ===================== UPLOAD ZONE ===================== */
     .upload-zone {
-      border: 3px dashed var(--border);
-      border-radius: 8px;
-      padding: 28px 20px;
-      text-align: center;
-      background: var(--bg);
-      cursor: pointer;
-      position: relative;
-      transition: border-color 0.2s;
+      border: 3px dashed var(--border); border-radius: 8px;
+      padding: 28px 20px; text-align: center; background: var(--bg);
+      cursor: pointer; position: relative; transition: border-color 0.2s;
     }
-
     .upload-zone:hover { border-color: var(--primary); }
-
     .upload-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
+      position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
     }
-
     .upload-icon { font-size: 2rem; display: block; margin-bottom: 6px; pointer-events: none; }
     .upload-label { font-size: 0.9rem; opacity: 0.65; pointer-events: none; }
-
-    /* Preview grid */
-    .img-preview-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .preview-thumb {
-      position: relative;
-      width: 78px;
-      height: 78px;
-    }
-
+    .img-preview-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .preview-thumb { position: relative; width: 78px; height: 78px; }
     .preview-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 2px solid var(--border);
-      display: block;
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 6px; border: 2px solid var(--border); display: block;
     }
-
     .thumb-remove {
-      position: absolute;
-      top: -7px;
-      right: -7px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: #000;
-      border: 2px solid var(--border);
-      font-size: 11px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
-      line-height: 1;
+      position: absolute; top: -7px; right: -7px; width: 22px; height: 22px;
+      border-radius: 50%; background: var(--primary); color: #000;
+      border: 2px solid var(--border); font-size: 11px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0; line-height: 1;
     }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; }
 
-    /* =====================
-       MODAL FOOTER BUTTONS
-    ===================== */
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 26px;
-    }
-
-    /* =====================
-       ADMIN LOGIN MODAL
-    ===================== */
-    #admin-modal .modal-box {
-      max-width: 360px;
-      text-align: center;
-    }
-
+    /* ===================== ADMIN LOGIN MODAL ===================== */
+    #admin-modal .modal-box { max-width: 380px; text-align: center; }
     #admin-modal .modal-heading { margin-bottom: 8px; }
-
     .admin-sub { font-size: 0.9rem; opacity: 0.6; margin-bottom: 20px; }
+    .admin-error { color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-top: 10px; display: none; }
+    .full-w { width: 100%; margin-bottom: 8px; }
 
-    #admin-pass-input {
-      text-align: center;
-      letter-spacing: 4px;
-      font-size: 1.2rem;
-    }
-
-    .admin-error {
-      color: var(--primary);
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .full-w { width: 100%; }
-
-    /* =====================
-       LIGHTBOX
-    ===================== */
+    /* ===================== LIGHTBOX ===================== */
     #lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.93);
-      z-index: 400;
-      justify-content: center;
-      align-items: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.93); z-index: 400;
+      justify-content: center; align-items: center;
     }
-
     #lightbox.open { display: flex; }
-
-    #lightbox img {
-      max-width: 92vw;
-      max-height: 92vh;
-      object-fit: contain;
-      border-radius: 4px;
-      border: 3px solid #ffffff33;
-    }
-
+    #lightbox img { max-width: 92vw; max-height: 92vh; object-fit: contain; border-radius: 4px; border: 3px solid #ffffff33; }
     #lightbox-close {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: #000;
-      border: 3px solid #fff;
-      font-size: 1.1rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      padding: 0;
+      position: absolute; top: 20px; right: 20px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--primary); color: #000; border: 3px solid #fff;
+      font-size: 1.1rem; font-weight: 900; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; padding: 0;
     }
 
-    /* =====================
-       TOAST
-    ===================== */
+    /* ===================== TOAST ===================== */
     #toast-root {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      align-items: center;
-      pointer-events: none;
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+      z-index: 999; display: flex; flex-direction: column; gap: 8px;
+      align-items: center; pointer-events: none;
     }
-
     .toast {
-      background: var(--primary);
-      color: #000;
-      font-family: "Sour Gummy", sans-serif;
-      font-size: 0.9rem;
-      font-weight: 900;
-      padding: 10px 26px;
-      border-radius: 8px;
-      border: 3px solid var(--border);
-      white-space: nowrap;
-      animation: toastIn 0.25s ease, toastFade 0.3s 2.4s ease forwards;
+      background: var(--primary); color: #000;
+      font-family: "Sour Gummy", sans-serif; font-size: 0.9rem; font-weight: 900;
+      padding: 10px 26px; border-radius: 8px; border: 3px solid var(--border);
+      white-space: nowrap; animation: toastIn 0.25s ease, toastFade 0.3s 2.4s ease forwards;
     }
+    @keyframes toastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toastFade { to { opacity:0; } }
 
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes toastFade {
-      to { opacity: 0; }
-    }
-
-    /* =====================
-       FOOTER
-    ===================== */
     .blog-footer {
-      text-align: center;
-      padding: 20px;
-      border-top: 3px solid var(--border);
-      font-size: 0.82rem;
-      opacity: 0.45;
-      margin-top: 20px;
-      font-family: monospace;
-      letter-spacing: 1px;
+      text-align: center; padding: 20px; border-top: 3px solid var(--border);
+      font-size: 0.82rem; opacity: 0.45; margin-top: 20px;
+      font-family: monospace; letter-spacing: 1px;
     }
 
-    /* =====================
-       RESPONSIVE
-    ===================== */
     @media (max-width: 600px) {
       .blog-header { padding: 12px 14px; }
       .site-wordmark { font-size: 1.3rem; }
       .blog-hero { padding: 36px 16px; }
       .post-body { padding: 18px 16px; }
       .modal-box { padding: 22px 18px; }
-      .post-gallery { grid-template-columns: repeat(2, 1fr); }
+      .post-gallery { grid-template-columns: repeat(2,1fr); }
     }
   </style>
 </head>
 <body>
 
-  <!-- =====================
-       HEADER
-  ===================== -->
+  <!-- HEADER -->
   <header class="blog-header">
     <a class="site-wordmark" href="#">TOBYK1DD<span>.</span></a>
     <div class="header-right">
       <span id="admin-chip" class="admin-chip" style="display:none">Admin</span>
-      <button id="admin-btn" onclick="openAdminModal()" title="Admin login">🔐</button>
+      <button id="admin-btn" onclick="handleAdminBtn()" title="Admin login">🔐</button>
       <button id="change-darkmode" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
       <button id="new-post-btn" onclick="openPostModal()" style="display:none">+ New Post</button>
     </div>
   </header>
 
-  <!-- =====================
-       HERO
-  ===================== -->
+  <!-- HERO -->
   <section class="blog-hero">
     <span class="hero-tag">Personal Blog</span>
     <h1 class="hero-heading">Thoughts, <em>Wins</em><br>&amp; Random Stuff</h1>
     <p class="hero-sub">Gaming. Coding. Streaming. Life. All of it.</p>
   </section>
 
-  <!-- =====================
-       FEED
-  ===================== -->
+  <!-- FEED -->
   <main>
     <div class="posts-wrapper">
       <div id="posts-count" class="posts-count"></div>
-      <div id="posts-feed"></div>
+      <div id="posts-feed"><div class="loading-state">Loading posts...</div></div>
     </div>
   </main>
 
-  <!-- =====================
-       FOOTER
-  ===================== -->
-  <footer class="blog-footer">
-    tobyk1dd.com &mdash; all rights reserved
-  </footer>
+  <footer class="blog-footer">tobyk1dd.com &mdash; all rights reserved</footer>
 
-  <!-- =====================
-       POST MODAL (New / Edit)
-  ===================== -->
+  <!-- POST MODAL (New / Edit) -->
   <div class="modal-overlay" id="post-modal">
     <div class="modal-box">
       <h2 class="modal-heading" id="post-modal-title">New Post</h2>
-
       <div class="form-row">
         <label for="f-title">Title</label>
         <input type="text" id="f-title" placeholder="What's on your mind?" />
       </div>
-
       <div class="form-row">
         <label for="f-tags">Tags <span style="opacity:0.45;font-weight:400;text-transform:none">(comma separated)</span></label>
         <input type="text" id="f-tags" placeholder="gaming, blog, coding..." />
       </div>
-
       <div class="form-row">
         <label for="f-content">Content</label>
         <textarea id="f-content" placeholder="Write whatever you want..."></textarea>
       </div>
-
       <div class="form-row">
         <label>Images</label>
         <div class="upload-zone">
@@ -661,89 +314,71 @@
         </div>
         <div class="img-preview-grid" id="img-preview-grid"></div>
       </div>
-
       <div class="modal-footer">
         <button class="btn-ghost" onclick="closePostModal()">Cancel</button>
-        <button onclick="savePost()">Publish ✓</button>
+        <button id="publish-btn" onclick="savePost()">Publish ✓</button>
       </div>
     </div>
   </div>
 
-  <!-- =====================
-       ADMIN LOGIN MODAL
-  ===================== -->
+  <!-- ADMIN LOGIN MODAL -->
   <div class="modal-overlay" id="admin-modal">
-    <div class="modal-box" style="max-width:360px;text-align:center">
-      <h2 class="modal-heading">Admin Access</h2>
-      <p class="admin-sub">Enter your password to unlock write mode.</p>
-      <div class="form-row">
-        <input type="password" id="admin-pass-input" placeholder="••••••••"
-               onkeydown="if(event.key==='Enter')checkPass()" />
+    <div class="modal-box" style="max-width:380px;text-align:center">
+      <h2 class="modal-heading">Admin Login</h2>
+      <p class="admin-sub">Sign in with your Supabase account to unlock write mode.</p>
+      <div class="form-row" style="text-align:left">
+        <label for="admin-email">Email</label>
+        <input type="email" id="admin-email" placeholder="you@example.com"
+               onkeydown="if(event.key==='Enter')document.getElementById('admin-pass').focus()" />
       </div>
-      <button class="full-w" onclick="checkPass()">Unlock</button>
-      <p class="admin-error" id="admin-error">Wrong password — try again.</p>
-      <button class="btn-ghost full-w" onclick="closeAdminModal()" style="margin-top:10px">Cancel</button>
+      <div class="form-row" style="text-align:left">
+        <label for="admin-pass">Password</label>
+        <input type="password" id="admin-pass" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter')signIn()" />
+      </div>
+      <button class="full-w" id="sign-in-btn" onclick="signIn()">Sign In</button>
+      <p class="admin-error" id="admin-error">Incorrect email or password.</p>
+      <button class="btn-ghost full-w" onclick="closeAdminModal()" style="margin-top:4px">Cancel</button>
     </div>
   </div>
 
-  <!-- =====================
-       LIGHTBOX
-  ===================== -->
+  <!-- LIGHTBOX -->
   <div id="lightbox">
     <button id="lightbox-close" onclick="closeLightbox()">✕</button>
     <img id="lightbox-img" src="" alt="Full size image" />
   </div>
 
-  <!-- TOAST ROOT -->
   <div id="toast-root"></div>
 
   <script>
-    /* =====================
-       CONSTANTS
-    ===================== */
-    const POSTS_KEY   = 'tobyk1dd_blog_posts';
-    const PASS_KEY    = 'tobyk1dd_blog_pass';
-    const SESSION_KEY = 'tobyk1dd_blog_admin';
-    const DEFAULT_PWD = 'tobyk1dd'; // <-- change this in console: setPassword('newpass')
+    /* ===================== SUPABASE CLIENT ===================== */
+    const SUPABASE_URL  = 'https://jfxyzehiaynabzsnncjp.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmeHl6ZWhpYXluYWJ6c25uY2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDczNjIsImV4cCI6MjA5NjIyMzM2Mn0.k9nqufXZO-wu0UuKBYu5VVZ8y4t4QhCpLUNoSvTfi7I';
+    const { createClient } = window.supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    /* =====================
-       STATE
-    ===================== */
-    let posts       = [];
+    /* ===================== STATE ===================== */
     let isAdmin     = false;
-    let editingId   = null;
-    let draftImages = [];  // base64 strings for current edit session
+    let editingId   = null;   // uuid of post being edited
+    let draftImages = [];     // { type:'url', url:string } | { type:'file', file:File, preview:string }
 
-    /* =====================
-       INIT
-    ===================== */
-    window.addEventListener('DOMContentLoaded', () => {
-      // Dark mode restore
+    /* ===================== INIT ===================== */
+    window.addEventListener('DOMContentLoaded', async () => {
+      // Dark mode
       if (localStorage.getItem('darkmode') === 'true') {
         document.body.classList.add('darkmode');
         document.getElementById('change-darkmode').textContent = '☀️';
       }
 
-      // Set up default password hash if first run
-      if (!localStorage.getItem(PASS_KEY)) {
-        localStorage.setItem(PASS_KEY, hash(DEFAULT_PWD));
-      }
+      // Auth state listener — auto-restores session on reload
+      db.auth.onAuthStateChange((event, session) => {
+        setAdmin(!!session);
+      });
 
-      // Load posts
-      const raw = localStorage.getItem(POSTS_KEY);
-      posts = raw ? JSON.parse(raw) : [];
-
-      // Restore admin session (tab-scoped)
-      if (sessionStorage.getItem(SESSION_KEY) === '1') {
-        setAdmin(true, false);
-      }
-
-      render();
+      await loadPosts();
     });
 
-    /* =====================
-       DARK MODE
-    ===================== */
+    /* ===================== DARK MODE ===================== */
     function toggleDark() {
       document.body.classList.toggle('darkmode');
       const on = document.body.classList.contains('darkmode');
@@ -751,128 +386,123 @@
       document.getElementById('change-darkmode').textContent = on ? '☀️' : '🌙';
     }
 
-    /* =====================
-       ADMIN AUTH
-    ===================== */
-    function openAdminModal() {
-      // If already admin, toggle off
+    /* ===================== ADMIN TOGGLE ===================== */
+    function handleAdminBtn() {
       if (isAdmin) {
-        setAdmin(false);
-        toast('Admin mode off');
-        return;
+        signOut();
+      } else {
+        openAdminModal();
       }
+    }
+
+    function setAdmin(on) {
+      isAdmin = on;
+      document.getElementById('new-post-btn').style.display = on ? 'inline-flex' : 'none';
+      document.getElementById('admin-chip').style.display   = on ? 'inline'      : 'none';
+      document.getElementById('admin-btn').textContent      = on ? '🔓'          : '🔐';
+      // Re-render to show/hide edit buttons
+      renderPosts(window._cachedPosts || []);
+    }
+
+    /* ===================== AUTH ===================== */
+    function openAdminModal() {
       document.getElementById('admin-modal').classList.add('open');
-      setTimeout(() => document.getElementById('admin-pass-input').focus(), 80);
+      setTimeout(() => document.getElementById('admin-email').focus(), 80);
     }
 
     function closeAdminModal() {
       document.getElementById('admin-modal').classList.remove('open');
-      document.getElementById('admin-pass-input').value = '';
+      document.getElementById('admin-email').value = '';
+      document.getElementById('admin-pass').value  = '';
       document.getElementById('admin-error').style.display = 'none';
     }
 
-    function checkPass() {
-      const val = document.getElementById('admin-pass-input').value;
-      if (hash(val) === localStorage.getItem(PASS_KEY)) {
-        setAdmin(true);
+    async function signIn() {
+      const email = document.getElementById('admin-email').value.trim();
+      const pass  = document.getElementById('admin-pass').value;
+      const btn   = document.getElementById('sign-in-btn');
+
+      if (!email || !pass) { toast('Enter email and password'); return; }
+
+      btn.textContent = 'Signing in...';
+      btn.disabled = true;
+
+      const { error } = await db.auth.signInWithPassword({ email, password: pass });
+
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+
+      if (error) {
+        document.getElementById('admin-error').style.display = 'block';
+        document.getElementById('admin-pass').value = '';
+      } else {
         closeAdminModal();
         toast('Admin mode unlocked ✓');
-      } else {
-        document.getElementById('admin-error').style.display = 'block';
-        document.getElementById('admin-pass-input').value = '';
-        document.getElementById('admin-pass-input').focus();
       }
     }
 
-    function setAdmin(on, persist = true) {
-      isAdmin = on;
-      if (persist) {
-        on ? sessionStorage.setItem(SESSION_KEY, '1')
-           : sessionStorage.removeItem(SESSION_KEY);
-      }
-      document.getElementById('new-post-btn').style.display  = on ? 'inline-flex' : 'none';
-      document.getElementById('admin-chip').style.display    = on ? 'inline'      : 'none';
-      document.getElementById('admin-btn').textContent       = on ? '🔓'          : '🔐';
-      render();
+    async function signOut() {
+      await db.auth.signOut();
+      toast('Signed out');
     }
 
-    // Expose helper for console use: setPassword('newpass')
-    window.setPassword = function(p) {
-      localStorage.setItem(PASS_KEY, hash(p));
-      console.log('Password updated.');
-    };
+    /* ===================== LOAD POSTS ===================== */
+    async function loadPosts() {
+      const { data, error } = await db
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    // Non-cryptographic hash (enough for local-only auth)
-    function hash(str) {
-      let h = 0;
-      for (let i = 0; i < str.length; i++) {
-        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
-      }
-      return String(h >>> 0);
-    }
-
-    /* =====================
-       STORAGE
-    ===================== */
-    function persist() {
-      localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
-    }
-
-    /* =====================
-       RENDER
-    ===================== */
-    function render() {
-      const feed  = document.getElementById('posts-feed');
-      const count = document.getElementById('posts-count');
-
-      if (posts.length === 0) {
-        count.textContent = '';
-        feed.innerHTML = `
-          <div class="no-posts">
-            <p>No posts yet.<br>
-            <span style="font-size:0.88rem">Log in as admin to write your first post.</span></p>
-          </div>`;
+      if (error) {
+        document.getElementById('posts-feed').innerHTML =
+          '<div class="no-posts"><p>Could not load posts.<br><span style="font-size:0.85rem;opacity:0.6">' + error.message + '</span></p></div>';
         return;
       }
 
-      const sorted = [...posts].sort((a, b) => b.id - a.id);
-      count.textContent = `${sorted.length} post${sorted.length !== 1 ? 's' : ''}`;
-      feed.innerHTML = sorted.map(postCard).join('');
+      window._cachedPosts = data || [];
+      renderPosts(window._cachedPosts);
+    }
+
+    /* ===================== RENDER ===================== */
+    function renderPosts(posts) {
+      const feed  = document.getElementById('posts-feed');
+      const count = document.getElementById('posts-count');
+
+      if (!posts || posts.length === 0) {
+        count.textContent = '';
+        feed.innerHTML = `<div class="no-posts"><p>No posts yet.<br>
+          <span style="font-size:0.88rem">Log in as admin to write your first post.</span></p></div>`;
+        return;
+      }
+
+      count.textContent = `${posts.length} post${posts.length !== 1 ? 's' : ''}`;
+      feed.innerHTML = posts.map(postCard).join('');
     }
 
     function postCard(p) {
-      const dateStr = new Date(p.id).toLocaleDateString('en-GB', {
+      const dateStr = new Date(p.created_at).toLocaleDateString('en-GB', {
         day: 'numeric', month: 'long', year: 'numeric'
       });
 
-      const tagsHtml = (p.tags || []).map(t =>
-        `<span class="tag">${esc(t)}</span>`
-      ).join('');
+      const tagsHtml = (p.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('');
 
       const heroHtml = p.images && p.images.length
-        ? `<img class="post-hero-img lb-trigger"
-               data-pid="${p.id}" data-idx="0"
-               src="${p.images[0]}"
-               alt="Post image" />`
+        ? `<img class="post-hero-img lb-trigger" data-pid="${esc(p.id)}" data-idx="0" src="${esc(p.images[0])}" alt="Post image" />`
         : '';
 
       const extraImgs = (p.images || []).slice(1).map((img, i) =>
-        `<img src="${img}" class="lb-trigger"
-              data-pid="${p.id}" data-idx="${i + 1}"
-              alt="Post image" />`
+        `<img src="${esc(img)}" class="lb-trigger" data-pid="${esc(p.id)}" data-idx="${i + 1}" alt="Post image" />`
       ).join('');
-      const galleryHtml = extraImgs
-        ? `<div class="post-gallery">${extraImgs}</div>`
-        : '';
+      const galleryHtml = extraImgs ? `<div class="post-gallery">${extraImgs}</div>` : '';
 
       const adminHtml = isAdmin ? `
         <div class="post-actions">
-          <button class="btn-ghost" onclick="openEditModal(${p.id})">✏️ Edit</button>
-          <button class="btn-danger" onclick="deletePost(${p.id})">🗑️ Delete</button>
+          <button class="btn-ghost" onclick="openEditModal('${esc(p.id)}')">✏️ Edit</button>
+          <button class="btn-danger" onclick="deletePost('${esc(p.id)}')">🗑️ Delete</button>
         </div>` : '';
 
       return `
-        <article class="post-card" id="post-${p.id}">
+        <article class="post-card" id="post-${esc(p.id)}">
           ${heroHtml}
           <div class="post-body">
             <div class="post-meta">
@@ -895,15 +525,13 @@
         .replace(/"/g, '&quot;');
     }
 
-    /* =====================
-       LIGHTBOX (event delegation)
-    ===================== */
+    /* ===================== LIGHTBOX (event delegation) ===================== */
     document.addEventListener('click', e => {
       const el = e.target.closest('.lb-trigger');
       if (!el) return;
-      const pid = Number(el.dataset.pid);
+      const pid = el.dataset.pid;
       const idx = Number(el.dataset.idx);
-      const post = posts.find(p => p.id === pid);
+      const post = (window._cachedPosts || []).find(p => p.id === pid);
       if (post && post.images[idx]) openLightbox(post.images[idx]);
     });
 
@@ -911,35 +539,30 @@
       document.getElementById('lightbox-img').src = src;
       document.getElementById('lightbox').classList.add('open');
     }
-
     function closeLightbox() {
       document.getElementById('lightbox').classList.remove('open');
       document.getElementById('lightbox-img').src = '';
     }
-
     document.getElementById('lightbox').addEventListener('click', function(e) {
       if (e.target === this) closeLightbox();
     });
 
-    /* =====================
-       POST MODAL
-    ===================== */
+    /* ===================== POST MODAL ===================== */
     function openPostModal(editId = null) {
       if (!isAdmin) return;
-
       editingId   = editId;
       draftImages = [];
       document.getElementById('img-preview-grid').innerHTML = '';
       document.getElementById('f-images').value = '';
 
-      if (editId !== null) {
-        const p = posts.find(x => x.id === editId);
+      if (editId) {
+        const p = (window._cachedPosts || []).find(x => x.id === editId);
         if (!p) return;
         document.getElementById('post-modal-title').textContent = 'Edit Post';
         document.getElementById('f-title').value   = p.title;
         document.getElementById('f-tags').value    = (p.tags || []).join(', ');
         document.getElementById('f-content').value = p.content;
-        draftImages = [...(p.images || [])];
+        draftImages = (p.images || []).map(url => ({ type: 'url', url }));
         renderPreviews();
       } else {
         document.getElementById('post-modal-title').textContent = 'New Post';
@@ -955,92 +578,119 @@
     function openEditModal(id) { openPostModal(id); }
 
     function closePostModal() {
+      // Revoke any object URLs we created
+      draftImages.forEach(img => {
+        if (img.type === 'file' && img.preview) URL.revokeObjectURL(img.preview);
+      });
       document.getElementById('post-modal').classList.remove('open');
       editingId   = null;
       draftImages = [];
     }
 
-    /* =====================
-       IMAGE HANDLING
-    ===================== */
+    /* ===================== IMAGE HANDLING ===================== */
     function handleImageUpload(files) {
       Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image\/')) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-          draftImages.push(e.target.result);
-          renderPreviews();
-        };
-        reader.readAsDataURL(file);
+        if (!file.type.startsWith('image/')) return;
+        const preview = URL.createObjectURL(file);
+        draftImages.push({ type: 'file', file, preview });
+        renderPreviews();
       });
       document.getElementById('f-images').value = '';
     }
 
     function renderPreviews() {
-      document.getElementById('img-preview-grid').innerHTML = draftImages.map((src, i) => `
-        <div class="preview-thumb">
+      document.getElementById('img-preview-grid').innerHTML = draftImages.map((img, i) => {
+        const src = img.type === 'url' ? img.url : img.preview;
+        return `<div class="preview-thumb">
           <img src="${src}" alt="Preview" />
           <button class="thumb-remove" onclick="removeImg(${i})">✕</button>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
 
     function removeImg(i) {
+      const img = draftImages[i];
+      if (img.type === 'file' && img.preview) URL.revokeObjectURL(img.preview);
       draftImages.splice(i, 1);
       renderPreviews();
     }
 
-    /* =====================
-       SAVE / DELETE POST
-    ===================== */
-    function savePost() {
+    /* Upload any pending files, return final URL array */
+    async function resolveImages() {
+      const urls = [];
+      for (const img of draftImages) {
+        if (img.type === 'url') {
+          urls.push(img.url);
+        } else {
+          const ext  = img.file.name.split('.').pop().toLowerCase();
+          const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+          const { error } = await db.storage.from('blog-images').upload(path, img.file);
+          if (error) throw new Error('Image upload failed: ' + error.message);
+          const { data: { publicUrl } } = db.storage.from('blog-images').getPublicUrl(path);
+          urls.push(publicUrl);
+        }
+      }
+      return urls;
+    }
+
+    /* ===================== SAVE / DELETE POST ===================== */
+    async function savePost() {
       const title   = document.getElementById('f-title').value.trim();
       const content = document.getElementById('f-content').value.trim();
       const tagsRaw = document.getElementById('f-tags').value.trim();
       const tags    = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
 
-      if (!title)   { toast('Add a title first!');   return; }
-      if (!content) { toast('Post needs some content!'); return; }
+      if (!title)   { toast('Add a title first!');         return; }
+      if (!content) { toast('Post needs some content!');   return; }
 
-      if (editingId !== null) {
-        const idx = posts.findIndex(p => p.id === editingId);
-        if (idx > -1) {
-          posts[idx] = { ...posts[idx], title, content, tags, images: draftImages };
-          persist();
-          render();
+      const btn = document.getElementById('publish-btn');
+      btn.textContent = 'Publishing...';
+      btn.disabled    = true;
+
+      try {
+        const images = await resolveImages();
+
+        if (editingId) {
+          const { error } = await db.from('posts')
+            .update({ title, content, tags, images })
+            .eq('id', editingId);
+          if (error) throw error;
           toast('Post updated ✓');
+        } else {
+          const { error } = await db.from('posts')
+            .insert([{ title, content, tags, images }]);
+          if (error) throw error;
+          toast('Post published ✓');
         }
-      } else {
-        posts.unshift({ id: Date.now(), title, content, tags, images: draftImages });
-        persist();
-        render();
-        toast('Post published ✓');
+
+        closePostModal();
+        await loadPosts();
+      } catch (err) {
+        toast('Error: ' + err.message);
+      } finally {
+        btn.textContent = 'Publish ✓';
+        btn.disabled    = false;
       }
-
-      closePostModal();
     }
 
-    function deletePost(id) {
+    async function deletePost(id) {
       if (!confirm('Delete this post permanently?')) return;
-      posts = posts.filter(p => p.id !== id);
-      persist();
-      render();
+      const { error } = await db.from('posts').delete().eq('id', id);
+      if (error) { toast('Delete failed: ' + error.message); return; }
       toast('Post deleted');
+      await loadPosts();
     }
 
-    /* =====================
-       TOAST
-    ===================== */
+    /* ===================== TOAST ===================== */
     function toast(msg) {
       const el = document.createElement('div');
-      el.className = 'toast';
+      el.className  = 'toast';
       el.textContent = msg;
       document.getElementById('toast-root').appendChild(el);
       setTimeout(() => el.remove(), 2800);
     }
 
-    /* =====================
-       KEYBOARD
-    ===================== */
+    /* ===================== KEYBOARD ===================== */
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
       closeLightbox();
