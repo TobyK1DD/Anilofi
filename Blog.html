@@ -1,229 +1,1052 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TobyK1DD — Blog</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="Main.css" />
   <style>
-    :root {
-      --red: #f64e4e;
-      --bg: #0a0a0a;
-      --surface: #111;
-      --card: #171717;
-      --border: #242424;
-      --text: #e6e6e6;
-      --muted: #666;
-      --head: 'Sour Gummy', cursive;
-      --mono: 'Space Mono', monospace;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
-    a { color: inherit; text-decoration: none; }
-
-    /* HEADER */
-    .site-header {
-      background: var(--surface);
-      border-bottom: 3px solid var(--red);
-      padding: 0 clamp(1rem, 4vw, 2.5rem);
-      position: sticky; top: 0; z-index: 10;
-    }
-    .header-inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 66px;
-    }
-    .logo { font-family: var(--head); font-size: 1.75rem; font-weight: 900; color: var(--red); }
-    .logo em { color: var(--text); font-style: normal; }
-    .nav { display: flex; }
-    .nav a {
-      font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
-      padding: 0.5rem 1.2rem; color: var(--muted);
-      border-left: 1px solid var(--border); transition: color 0.15s;
-    }
-    .nav a:hover { color: var(--red); }
-
-    /* LAYOUT */
-    .wrap {
-      max-width: 1200px; margin: 0 auto;
-      padding: 2.5rem clamp(1rem, 4vw, 2.5rem);
-      display: grid; grid-template-columns: 1fr 264px; gap: 2.5rem; align-items: start;
+    /* =====================
+       BLOG OVERRIDES & EXTRAS
+    ===================== */
+    body {
+      min-height: 100vh;
+      height: auto;
+      padding: 0;
+      padding-bottom: 80px;
     }
 
-    /* POST GRID */
-    .grid {
+    /* =====================
+       STICKY HEADER
+    ===================== */
+    .blog-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 3px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+    }
+
+    .site-wordmark {
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--primary);
+      text-decoration: none;
+      line-height: 1;
+    }
+
+    .site-wordmark span {
+      color: var(--text);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-chip {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #000;
+      border: 2px solid var(--border);
+    }
+
+    /* override fixed positioning from Main.css on darkmode button */
+    #change-darkmode {
+      position: static;
+      width: 42px;
+      height: 42px;
+    }
+
+    #new-post-btn {
+      font-size: 15px;
+      padding: 8px 18px;
+    }
+
+    #admin-btn {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      font-size: 1.1rem;
+      border-radius: 50%;
+    }
+
+    /* =====================
+       HERO BANNER
+    ===================== */
+    .blog-hero {
+      background: var(--bg-soft);
+      border-bottom: 3px solid var(--border);
+      padding: 48px 24px 44px;
+      text-align: center;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: var(--primary);
+      color: #000;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 10px;
+      margin-bottom: 16px;
+    }
+
+    .hero-heading {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.05;
+      margin-bottom: 10px;
+      font-family: "Sour Gummy", sans-serif;
+    }
+
+    .hero-heading em {
+      color: var(--primary);
+      font-style: normal;
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      opacity: 0.6;
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* =====================
+       POSTS FEED
+    ===================== */
+    .posts-wrapper {
+      max-width: 860px;
+      margin: 48px auto;
+      padding: 0 20px;
+    }
+
+    .posts-count {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.5;
+      margin-bottom: 28px;
+    }
+
+    .no-posts {
+      text-align: center;
+      padding: 80px 20px;
+      border: 3px dashed var(--border);
+      border-radius: 8px;
+      background: var(--bg-soft);
+    }
+
+    .no-posts p { opacity: 0.55; font-size: 1rem; line-height: 1.7; }
+
+    /* =====================
+       POST CARD
+    ===================== */
+    .post-card {
+      background: var(--bg-soft);
+      border: 3px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 32px;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .post-hero-img {
+      width: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+      border-bottom: 3px solid var(--border);
+      transition: opacity 0.15s;
+    }
+
+    .post-hero-img:hover { opacity: 0.9; }
+
+    .post-body {
+      padding: 26px 28px 22px;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .post-date {
+      font-family: monospace;
+      font-size: 12px;
+      opacity: 0.55;
+      letter-spacing: 0.5px;
+    }
+
+    .post-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #000;
+      border: 2px solid var(--border);
+    }
+
+    .post-title {
+      font-size: clamp(1.3rem, 3vw, 1.75rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 16px;
+      font-family: "Sour Gummy", sans-serif;
+    }
+
+    .post-content {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* =====================
+       POST IMAGE GALLERY
+    ===================== */
+    .post-gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 20px;
     }
 
-    /* CARD */
-    .card {
-      display: flex; flex-direction: column;
-      background: var(--card); border: 2px solid var(--border);
-      cursor: pointer; transition: border-color 0.2s, transform 0.2s;
-    }
-    .card:hover { border-color: var(--red); transform: translateY(-3px); }
-    .card-img { width: 100%; height: 172px; object-fit: cover; display: block; }
-    .card-img-placeholder {
-      width: 100%; height: 172px;
-      background: var(--surface);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.5rem; color: var(--border);
-    }
-    .card-bar {
-      background: var(--red); padding: 5px 12px;
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase;
-      color: #fff; font-weight: 700;
-    }
-    .card-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem; flex: 1; }
-    .card-title { font-family: var(--head); font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
-    .card-excerpt { font-size: 0.77rem; color: var(--muted); line-height: 1.7; flex: 1; }
-    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
-    .tag { font-size: 0.58rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 8px; border: 1px solid var(--border); color: var(--muted); }
-
-    /* SIDEBAR */
-    .sidebar { display: flex; flex-direction: column; gap: 1.25rem; }
-    .sbox { background: var(--card); border: 2px solid var(--border); }
-    .sbox-bar { background: var(--red); padding: 5px 12px; font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; font-weight: 700; }
-    .sbox-body { padding: 1rem; }
-    .sbox-text { font-size: 0.77rem; color: var(--muted); line-height: 1.75; }
-    .sbox-link { display: block; font-size: 0.7rem; color: var(--muted); padding: 0.4rem 0; border-bottom: 1px solid var(--border); transition: color 0.15s, padding-left 0.15s; }
-    .sbox-link:last-child { border-bottom: none; }
-    .sbox-link:hover { color: var(--red); padding-left: 4px; }
-    .curr { display: flex; gap: 8px; font-size: 0.7rem; color: var(--muted); padding: 0.3rem 0; border-bottom: 1px solid var(--border); align-items: baseline; }
-    .curr:last-child { border-bottom: none; }
-    .curr strong { color: var(--text); font-weight: 400; }
-
-    /* STATES */
-    .state-msg {
-      grid-column: 1 / -1; text-align: center;
-      color: var(--muted); font-size: 0.78rem; padding: 4rem 2rem;
-      border: 2px dashed var(--border);
+    .post-gallery img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: block;
+      transition: opacity 0.15s;
     }
 
-    /* FOOTER */
-    footer {
-      border-top: 2px solid var(--border); padding: 1.5rem 2rem;
-      text-align: center; font-size: 0.62rem;
-      letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    .post-gallery img:hover { opacity: 0.85; }
+
+    .post-gallery img:only-child {
+      grid-column: 1 / -1;
+      aspect-ratio: 16 / 9;
     }
-    footer span { color: var(--red); }
 
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .card { animation: fadeUp 0.3s ease both; }
+    /* =====================
+       ADMIN ACTIONS ON CARD
+    ===================== */
+    .post-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 2px solid var(--accent);
+    }
 
-    @media (max-width: 780px) {
-      .wrap { grid-template-columns: 1fr; }
-      .sidebar { order: -1; }
+    .post-actions button { font-size: 14px; padding: 7px 16px; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--primary);
+      border: 3px solid var(--primary);
+    }
+
+    .btn-danger:hover {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 3px solid var(--border);
+    }
+
+    .btn-ghost:hover { background: var(--accent); }
+
+    /* =====================
+       MODAL BASE
+    ===================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 200;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 16px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--bg-soft);
+      border: 3px solid var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      width: 100%;
+      max-width: 680px;
+      margin: auto;
+    }
+
+    .modal-heading {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 26px;
+      font-family: "Sour Gummy", sans-serif;
+    }
+
+    /* =====================
+       FORM CONTROLS
+    ===================== */
+    .form-row { margin-bottom: 20px; }
+
+    .form-row label {
+      display: block;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.65;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .form-row input[type="text"],
+    .form-row input[type="password"],
+    .form-row textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 3px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+
+    .form-row textarea { min-height: 220px; }
+
+    .form-row input:focus,
+    .form-row textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* =====================
+       IMAGE UPLOAD ZONE
+    ===================== */
+    .upload-zone {
+      border: 3px dashed var(--border);
+      border-radius: 8px;
+      padding: 28px 20px;
+      text-align: center;
+      background: var(--bg);
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .upload-zone:hover { border-color: var(--primary); }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .upload-icon { font-size: 2rem; display: block; margin-bottom: 6px; pointer-events: none; }
+    .upload-label { font-size: 0.9rem; opacity: 0.65; pointer-events: none; }
+
+    /* Preview grid */
+    .img-preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .preview-thumb {
+      position: relative;
+      width: 78px;
+      height: 78px;
+    }
+
+    .preview-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      display: block;
+    }
+
+    .thumb-remove {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #000;
+      border: 2px solid var(--border);
+      font-size: 11px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* =====================
+       MODAL FOOTER BUTTONS
+    ===================== */
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    /* =====================
+       ADMIN LOGIN MODAL
+    ===================== */
+    #admin-modal .modal-box {
+      max-width: 360px;
+      text-align: center;
+    }
+
+    #admin-modal .modal-heading { margin-bottom: 8px; }
+
+    .admin-sub { font-size: 0.9rem; opacity: 0.6; margin-bottom: 20px; }
+
+    #admin-pass-input {
+      text-align: center;
+      letter-spacing: 4px;
+      font-size: 1.2rem;
+    }
+
+    .admin-error {
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .full-w { width: 100%; }
+
+    /* =====================
+       LIGHTBOX
+    ===================== */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.93);
+      z-index: 400;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #lightbox.open { display: flex; }
+
+    #lightbox img {
+      max-width: 92vw;
+      max-height: 92vh;
+      object-fit: contain;
+      border-radius: 4px;
+      border: 3px solid #ffffff33;
+    }
+
+    #lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #000;
+      border: 3px solid #fff;
+      font-size: 1.1rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* =====================
+       TOAST
+    ===================== */
+    #toast-root {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--primary);
+      color: #000;
+      font-family: "Sour Gummy", sans-serif;
+      font-size: 0.9rem;
+      font-weight: 900;
+      padding: 10px 26px;
+      border-radius: 8px;
+      border: 3px solid var(--border);
+      white-space: nowrap;
+      animation: toastIn 0.25s ease, toastFade 0.3s 2.4s ease forwards;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastFade {
+      to { opacity: 0; }
+    }
+
+    /* =====================
+       FOOTER
+    ===================== */
+    .blog-footer {
+      text-align: center;
+      padding: 20px;
+      border-top: 3px solid var(--border);
+      font-size: 0.82rem;
+      opacity: 0.45;
+      margin-top: 20px;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
+    /* =====================
+       RESPONSIVE
+    ===================== */
+    @media (max-width: 600px) {
+      .blog-header { padding: 12px 14px; }
+      .site-wordmark { font-size: 1.3rem; }
+      .blog-hero { padding: 36px 16px; }
+      .post-body { padding: 18px 16px; }
+      .modal-box { padding: 22px 18px; }
+      .post-gallery { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="Blog.html" class="logo">TobyK1DD<em>.blog</em></a>
-    <nav class="nav">
-      <a href="Blog.html">Posts</a>
-      <a href="BlogAdmin.html">Admin ↗</a>
-    </nav>
-  </div>
-</header>
+  <!-- =====================
+       HEADER
+  ===================== -->
+  <header class="blog-header">
+    <a class="site-wordmark" href="#">TOBYK1DD<span>.</span></a>
+    <div class="header-right">
+      <span id="admin-chip" class="admin-chip" style="display:none">Admin</span>
+      <button id="admin-btn" onclick="openAdminModal()" title="Admin login">🔐</button>
+      <button id="change-darkmode" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
+      <button id="new-post-btn" onclick="openPostModal()" style="display:none">+ New Post</button>
+    </div>
+  </header>
 
-<div class="wrap">
+  <!-- =====================
+       HERO
+  ===================== -->
+  <section class="blog-hero">
+    <span class="hero-tag">Personal Blog</span>
+    <h1 class="hero-heading">Thoughts, <em>Wins</em><br>&amp; Random Stuff</h1>
+    <p class="hero-sub">Gaming. Coding. Streaming. Life. All of it.</p>
+  </section>
+
+  <!-- =====================
+       FEED
+  ===================== -->
   <main>
-    <div id="grid" class="grid">
-      <div class="state-msg">Loading posts...</div>
+    <div class="posts-wrapper">
+      <div id="posts-count" class="posts-count"></div>
+      <div id="posts-feed"></div>
     </div>
   </main>
 
-  <aside class="sidebar">
-    <div class="sbox">
-      <div class="sbox-bar">About</div>
-      <div class="sbox-body">
-        <p class="sbox-text">Nuneaton-based Twitch streamer, web dev, anime fan & football tactics nerd. Welcome to my corner of the internet. 🎮</p>
+  <!-- =====================
+       FOOTER
+  ===================== -->
+  <footer class="blog-footer">
+    tobyk1dd.com &mdash; all rights reserved
+  </footer>
+
+  <!-- =====================
+       POST MODAL (New / Edit)
+  ===================== -->
+  <div class="modal-overlay" id="post-modal">
+    <div class="modal-box">
+      <h2 class="modal-heading" id="post-modal-title">New Post</h2>
+
+      <div class="form-row">
+        <label for="f-title">Title</label>
+        <input type="text" id="f-title" placeholder="What's on your mind?" />
+      </div>
+
+      <div class="form-row">
+        <label for="f-tags">Tags <span style="opacity:0.45;font-weight:400;text-transform:none">(comma separated)</span></label>
+        <input type="text" id="f-tags" placeholder="gaming, blog, coding..." />
+      </div>
+
+      <div class="form-row">
+        <label for="f-content">Content</label>
+        <textarea id="f-content" placeholder="Write whatever you want..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <label>Images</label>
+        <div class="upload-zone">
+          <span class="upload-icon">📷</span>
+          <p class="upload-label">Click or drag images here</p>
+          <input type="file" id="f-images" accept="image/*" multiple onchange="handleImageUpload(this.files)" />
+        </div>
+        <div class="img-preview-grid" id="img-preview-grid"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-ghost" onclick="closePostModal()">Cancel</button>
+        <button onclick="savePost()">Publish ✓</button>
       </div>
     </div>
+  </div>
 
-    <div class="sbox">
-      <div class="sbox-bar">Currently</div>
-      <div class="sbox-body">
-        <div class="curr">⚾ <strong>Playing</strong> MLB The Show 26</div>
-        <div class="curr">🍃 <strong>Watching</strong> Naruto Shippuden</div>
-        <div class="curr">🎵 <strong>Listening</strong> Lo-fi beats</div>
-        <div class="curr">🟣 <strong>Streaming</strong> twitch.tv/tobyk1dd</div>
+  <!-- =====================
+       ADMIN LOGIN MODAL
+  ===================== -->
+  <div class="modal-overlay" id="admin-modal">
+    <div class="modal-box" style="max-width:360px;text-align:center">
+      <h2 class="modal-heading">Admin Access</h2>
+      <p class="admin-sub">Enter your password to unlock write mode.</p>
+      <div class="form-row">
+        <input type="password" id="admin-pass-input" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter')checkPass()" />
       </div>
+      <button class="full-w" onclick="checkPass()">Unlock</button>
+      <p class="admin-error" id="admin-error">Wrong password — try again.</p>
+      <button class="btn-ghost full-w" onclick="closeAdminModal()" style="margin-top:10px">Cancel</button>
     </div>
+  </div>
 
-    <div class="sbox">
-      <div class="sbox-bar">Find Me</div>
-      <div class="sbox-body">
-        <a class="sbox-link" href="https://twitch.tv/tobyk1dd" target="_blank">🟣 Twitch — tobyk1dd</a>
-        <a class="sbox-link" href="https://tobyk1dd.github.io/TobyK1DD/" target="_blank">💻 Portfolio</a>
-      </div>
-    </div>
-  </aside>
-</div>
+  <!-- =====================
+       LIGHTBOX
+  ===================== -->
+  <div id="lightbox">
+    <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="Full size image" />
+  </div>
 
-<footer>© 2026 <span>TobyK1DD</span>.blog — est. 2026</footer>
+  <!-- TOAST ROOT -->
+  <div id="toast-root"></div>
 
-<script>
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script>
+    /* =====================
+       CONSTANTS
+    ===================== */
+    const POSTS_KEY   = 'tobyk1dd_blog_posts';
+    const PASS_KEY    = 'tobyk1dd_blog_pass';
+    const SESSION_KEY = 'tobyk1dd_blog_admin';
+    const DEFAULT_PWD = 'tobyk1dd'; // <-- change this in console: setPassword('newpass')
 
-function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+    /* =====================
+       STATE
+    ===================== */
+    let posts       = [];
+    let isAdmin     = false;
+    let editingId   = null;
+    let draftImages = [];  // base64 strings for current edit session
 
-function fmtDate(d) {
-  return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-}
+    /* =====================
+       INIT
+    ===================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Dark mode restore
+      if (localStorage.getItem('darkmode') === 'true') {
+        document.body.classList.add('darkmode');
+        document.getElementById('change-darkmode').textContent = '☀️';
+      }
 
-function renderGrid(posts) {
-  const grid = document.getElementById('grid');
-  if (!posts.length) {
-    grid.innerHTML = '<div class="state-msg">No posts yet. Something good is coming.</div>';
-    return;
-  }
-  grid.innerHTML = posts.map((p, i) => `
-    <a class="card" href="BlogPost.html?slug=${encodeURIComponent(p.slug)}" style="animation-delay:${i * 0.06}s">
-      ${p.cover_image
-        ? `<img class="card-img" src="${esc(p.cover_image)}" alt="${esc(p.title)}" loading="lazy">`
-        : '<div class="card-img-placeholder">✍️<\/div>'}
-      <div class="card-bar">
-        <span>${fmtDate(p.created_at)}<\/span>
-        <span>READ →<\/span>
-      <\/div>
-      <div class="card-body">
-        <div class="card-title">${esc(p.title)}<\/div>
-        ${p.excerpt ? `<div class="card-excerpt">${esc(p.excerpt)}<\/div>` : ''}
-        ${p.tags && p.tags.length
-          ? `<div class="card-tags">${p.tags.map(t => `<span class="tag">${esc(t)}<\/span>`).join('')}<\/div>`
-          : ''}
-      <\/div>
-    <\/a>
-  `).join('');
-}
+      // Set up default password hash if first run
+      if (!localStorage.getItem(PASS_KEY)) {
+        localStorage.setItem(PASS_KEY, hash(DEFAULT_PWD));
+      }
 
-async function init() {
-  const { data, error } = await sb
-    .from('posts')
-    .select('id, title, slug, excerpt, cover_image, tags, created_at')
-    .eq('published', true)
-    .order('created_at', { ascending: false });
+      // Load posts
+      const raw = localStorage.getItem(POSTS_KEY);
+      posts = raw ? JSON.parse(raw) : [];
 
-  if (error) {
-    document.getElementById('grid').innerHTML = '<div class="state-msg">Could not load posts. Check Supabase config.</div>';
-    return;
-  }
-  renderGrid(data || []);
-}
+      // Restore admin session (tab-scoped)
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        setAdmin(true, false);
+      }
 
-init();
-</script>
+      render();
+    });
+
+    /* =====================
+       DARK MODE
+    ===================== */
+    function toggleDark() {
+      document.body.classList.toggle('darkmode');
+      const on = document.body.classList.contains('darkmode');
+      localStorage.setItem('darkmode', on);
+      document.getElementById('change-darkmode').textContent = on ? '☀️' : '🌙';
+    }
+
+    /* =====================
+       ADMIN AUTH
+    ===================== */
+    function openAdminModal() {
+      // If already admin, toggle off
+      if (isAdmin) {
+        setAdmin(false);
+        toast('Admin mode off');
+        return;
+      }
+      document.getElementById('admin-modal').classList.add('open');
+      setTimeout(() => document.getElementById('admin-pass-input').focus(), 80);
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.remove('open');
+      document.getElementById('admin-pass-input').value = '';
+      document.getElementById('admin-error').style.display = 'none';
+    }
+
+    function checkPass() {
+      const val = document.getElementById('admin-pass-input').value;
+      if (hash(val) === localStorage.getItem(PASS_KEY)) {
+        setAdmin(true);
+        closeAdminModal();
+        toast('Admin mode unlocked ✓');
+      } else {
+        document.getElementById('admin-error').style.display = 'block';
+        document.getElementById('admin-pass-input').value = '';
+        document.getElementById('admin-pass-input').focus();
+      }
+    }
+
+    function setAdmin(on, persist = true) {
+      isAdmin = on;
+      if (persist) {
+        on ? sessionStorage.setItem(SESSION_KEY, '1')
+           : sessionStorage.removeItem(SESSION_KEY);
+      }
+      document.getElementById('new-post-btn').style.display  = on ? 'inline-flex' : 'none';
+      document.getElementById('admin-chip').style.display    = on ? 'inline'      : 'none';
+      document.getElementById('admin-btn').textContent       = on ? '🔓'          : '🔐';
+      render();
+    }
+
+    // Expose helper for console use: setPassword('newpass')
+    window.setPassword = function(p) {
+      localStorage.setItem(PASS_KEY, hash(p));
+      console.log('Password updated.');
+    };
+
+    // Non-cryptographic hash (enough for local-only auth)
+    function hash(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+      }
+      return String(h >>> 0);
+    }
+
+    /* =====================
+       STORAGE
+    ===================== */
+    function persist() {
+      localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+    }
+
+    /* =====================
+       RENDER
+    ===================== */
+    function render() {
+      const feed  = document.getElementById('posts-feed');
+      const count = document.getElementById('posts-count');
+
+      if (posts.length === 0) {
+        count.textContent = '';
+        feed.innerHTML = `
+          <div class="no-posts">
+            <p>No posts yet.<br>
+            <span style="font-size:0.88rem">Log in as admin to write your first post.</span></p>
+          </div>`;
+        return;
+      }
+
+      const sorted = [...posts].sort((a, b) => b.id - a.id);
+      count.textContent = `${sorted.length} post${sorted.length !== 1 ? 's' : ''}`;
+      feed.innerHTML = sorted.map(postCard).join('');
+    }
+
+    function postCard(p) {
+      const dateStr = new Date(p.id).toLocaleDateString('en-GB', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+
+      const tagsHtml = (p.tags || []).map(t =>
+        `<span class="tag">${esc(t)}</span>`
+      ).join('');
+
+      const heroHtml = p.images && p.images.length
+        ? `<img class="post-hero-img lb-trigger"
+               data-pid="${p.id}" data-idx="0"
+               src="${p.images[0]}"
+               alt="Post image" />`
+        : '';
+
+      const extraImgs = (p.images || []).slice(1).map((img, i) =>
+        `<img src="${img}" class="lb-trigger"
+              data-pid="${p.id}" data-idx="${i + 1}"
+              alt="Post image" />`
+      ).join('');
+      const galleryHtml = extraImgs
+        ? `<div class="post-gallery">${extraImgs}</div>`
+        : '';
+
+      const adminHtml = isAdmin ? `
+        <div class="post-actions">
+          <button class="btn-ghost" onclick="openEditModal(${p.id})">✏️ Edit</button>
+          <button class="btn-danger" onclick="deletePost(${p.id})">🗑️ Delete</button>
+        </div>` : '';
+
+      return `
+        <article class="post-card" id="post-${p.id}">
+          ${heroHtml}
+          <div class="post-body">
+            <div class="post-meta">
+              <span class="post-date">${dateStr}</span>
+              <div class="post-tags">${tagsHtml}</div>
+            </div>
+            <h2 class="post-title">${esc(p.title)}</h2>
+            <div class="post-content">${esc(p.content)}</div>
+            ${galleryHtml}
+            ${adminHtml}
+          </div>
+        </article>`;
+    }
+
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* =====================
+       LIGHTBOX (event delegation)
+    ===================== */
+    document.addEventListener('click', e => {
+      const el = e.target.closest('.lb-trigger');
+      if (!el) return;
+      const pid = Number(el.dataset.pid);
+      const idx = Number(el.dataset.idx);
+      const post = posts.find(p => p.id === pid);
+      if (post && post.images[idx]) openLightbox(post.images[idx]);
+    });
+
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.getElementById('lightbox-img').src = '';
+    }
+
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+
+    /* =====================
+       POST MODAL
+    ===================== */
+    function openPostModal(editId = null) {
+      if (!isAdmin) return;
+
+      editingId   = editId;
+      draftImages = [];
+      document.getElementById('img-preview-grid').innerHTML = '';
+      document.getElementById('f-images').value = '';
+
+      if (editId !== null) {
+        const p = posts.find(x => x.id === editId);
+        if (!p) return;
+        document.getElementById('post-modal-title').textContent = 'Edit Post';
+        document.getElementById('f-title').value   = p.title;
+        document.getElementById('f-tags').value    = (p.tags || []).join(', ');
+        document.getElementById('f-content').value = p.content;
+        draftImages = [...(p.images || [])];
+        renderPreviews();
+      } else {
+        document.getElementById('post-modal-title').textContent = 'New Post';
+        document.getElementById('f-title').value   = '';
+        document.getElementById('f-tags').value    = '';
+        document.getElementById('f-content').value = '';
+      }
+
+      document.getElementById('post-modal').classList.add('open');
+      setTimeout(() => document.getElementById('f-title').focus(), 80);
+    }
+
+    function openEditModal(id) { openPostModal(id); }
+
+    function closePostModal() {
+      document.getElementById('post-modal').classList.remove('open');
+      editingId   = null;
+      draftImages = [];
+    }
+
+    /* =====================
+       IMAGE HANDLING
+    ===================== */
+    function handleImageUpload(files) {
+      Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image\/')) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          draftImages.push(e.target.result);
+          renderPreviews();
+        };
+        reader.readAsDataURL(file);
+      });
+      document.getElementById('f-images').value = '';
+    }
+
+    function renderPreviews() {
+      document.getElementById('img-preview-grid').innerHTML = draftImages.map((src, i) => `
+        <div class="preview-thumb">
+          <img src="${src}" alt="Preview" />
+          <button class="thumb-remove" onclick="removeImg(${i})">✕</button>
+        </div>`).join('');
+    }
+
+    function removeImg(i) {
+      draftImages.splice(i, 1);
+      renderPreviews();
+    }
+
+    /* =====================
+       SAVE / DELETE POST
+    ===================== */
+    function savePost() {
+      const title   = document.getElementById('f-title').value.trim();
+      const content = document.getElementById('f-content').value.trim();
+      const tagsRaw = document.getElementById('f-tags').value.trim();
+      const tags    = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      if (!title)   { toast('Add a title first!');   return; }
+      if (!content) { toast('Post needs some content!'); return; }
+
+      if (editingId !== null) {
+        const idx = posts.findIndex(p => p.id === editingId);
+        if (idx > -1) {
+          posts[idx] = { ...posts[idx], title, content, tags, images: draftImages };
+          persist();
+          render();
+          toast('Post updated ✓');
+        }
+      } else {
+        posts.unshift({ id: Date.now(), title, content, tags, images: draftImages });
+        persist();
+        render();
+        toast('Post published ✓');
+      }
+
+      closePostModal();
+    }
+
+    function deletePost(id) {
+      if (!confirm('Delete this post permanently?')) return;
+      posts = posts.filter(p => p.id !== id);
+      persist();
+      render();
+      toast('Post deleted');
+    }
+
+    /* =====================
+       TOAST
+    ===================== */
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.getElementById('toast-root').appendChild(el);
+      setTimeout(() => el.remove(), 2800);
+    }
+
+    /* =====================
+       KEYBOARD
+    ===================== */
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      closeLightbox();
+      closeAdminModal();
+      closePostModal();
+    });
+  </script>
 </body>
 </html>
