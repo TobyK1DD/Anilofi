@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading… — TobyK1DD.blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --red: #f64e4e;
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #242424;
+      --text: #e6e6e6;
+      --muted: #666;
+      --head: 'Sour Gummy', cursive;
+      --mono: 'Space Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    /* HEADER */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 3px solid var(--red);
+      padding: 0 clamp(1rem, 4vw, 2.5rem);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 66px;
+    }
+    .logo { font-family: var(--head); font-size: 1.75rem; font-weight: 900; color: var(--red); }
+    .logo em { color: var(--text); font-style: normal; }
+    .back-link { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); transition: color 0.15s; }
+    .back-link:hover { color: var(--red); }
+
+    /* HERO */
+    .hero { width: 100%; max-height: 440px; object-fit: cover; display: block; }
+    .hero-empty { width: 100%; height: 8px; background: var(--red); }
+
+    /* POST */
+    .post-wrap { max-width: 800px; margin: 0 auto; padding: 2.5rem clamp(1rem, 4vw, 2rem); }
+
+    .post-bar {
+      background: var(--red); padding: 6px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; font-weight: 700; margin-bottom: 1.75rem;
+    }
+
+    .post-title {
+      font-family: var(--head);
+      font-size: clamp(1.9rem, 5vw, 2.9rem);
+      font-weight: 900; line-height: 1.12;
+      margin-bottom: 1.25rem;
+    }
+
+    .post-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .tag {
+      font-size: 0.58rem; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 3px 10px; border: 1px solid var(--red); color: var(--red);
+    }
+
+    /* CONTENT */
+    .post-content { font-size: 0.88rem; line-height: 1.9; color: #bbb; }
+    .post-content h1,
+    .post-content h2,
+    .post-content h3,
+    .post-content h4 { font-family: var(--head); color: var(--text); margin: 2.5rem 0 0.75rem; }
+    .post-content h1 { font-size: 1.9rem; }
+    .post-content h2 { font-size: 1.5rem; }
+    .post-content h3 { font-size: 1.2rem; }
+    .post-content p { margin-bottom: 1.4rem; }
+    .post-content a { color: var(--red); text-decoration: underline; }
+    .post-content a:hover { opacity: 0.75; }
+    .post-content strong { color: var(--text); font-weight: 700; }
+    .post-content em { font-style: italic; }
+    .post-content blockquote {
+      border-left: 3px solid var(--red); margin: 1.75rem 0;
+      padding: 0.5rem 0 0.5rem 1.5rem;
+      color: var(--muted); font-style: italic;
+    }
+    .post-content code {
+      background: #1a1a1a; color: var(--red);
+      padding: 2px 6px; font-family: var(--mono); font-size: 0.85em;
+    }
+    .post-content pre {
+      background: #1a1a1a; margin: 1.75rem 0;
+      padding: 1.25rem; overflow-x: auto;
+      border-left: 3px solid var(--red);
+    }
+    .post-content pre code { background: none; padding: 0; color: #ccc; }
+    .post-content img { max-width: 100%; display: block; margin: 2rem auto; }
+    .post-content ul,
+    .post-content ol { padding-left: 1.5rem; margin-bottom: 1.4rem; }
+    .post-content li { margin-bottom: 0.4rem; }
+    .post-content hr { border: none; border-top: 2px solid var(--border); margin: 2.5rem 0; }
+    .post-content table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.82rem; }
+    .post-content th, .post-content td { padding: 8px 12px; border: 1px solid var(--border); }
+    .post-content th { background: var(--surface); color: var(--text); }
+
+    /* FOOTER NAV */
+    .post-footer {
+      margin-top: 3.5rem; padding-top: 1.5rem;
+      border-top: 2px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .back-btn {
+      font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); padding: 8px 18px;
+      border: 1px solid var(--border); transition: color 0.15s, border-color 0.15s;
+    }
+    .back-btn:hover { color: var(--red); border-color: var(--red); }
+
+    /* STATES */
+    .state-msg {
+      text-align: center; color: var(--muted);
+      font-size: 0.8rem; padding: 6rem 2rem;
+    }
+
+    footer {
+      border-top: 2px solid var(--border); padding: 1.5rem 2rem;
+      text-align: center; font-size: 0.62rem;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    }
+    footer span { color: var(--red); }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="Blog.html" class="logo">TobyK1DD<em>.blog</em></a>
+    <a href="Blog.html" class="back-link">← All Posts</a>
+  </div>
+</header>
+
+<div id="content"><div class="state-msg">Loading post...</div></div>
+
+<footer>© 2026 <span>TobyK1DD</span>.blog — est. 2026</footer>
+
+<script>
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+}
+
+async function init() {
+  const slug = new URLSearchParams(window.location.search).get('slug');
+  if (!slug) {
+    document.getElementById('content').innerHTML = '<div class="state-msg">No post specified.</div>';
+    return;
+  }
+
+  const { data: post, error } = await sb
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .eq('published', true)
+    .single();
+
+  if (error || !post) {
+    document.getElementById('content').innerHTML = '<div class="state-msg">Post not found or not published yet.</div>';
+    return;
+  }
+
+  document.title = `${post.title} — TobyK1DD.blog`;
+
+  const tagsHtml = post.tags && post.tags.length
+    ? `<div class="post-tags">${post.tags.map(t => `<span class="tag">${esc(t)}<\/span>`).join('')}<\/div>`
+    : '';
+
+  const heroHtml = post.cover_image
+    ? `<img class="hero" src="${esc(post.cover_image)}" alt="${esc(post.title)}">`
+    : '<div class="hero-empty"><\/div>';
+
+  const contentHtml = post.content
+    ? marked.parse(post.content)
+    : '<p style="color:var(--muted)">No content yet.</p>';
+
+  document.getElementById('content').innerHTML = `
+    ${heroHtml}
+    <div class="post-wrap">
+      <div class="post-bar">
+        <span>${fmtDate(post.created_at)}<\/span>
+        <span>TobyK1DD<\/span>
+      <\/div>
+      <h1 class="post-title">${esc(post.title)}<\/h1>
+      ${tagsHtml}
+      <div class="post-content">${contentHtml}<\/div>
+      <div class="post-footer">
+        <a href="Blog.html" class="back-btn">← Back to posts<\/a>
+        <span style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase">${fmtDate(post.created_at)}<\/span>
+      <\/div>
+    <\/div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

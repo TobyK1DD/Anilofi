@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — TobyK1DD.blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --red: #f64e4e;
+      --bg: #0a0a0a;
+      --surface: #111;
+      --card: #171717;
+      --border: #242424;
+      --text: #e6e6e6;
+      --muted: #666;
+      --green: #3dba78;
+      --green-dark: #1a3a2a;
+      --head: 'Sour Gummy', cursive;
+      --mono: 'Space Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── SHARED FORM ELEMENTS ── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); font-family: var(--mono); font-size: 0.8rem;
+      padding: 8px 12px; outline: none; width: 100%;
+      transition: border-color 0.15s;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    textarea:focus { border-color: var(--red); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--mono); font-size: 0.68rem;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 8px 16px; cursor: pointer; border: 1px solid transparent;
+      transition: opacity 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn:hover { opacity: 0.8; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-outline { background: transparent; border-color: var(--border); color: var(--muted); }
+    .btn-outline:hover { border-color: var(--red); color: var(--red); opacity: 1; }
+    .btn-danger { background: transparent; border-color: #7a2020; color: #c04a4a; }
+    .btn-danger:hover { border-color: var(--red); color: var(--red); opacity: 1; }
+
+    .err { font-size: 0.7rem; color: var(--red); margin-top: 0.5rem; }
+
+    /* ── LOGIN ── */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .login-box { background: var(--surface); border: 2px solid var(--border); width: 100%; max-width: 370px; }
+    .login-bar { background: var(--red); padding: 8px 18px; font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; color: #fff; }
+    .login-body { padding: 1.75rem 1.5rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
+    .login-title { font-family: var(--head); font-size: 1.9rem; font-weight: 900; margin-bottom: 0.25rem; }
+    .login-sub { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── DASHBOARD SHELL ── */
+    #dashboard { display: none; flex-direction: column; min-height: 100vh; }
+
+    .admin-bar {
+      background: var(--surface); border-bottom: 3px solid var(--red);
+      padding: 0 1.5rem; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 10; flex-shrink: 0;
+    }
+    .admin-logo { font-family: var(--head); font-size: 1.25rem; font-weight: 900; color: var(--red); }
+    .admin-logo em { color: var(--text); font-style: normal; font-size: 0.7rem; }
+    .admin-user { font-size: 0.65rem; color: var(--muted); display: flex; align-items: center; gap: 1rem; }
+    #user-email { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .admin-body { display: grid; grid-template-columns: 192px 1fr; flex: 1; min-height: 0; }
+
+    /* SIDEBAR NAV */
+    .admin-nav {
+      background: var(--surface); border-right: 2px solid var(--border);
+      padding: 1.25rem 0; display: flex; flex-direction: column;
+    }
+    .nav-item {
+      padding: 10px 1.25rem; font-size: 0.68rem; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted); cursor: pointer;
+      border-left: 2px solid transparent; transition: color 0.15s, background 0.15s;
+    }
+    .nav-item:hover { color: var(--text); background: var(--card); }
+    .nav-item.active { color: var(--red); border-left-color: var(--red); background: var(--card); }
+    .nav-divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+    .nav-link { padding: 8px 1.25rem; font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); transition: color 0.15s; display: block; }
+    .nav-link:hover { color: var(--red); }
+
+    /* MAIN CONTENT */
+    .admin-main { padding: 1.75rem 2rem; overflow-y: auto; }
+
+    /* ── POST LIST ── */
+    .list-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .list-header h2 { font-family: var(--head); font-size: 1.4rem; font-weight: 700; }
+
+    .post-table { width: 100%; border-collapse: collapse; }
+    .post-table th {
+      text-align: left; font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); padding: 8px 12px; border-bottom: 2px solid var(--border);
+    }
+    .post-table td {
+      padding: 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.76rem; vertical-align: middle;
+    }
+    .post-table tr:hover td { background: var(--surface); }
+    .post-table td:first-child { color: var(--text); font-weight: 700; }
+
+    .badge { font-size: 0.56rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 9px; font-weight: 700; }
+    .badge-pub { background: var(--green-dark); color: var(--green); }
+    .badge-draft { background: #1e1e1e; color: var(--muted); }
+
+    .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* ── EDITOR ── */
+    #view-editor { display: none; }
+    .editor-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .editor-header h2 { font-family: var(--head); font-size: 1.4rem; font-weight: 700; }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 288px;
+      gap: 1.5rem; align-items: start;
+    }
+    .editor-left { display: flex; flex-direction: column; gap: 1rem; }
+    .editor-right { display: flex; flex-direction: column; gap: 1rem; }
+
+    .ebox { background: var(--card); border: 2px solid var(--border); }
+    .ebox-bar { background: var(--red); padding: 5px 12px; font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; font-weight: 700; }
+    .ebox-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .content-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .ctab {
+      padding: 8px 16px; font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: color 0.15s;
+    }
+    .ctab.active { color: var(--red); border-bottom-color: var(--red); }
+
+    #content-input {
+      width: 100%; min-height: 360px;
+      background: var(--bg); border: none; border-top: 1px solid var(--border);
+      color: var(--text); font-family: var(--mono); font-size: 0.8rem;
+      padding: 1rem; outline: none; resize: vertical; line-height: 1.7;
+    }
+    #content-preview {
+      display: none; min-height: 360px; padding: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.84rem; line-height: 1.85; color: #bbb;
+    }
+    #content-preview h1, #content-preview h2, #content-preview h3 { font-family: var(--head); color: var(--text); margin: 1.5rem 0 0.5rem; }
+    #content-preview p { margin-bottom: 1rem; }
+    #content-preview code { background: #1a1a1a; color: var(--red); padding: 2px 6px; }
+    #content-preview pre { background: #1a1a1a; padding: 1rem; margin: 1rem 0; border-left: 3px solid var(--red); overflow-x: auto; }
+    #content-preview pre code { background: none; color: #ccc; }
+    #content-preview blockquote { border-left: 3px solid var(--red); padding-left: 1rem; color: var(--muted); margin: 1rem 0; }
+    #content-preview a { color: var(--red); }
+    #content-preview ul, #content-preview ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+
+    /* TOGGLE */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-label { font-size: 0.68rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+    .toggle {
+      width: 42px; height: 22px; background: var(--border);
+      border-radius: 11px; position: relative; cursor: pointer; transition: background 0.2s;
+    }
+    .toggle.on { background: var(--green); }
+    .toggle::after {
+      content: ''; position: absolute;
+      width: 16px; height: 16px; background: #fff;
+      border-radius: 50%; top: 3px; left: 3px; transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* IMAGE UPLOAD */
+    .img-upload-zone {
+      border: 2px dashed var(--border); padding: 1.25rem;
+      text-align: center; cursor: pointer; transition: border-color 0.15s;
+      font-size: 0.72rem; color: var(--muted);
+    }
+    .img-upload-zone:hover { border-color: var(--red); color: var(--red); }
+    .cover-preview { width: 100%; height: 130px; object-fit: cover; display: block; margin-top: 0.75rem; }
+    .img-remove { font-size: 0.62rem; color: #c04a4a; cursor: pointer; margin-top: 0.4rem; display: inline-block; }
+    .img-remove:hover { color: var(--red); }
+
+    /* SLUG ROW */
+    .slug-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+    .slug-hint { font-size: 0.58rem; color: var(--muted); margin-top: 3px; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--surface); border: 2px solid var(--red);
+      padding: 11px 18px; font-size: 0.76rem; z-index: 999;
+      transform: translateY(8px); opacity: 0; transition: all 0.25s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.ok { border-color: var(--green); }
+
+    /* EMPTY / LOADING */
+    .empty-msg { color: var(--muted); font-size: 0.78rem; padding: 2rem; text-align: center; border: 2px dashed var(--border); }
+
+    @media (max-width: 900px) {
+      .admin-body { grid-template-columns: 1fr; }
+      .admin-nav { flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 2px solid var(--border); padding: 0; }
+      .nav-item { border-left: none; border-bottom: 2px solid transparent; }
+      .nav-item.active { border-bottom-color: var(--red); }
+      .editor-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-bar">TobyK1DD.blog — Admin Access</div>
+    <div class="login-body">
+      <div>
+        <h1 class="login-title">Sign In</h1>
+        <p class="login-sub">Admin only.</p>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-red" onclick="doLogin()" style="width:100%;justify-content:center">Sign In →</button>
+      <p class="err" id="login-err" style="display:none"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+  <div class="admin-bar">
+    <div class="admin-logo">TobyK1DD<em>.blog</em> &mdash; <span style="font-size:0.68rem;color:var(--muted);font-family:var(--mono)">Admin</span></div>
+    <div class="admin-user">
+      <span id="user-email">—</span>
+      <button class="btn btn-outline" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <nav class="admin-nav">
+      <div class="nav-item active" id="nav-list" onclick="showList()">📝 All Posts</div>
+      <div class="nav-item" id="nav-new" onclick="openEditor(null)">✏️ New Post</div>
+      <hr class="nav-divider">
+      <a class="nav-link" href="Blog.html" target="_blank">← View Blog</a>
+    </nav>
+
+    <main class="admin-main">
+
+      <!-- POST LIST VIEW -->
+      <div id="view-list">
+        <div class="list-header">
+          <h2>All Posts</h2>
+          <button class="btn btn-red" onclick="openEditor(null)">+ New Post</button>
+        </div>
+        <div id="table-wrap"></div>
+      </div>
+
+      <!-- EDITOR VIEW -->
+      <div id="view-editor">
+        <div class="editor-header">
+          <button class="btn btn-outline" onclick="showList()">← Back</button>
+          <h2 id="editor-heading">New Post</h2>
+        </div>
+
+        <div class="editor-grid">
+
+          <!-- LEFT: CONTENT -->
+          <div class="editor-left">
+            <div class="field">
+              <label>Title</label>
+              <input type="text" id="f-title" placeholder="Your post title..." oninput="autoSlug()">
+            </div>
+
+            <div class="field">
+              <label>Slug</label>
+              <div class="slug-row">
+                <input type="text" id="f-slug" placeholder="url-friendly-slug">
+                <button class="btn btn-outline" onclick="autoSlug(true)" title="Re-generate from title" style="white-space:nowrap;padding:8px 10px">↺ Regen</button>
+              </div>
+              <span class="slug-hint">Auto-generated from title. Edit manually if needed.</span>
+            </div>
+
+            <div class="field">
+              <label>Excerpt</label>
+              <textarea id="f-excerpt" placeholder="A short description shown on the blog index..." style="min-height:72px"></textarea>
+            </div>
+
+            <!-- CONTENT EDITOR -->
+            <div class="ebox">
+              <div class="ebox-bar">Content — Markdown</div>
+              <div class="content-tabs">
+                <div class="ctab active" id="tab-write" onclick="setTab('write')">Write</div>
+                <div class="ctab" id="tab-preview" onclick="setTab('preview')">Preview</div>
+              </div>
+              <textarea id="content-input" placeholder="# Write your post in Markdown
+
+**Bold**, *italic*, [links](https://...), `code`, > blockquote..."></textarea>
+              <div id="content-preview"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT: META -->
+          <div class="editor-right">
+
+            <!-- PUBLISH BOX -->
+            <div class="ebox">
+              <div class="ebox-bar">Publish</div>
+              <div class="ebox-body">
+                <div class="toggle-row">
+                  <span class="toggle-label" id="pub-label">Draft</span>
+                  <div class="toggle" id="pub-toggle" onclick="flipPublished()"></div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:0.5rem">
+                  <button class="btn btn-outline" onclick="savePost(false)" style="flex:1;justify-content:center">Save Draft</button>
+                  <button class="btn btn-green" onclick="savePost(true)" style="flex:1;justify-content:center">Publish ✓</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- COVER IMAGE -->
+            <div class="ebox">
+              <div class="ebox-bar">Cover Image</div>
+              <div class="ebox-body">
+                <input type="file" id="img-input" accept="image/*" style="display:none" onchange="uploadCover(this)">
+                <div class="img-upload-zone" id="upload-zone" onclick="document.getElementById('img-input').click()">
+                  <div>📷 Click to upload</div>
+                  <div style="font-size:0.62rem;margin-top:4px;color:var(--muted)">JPG, PNG, WEBP — max 5 MB</div>
+                </div>
+                <div id="cover-preview-wrap" style="display:none">
+                  <img id="cover-preview" class="cover-preview" alt="Cover preview">
+                  <span class="img-remove" onclick="removeCover()">✕ Remove image</span>
+                </div>
+                <p class="err" id="img-err" style="display:none;margin-top:6px"></p>
+              </div>
+            </div>
+
+            <!-- TAGS -->
+            <div class="ebox">
+              <div class="ebox-bar">Tags</div>
+              <div class="ebox-body">
+                <div class="field">
+                  <input type="text" id="f-tags" placeholder="gaming, anime, tactics">
+                </div>
+                <span style="font-size:0.6rem;color:var(--muted)">Comma-separated</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const STORAGE_BUCKET = 'blog-images';
+// ────────────────────────────────────────────────────────
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let editingId = null;
+let isPublished = false;
+let coverUrl = '';
+let slugLocked = false;  // stop auto-slug once user edits slug or is editing existing post
+
+// ── HELPERS ──
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) { return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+
+function toast(msg, ok=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (ok ? ' ok' : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = 'toast', 2600);
+}
+
+// ── AUTH ──
+async function checkAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) { enterDashboard(session.user); }
+}
+
+function enterDashboard(user) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  document.getElementById('user-email').textContent = user.email;
+  loadPosts();
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+  enterDashboard(data.user);
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ── NAV ──
+function showList() {
+  document.getElementById('nav-list').classList.add('active');
+  document.getElementById('nav-new').classList.remove('active');
+  document.getElementById('view-list').style.display = 'block';
+  document.getElementById('view-editor').style.display = 'none';
+  loadPosts();
+}
+
+function showEditor() {
+  document.getElementById('nav-list').classList.remove('active');
+  document.getElementById('nav-new').classList.add('active');
+  document.getElementById('view-list').style.display = 'none';
+  document.getElementById('view-editor').style.display = 'block';
+}
+
+// ── POST LIST ──
+async function loadPosts() {
+  const wrap = document.getElementById('table-wrap');
+  wrap.innerHTML = '<p style="color:var(--muted);font-size:0.78rem;padding:1rem 0">Loading...</p>';
+
+  const { data, error } = await sb
+    .from('posts')
+    .select('id, title, slug, published, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) { wrap.innerHTML = `<p class="err" style="padding:1rem 0">Error: ${esc(error.message)}<\/p>`; return; }
+  if (!data.length) { wrap.innerHTML = '<div class="empty-msg">No posts yet.<br>Create your first one above.</div>'; return; }
+
+  wrap.innerHTML = `
+    <table class="post-table">
+      <thead><tr>
+        <th>Title<\/th>
+        <th>Status<\/th>
+        <th>Date<\/th>
+        <th>Actions<\/th>
+      <\/tr><\/thead>
+      <tbody>
+        ${data.map(p => `
+          <tr>
+            <td>${esc(p.title)}<\/td>
+            <td><span class="badge ${p.published ? 'badge-pub' : 'badge-draft'}">${p.published ? 'Published' : 'Draft'}<\/span><\/td>
+            <td style="color:var(--muted);font-size:0.7rem">${fmtDate(p.created_at)}<\/td>
+            <td>
+              <div class="row-actions">
+                <button class="btn btn-outline" onclick="openEditor('${p.id}')">Edit<\/button>
+                <button class="btn btn-outline" onclick="quickToggle('${p.id}', ${p.published})">${p.published ? 'Unpublish' : 'Publish'}<\/button>
+                <button class="btn btn-danger" onclick="deletePost('${p.id}', '${esc(p.title)}')">Delete<\/button>
+              <\/div>
+            <\/td>
+          <\/tr>
+        `).join('')}
+      <\/tbody>
+    <\/table>`;
+}
+
+// ── EDITOR ──
+async function openEditor(id) {
+  editingId = id;
+  coverUrl = '';
+  isPublished = false;
+  slugLocked = !!id;
+
+  // Reset all fields
+  ['f-title','f-slug','f-excerpt','f-tags'].forEach(f => document.getElementById(f).value = '');
+  document.getElementById('content-input').value = '';
+  document.getElementById('cover-preview-wrap').style.display = 'none';
+  document.getElementById('img-input').value = '';
+  document.getElementById('img-err').style.display = 'none';
+  setTab('write');
+  updateToggleUI();
+
+  if (id) {
+    document.getElementById('editor-heading').textContent = 'Edit Post';
+    const { data: post, error } = await sb.from('posts').select('*').eq('id', id).single();
+    if (error || !post) { toast('Could not load post.'); return; }
+
+    document.getElementById('f-title').value   = post.title   || '';
+    document.getElementById('f-slug').value    = post.slug    || '';
+    document.getElementById('f-excerpt').value = post.excerpt || '';
+    document.getElementById('content-input').value = post.content || '';
+    document.getElementById('f-tags').value    = (post.tags || []).join(', ');
+    isPublished = post.published;
+    coverUrl    = post.cover_image || '';
+
+    if (coverUrl) {
+      document.getElementById('cover-preview').src = coverUrl;
+      document.getElementById('cover-preview-wrap').style.display = 'block';
+    }
+    updateToggleUI();
+  } else {
+    document.getElementById('editor-heading').textContent = 'New Post';
+  }
+
+  showEditor();
+}
+
+async function savePost(publish) {
+  const title   = document.getElementById('f-title').value.trim();
+  const slug    = document.getElementById('f-slug').value.trim();
+  const excerpt = document.getElementById('f-excerpt').value.trim();
+  const content = document.getElementById('content-input').value;
+  const tagsRaw = document.getElementById('f-tags').value;
+  const tags    = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
+  if (!title) { toast('Title is required.'); return; }
+  if (!slug)  { toast('Slug is required.'); return; }
+
+  if (typeof publish === 'boolean') isPublished = publish;
+
+  const payload = {
+    title, slug, excerpt, content,
+    cover_image: coverUrl,
+    tags, published: isPublished,
+    updated_at: new Date().toISOString()
+  };
+
+  let error;
+  if (editingId) {
+    ({ error } = await sb.from('posts').update(payload).eq('id', editingId));
+  } else {
+    const res = await sb.from('posts').insert({ ...payload, created_at: new Date().toISOString() }).select().single();
+    error = res.error;
+    if (res.data) { editingId = res.data.id; slugLocked = true; }
+  }
+
+  if (error) { toast('Save failed: ' + error.message); return; }
+  updateToggleUI();
+  toast(isPublished ? 'Published! 🎉' : 'Saved as draft.', isPublished);
+}
+
+async function deletePost(id, title) {
+  if (!confirm(`Delete "${title}"?\n\nThis cannot be undone.`)) return;
+  const { error } = await sb.from('posts').delete().eq('id', id);
+  if (error) { toast('Delete failed.'); return; }
+  toast('Post deleted.');
+  loadPosts();
+}
+
+async function quickToggle(id, current) {
+  const { error } = await sb.from('posts')
+    .update({ published: !current, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) { toast('Update failed.'); return; }
+  toast(current ? 'Unpublished.' : 'Published!', !current);
+  loadPosts();
+}
+
+// ── SLUG ──
+function autoSlug(force = false) {
+  if (slugLocked && !force) return;
+  const val = document.getElementById('f-title').value;
+  document.getElementById('f-slug').value = val
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 80);
+}
+
+// Lock slug when user manually edits it
+document.getElementById('f-slug').addEventListener('input', () => { slugLocked = true; });
+
+// ── TOGGLE ──
+function flipPublished() {
+  isPublished = !isPublished;
+  updateToggleUI();
+}
+function updateToggleUI() {
+  document.getElementById('pub-toggle').classList.toggle('on', isPublished);
+  document.getElementById('pub-label').textContent = isPublished ? 'Published' : 'Draft';
+  document.getElementById('pub-label').style.color = isPublished ? 'var(--green)' : 'var(--muted)';
+}
+
+// ── CONTENT TABS ──
+function setTab(tab) {
+  const isWrite = tab === 'write';
+  document.getElementById('content-input').style.display = isWrite ? 'block' : 'none';
+  document.getElementById('content-preview').style.display = isWrite ? 'none' : 'block';
+  document.getElementById('tab-write').classList.toggle('active', isWrite);
+  document.getElementById('tab-preview').classList.toggle('active', !isWrite);
+  if (!isWrite) {
+    const src = document.getElementById('content-input').value || '';
+    document.getElementById('content-preview').innerHTML = marked.parse(src);
+  }
+}
+
+// ── COVER IMAGE UPLOAD ──
+async function uploadCover(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const errEl = document.getElementById('img-err');
+  errEl.style.display = 'none';
+
+  if (file.size > 5 * 1024 * 1024) {
+    errEl.textContent = 'File too large (max 5 MB).';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const zone = document.getElementById('upload-zone');
+  zone.textContent = 'Uploading...';
+
+  const ext  = file.name.split('.').pop().toLowerCase();
+  const path = `covers/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { data, error } = await sb.storage
+    .from(STORAGE_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false });
+
+  zone.innerHTML = '📷 Click to upload<div style="font-size:0.62rem;margin-top:4px;color:var(--muted)">JPG, PNG, WEBP — max 5 MB<\/div>';
+
+  if (error) {
+    errEl.textContent = 'Upload failed: ' + error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
+  coverUrl = urlData.publicUrl;
+
+  document.getElementById('cover-preview').src = coverUrl;
+  document.getElementById('cover-preview-wrap').style.display = 'block';
+  input.value = '';
+  toast('Image uploaded!', true);
+}
+
+function removeCover() {
+  coverUrl = '';
+  document.getElementById('cover-preview-wrap').style.display = 'none';
+  document.getElementById('img-input').value = '';
+}
+
+// ── INIT ──
+checkAuth();
+</script>
+</body>
+</html>

@@ -1,64 +1,229 @@
 <!DOCTYPE html>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="main.css">
-        <script src="app.js"></script>
-        <title>TobyK1DD's World</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    </head>
-    </head>
-<body>
-  <br>
-      <nav>
-      <div class="links"> 
-        <a href="index.html">Home</a>
-        <a href="About Me.html">About Me</a>
-        <a href="Blog.html">Blog</a>
-        <a href="My Work.html">My Work</a>
-        <a href="Contact.html">Contact</a>
-        <a href="https://linktr.ee/tobyk1dd">Links</a>
-        <button id="themeToggle">🌙Light/Dark☀️</button>
-    </div></nav>
-    <header><div class="header">
-        <img src="Header3.svg" width="99%" height="100%" background-color="#AAC6D3;">
-    </div></header>
-<div class="container" style="margin-top: 10px; text-align: center; align-items: center; align-content: center;">
-    <h1>TobyK1DD's World</h1>
-    <br>
-    <h2>Welcome to my personal blog</h2>
-    <br>
-    <div class="links"> 
-            <a href="1.html">First Blog Post</a>
-            <a href="2.html">Second Blog Post</a>
-            <a href="3.html">Third Blog Post</a>
-        </div>    
-</div>
-<footer>
-    <div class="footer">
-        <p>nothing here just yet</p>
-    </div>
-</footer>
-<script>
-  const toggleBtn = document.getElementById("themeToggle");
-
-  // Load saved theme on page load
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("darkmode");
-  }
-
-  toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("darkmode");
-
-    // Save preference
-    if (document.body.classList.contains("darkmode")) {
-      localStorage.setItem("theme", "dark");
-    } else {
-      localStorage.setItem("theme", "light");
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TobyK1DD — Blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    :root {
+      --red: #f64e4e;
+      --bg: #0a0a0a;
+      --surface: #111;
+      --card: #171717;
+      --border: #242424;
+      --text: #e6e6e6;
+      --muted: #666;
+      --head: 'Sour Gummy', cursive;
+      --mono: 'Space Mono', monospace;
     }
-  });
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+
+    /* HEADER */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 3px solid var(--red);
+      padding: 0 clamp(1rem, 4vw, 2.5rem);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 66px;
+    }
+    .logo { font-family: var(--head); font-size: 1.75rem; font-weight: 900; color: var(--red); }
+    .logo em { color: var(--text); font-style: normal; }
+    .nav { display: flex; }
+    .nav a {
+      font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+      padding: 0.5rem 1.2rem; color: var(--muted);
+      border-left: 1px solid var(--border); transition: color 0.15s;
+    }
+    .nav a:hover { color: var(--red); }
+
+    /* LAYOUT */
+    .wrap {
+      max-width: 1200px; margin: 0 auto;
+      padding: 2.5rem clamp(1rem, 4vw, 2.5rem);
+      display: grid; grid-template-columns: 1fr 264px; gap: 2.5rem; align-items: start;
+    }
+
+    /* POST GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* CARD */
+    .card {
+      display: flex; flex-direction: column;
+      background: var(--card); border: 2px solid var(--border);
+      cursor: pointer; transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: var(--red); transform: translateY(-3px); }
+    .card-img { width: 100%; height: 172px; object-fit: cover; display: block; }
+    .card-img-placeholder {
+      width: 100%; height: 172px;
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; color: var(--border);
+    }
+    .card-bar {
+      background: var(--red); padding: 5px 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; font-weight: 700;
+    }
+    .card-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.65rem; flex: 1; }
+    .card-title { font-family: var(--head); font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
+    .card-excerpt { font-size: 0.77rem; color: var(--muted); line-height: 1.7; flex: 1; }
+    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .tag { font-size: 0.58rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 8px; border: 1px solid var(--border); color: var(--muted); }
+
+    /* SIDEBAR */
+    .sidebar { display: flex; flex-direction: column; gap: 1.25rem; }
+    .sbox { background: var(--card); border: 2px solid var(--border); }
+    .sbox-bar { background: var(--red); padding: 5px 12px; font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; font-weight: 700; }
+    .sbox-body { padding: 1rem; }
+    .sbox-text { font-size: 0.77rem; color: var(--muted); line-height: 1.75; }
+    .sbox-link { display: block; font-size: 0.7rem; color: var(--muted); padding: 0.4rem 0; border-bottom: 1px solid var(--border); transition: color 0.15s, padding-left 0.15s; }
+    .sbox-link:last-child { border-bottom: none; }
+    .sbox-link:hover { color: var(--red); padding-left: 4px; }
+    .curr { display: flex; gap: 8px; font-size: 0.7rem; color: var(--muted); padding: 0.3rem 0; border-bottom: 1px solid var(--border); align-items: baseline; }
+    .curr:last-child { border-bottom: none; }
+    .curr strong { color: var(--text); font-weight: 400; }
+
+    /* STATES */
+    .state-msg {
+      grid-column: 1 / -1; text-align: center;
+      color: var(--muted); font-size: 0.78rem; padding: 4rem 2rem;
+      border: 2px dashed var(--border);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 2px solid var(--border); padding: 1.5rem 2rem;
+      text-align: center; font-size: 0.62rem;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    }
+    footer span { color: var(--red); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card { animation: fadeUp 0.3s ease both; }
+
+    @media (max-width: 780px) {
+      .wrap { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="Blog.html" class="logo">TobyK1DD<em>.blog</em></a>
+    <nav class="nav">
+      <a href="Blog.html">Posts</a>
+      <a href="BlogAdmin.html">Admin ↗</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <main>
+    <div id="grid" class="grid">
+      <div class="state-msg">Loading posts...</div>
+    </div>
+  </main>
+
+  <aside class="sidebar">
+    <div class="sbox">
+      <div class="sbox-bar">About</div>
+      <div class="sbox-body">
+        <p class="sbox-text">Nuneaton-based Twitch streamer, web dev, anime fan & football tactics nerd. Welcome to my corner of the internet. 🎮</p>
+      </div>
+    </div>
+
+    <div class="sbox">
+      <div class="sbox-bar">Currently</div>
+      <div class="sbox-body">
+        <div class="curr">⚾ <strong>Playing</strong> MLB The Show 26</div>
+        <div class="curr">🍃 <strong>Watching</strong> Naruto Shippuden</div>
+        <div class="curr">🎵 <strong>Listening</strong> Lo-fi beats</div>
+        <div class="curr">🟣 <strong>Streaming</strong> twitch.tv/tobyk1dd</div>
+      </div>
+    </div>
+
+    <div class="sbox">
+      <div class="sbox-bar">Find Me</div>
+      <div class="sbox-body">
+        <a class="sbox-link" href="https://twitch.tv/tobyk1dd" target="_blank">🟣 Twitch — tobyk1dd</a>
+        <a class="sbox-link" href="https://tobyk1dd.github.io/TobyK1DD/" target="_blank">💻 Portfolio</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>© 2026 <span>TobyK1DD</span>.blog — est. 2026</footer>
+
+<script>
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function renderGrid(posts) {
+  const grid = document.getElementById('grid');
+  if (!posts.length) {
+    grid.innerHTML = '<div class="state-msg">No posts yet. Something good is coming.</div>';
+    return;
+  }
+  grid.innerHTML = posts.map((p, i) => `
+    <a class="card" href="BlogPost.html?slug=${encodeURIComponent(p.slug)}" style="animation-delay:${i * 0.06}s">
+      ${p.cover_image
+        ? `<img class="card-img" src="${esc(p.cover_image)}" alt="${esc(p.title)}" loading="lazy">`
+        : '<div class="card-img-placeholder">✍️<\/div>'}
+      <div class="card-bar">
+        <span>${fmtDate(p.created_at)}<\/span>
+        <span>READ →<\/span>
+      <\/div>
+      <div class="card-body">
+        <div class="card-title">${esc(p.title)}<\/div>
+        ${p.excerpt ? `<div class="card-excerpt">${esc(p.excerpt)}<\/div>` : ''}
+        ${p.tags && p.tags.length
+          ? `<div class="card-tags">${p.tags.map(t => `<span class="tag">${esc(t)}<\/span>`).join('')}<\/div>`
+          : ''}
+      <\/div>
+    <\/a>
+  `).join('');
+}
+
+async function init() {
+  const { data, error } = await sb
+    .from('posts')
+    .select('id, title, slug, excerpt, cover_image, tags, created_at')
+    .eq('published', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    document.getElementById('grid').innerHTML = '<div class="state-msg">Could not load posts. Check Supabase config.</div>';
+    return;
+  }
+  renderGrid(data || []);
+}
+
+init();
 </script>
 </body>
 </html>
