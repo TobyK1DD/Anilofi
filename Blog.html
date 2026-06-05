@@ -8,254 +8,194 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="Main.css" />
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
-    body {
-      min-height: 100vh;
-      height: auto;
-      padding: 0;
-      padding-bottom: 80px;
-    }
+    body { min-height:100vh; height:auto; padding:0; padding-bottom:80px; }
 
-    /* ===================== HEADER ===================== */
+    /* ===== HEADER ===== */
     .blog-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      border-bottom: 3px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 24px;
+      position:sticky; top:0; z-index:100; background:var(--bg);
+      border-bottom:3px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; padding:14px 24px;
     }
     .site-wordmark {
-      font-family: "Sour Gummy", sans-serif;
-      font-size: 1.7rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      color: var(--primary);
-      text-decoration: none;
-      line-height: 1;
+      font-family:"Sour Gummy",sans-serif; font-size:1.7rem; font-weight:900;
+      letter-spacing:2px; color:var(--primary); text-decoration:none; line-height:1;
     }
-    .site-wordmark span { color: var(--text); }
-    .header-right { display: flex; align-items: center; gap: 10px; }
+    .site-wordmark span { color:var(--text); }
+    .header-right { display:flex; align-items:center; gap:10px; }
     .admin-chip {
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      background: var(--primary);
-      color: #000;
-      border: 2px solid var(--border);
+      font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px;
+      padding:4px 10px; border-radius:4px; background:var(--primary); color:#000; border:2px solid var(--border);
     }
-    #change-darkmode { position: static; width: 42px; height: 42px; }
-    #new-post-btn { font-size: 15px; padding: 8px 18px; }
-    #admin-btn { width: 42px; height: 42px; padding: 0; font-size: 1.1rem; border-radius: 50%; }
+    #change-darkmode { position:static; width:42px; height:42px; }
+    #new-post-btn { font-size:15px; padding:8px 18px; }
+    #admin-btn { width:42px; height:42px; padding:0; font-size:1.1rem; border-radius:50%; }
 
-    /* ===================== HERO ===================== */
+    /* ===== HERO ===== */
     .blog-hero {
-      background: var(--bg-soft);
-      border-bottom: 3px solid var(--border);
-      padding: 48px 24px 44px;
-      text-align: center;
+      background:var(--bg-soft); border-bottom:3px solid var(--border);
+      padding:48px 24px 44px; text-align:center;
     }
     .hero-tag {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      background: var(--primary);
-      color: #000;
-      border: 2px solid var(--border);
-      border-radius: 4px;
-      padding: 3px 10px;
-      margin-bottom: 16px;
+      display:inline-block; font-size:11px; font-weight:900; letter-spacing:2px;
+      text-transform:uppercase; background:var(--primary); color:#000;
+      border:2px solid var(--border); border-radius:4px; padding:3px 10px; margin-bottom:16px;
     }
     .hero-heading {
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1.05;
-      margin-bottom: 10px;
-      font-family: "Sour Gummy", sans-serif;
+      font-size:clamp(2.4rem,6vw,4rem); font-weight:900; color:var(--text);
+      line-height:1.05; margin-bottom:10px; font-family:"Sour Gummy",sans-serif;
     }
-    .hero-heading em { color: var(--primary); font-style: normal; }
-    .hero-sub { font-size: 1rem; opacity: 0.6; max-width: 420px; margin: 0 auto; line-height: 1.5; }
+    .hero-heading em { color:var(--primary); font-style:normal; }
+    .hero-sub { font-size:1rem; opacity:0.6; max-width:420px; margin:0 auto; line-height:1.5; }
 
-    /* ===================== FEED ===================== */
-    .posts-wrapper { max-width: 860px; margin: 48px auto; padding: 0 20px; }
-    .posts-count {
-      font-size: 12px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 2px; opacity: 0.5; margin-bottom: 28px;
+    /* ===== TWO-COLUMN LAYOUT ===== */
+    .blog-layout {
+      max-width:1240px; margin:0 auto; padding:40px 20px;
+      display:grid; grid-template-columns:1fr 290px; gap:30px; align-items:start;
     }
-    .no-posts {
-      text-align: center; padding: 80px 20px;
-      border: 3px dashed var(--border); border-radius: 8px;
-      background: var(--bg-soft);
-    }
-    .no-posts p { opacity: 0.55; font-size: 1rem; line-height: 1.7; }
-    .loading-state { text-align: center; padding: 60px 20px; opacity: 0.5; font-size: 1rem; }
+    .blog-main { min-width:0; }
 
-    /* ===================== POST CARD ===================== */
+    /* ===== SIDEBAR ===== */
+    .blog-sidebar {
+      position:sticky; top:80px;
+      display:flex; flex-direction:column; gap:14px;
+    }
+    .widget { background:var(--bg-soft); border:3px solid var(--border); border-radius:8px; overflow:hidden; }
+    .widget-head {
+      background:var(--primary); color:#000; padding:9px 14px;
+      font-size:11px; font-weight:900; letter-spacing:2px; text-transform:uppercase;
+      font-family:"Sour Gummy",sans-serif;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .btn-widget-edit {
+      background:transparent; border:none; font-size:13px; cursor:pointer;
+      padding:2px 6px; border-radius:4px; line-height:1; color:#000;
+    }
+    .btn-widget-edit:hover { background:rgba(0,0,0,0.15); }
+    .widget-body { padding:14px 16px; }
+
+    .social-link {
+      display:flex; align-items:center; gap:9px; padding:8px 10px;
+      border-radius:6px; border:2px solid var(--border); background:var(--bg);
+      color:var(--text); text-decoration:none; font-size:0.9rem; font-weight:700;
+      margin-bottom:8px; transition:background 0.15s, color 0.15s;
+      font-family:"Sour Gummy",sans-serif;
+    }
+    .social-link:last-child { margin-bottom:0; }
+    .social-link:hover { background:var(--primary); color:#000; border-color:var(--primary); }
+
+    .tag-cloud { display:flex; flex-wrap:wrap; gap:6px; }
+
+    .stat-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:7px 0; font-size:0.9rem; border-bottom:1px solid var(--accent);
+    }
+    .stat-row:last-child { border-bottom:none; }
+    .stat-row strong { font-weight:900; color:var(--primary); }
+
+    /* ===== POSTS ===== */
+    .posts-count { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; opacity:0.5; margin-bottom:28px; }
+    .no-posts { text-align:center; padding:80px 20px; border:3px dashed var(--border); border-radius:8px; background:var(--bg-soft); }
+    .no-posts p { opacity:0.55; font-size:1rem; line-height:1.7; }
+    .loading-state { text-align:center; padding:60px 20px; opacity:0.5; }
+
     .post-card {
-      background: var(--bg-soft);
-      border: 3px solid var(--border);
-      border-radius: 8px;
-      margin-bottom: 32px;
-      overflow: hidden;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      background:var(--bg-soft); border:3px solid var(--border); border-radius:8px;
+      margin-bottom:32px; overflow:hidden;
+      transition:transform 0.15s, box-shadow 0.15s;
     }
-    .post-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
-    .post-hero-img {
-      width: 100%; max-height: 380px; object-fit: cover; display: block;
-      cursor: pointer; border-bottom: 3px solid var(--border); transition: opacity 0.15s;
-    }
-    .post-hero-img:hover { opacity: 0.9; }
-    .post-body { padding: 26px 28px 22px; }
-    .post-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-    .post-date { font-family: monospace; font-size: 12px; opacity: 0.55; letter-spacing: 0.5px; }
-    .post-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tag {
-      font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
-      padding: 3px 8px; border-radius: 4px; background: var(--primary);
-      color: #000; border: 2px solid var(--border);
-    }
-    .post-title {
-      font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 900; line-height: 1.15;
-      color: var(--text); margin-bottom: 16px; font-family: "Sour Gummy", sans-serif;
-    }
-    .post-content { font-size: 1rem; line-height: 1.75; color: var(--text); white-space: pre-wrap; word-break: break-word; }
-    .post-gallery { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 20px; }
-    .post-gallery img {
-      width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px;
-      border: 2px solid var(--border); cursor: pointer; display: block; transition: opacity 0.15s;
-    }
-    .post-gallery img:hover { opacity: 0.85; }
-    .post-gallery img:only-child { grid-column: 1/-1; aspect-ratio: 16/9; }
-    .post-actions { display: flex; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 2px solid var(--accent); }
-    .post-actions button { font-size: 14px; padding: 7px 16px; }
-    .btn-danger { background: transparent; color: var(--primary); border: 3px solid var(--primary); }
-    .btn-danger:hover { background: var(--primary); color: #000; }
-    .btn-ghost { background: transparent; color: var(--text); border: 3px solid var(--border); }
-    .btn-ghost:hover { background: var(--accent); }
+    .post-card:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.12); }
+    .post-hero-img { width:100%; max-height:360px; object-fit:cover; display:block; cursor:pointer; border-bottom:3px solid var(--border); transition:opacity 0.15s; }
+    .post-hero-img:hover { opacity:0.9; }
+    .post-body { padding:24px 26px 20px; }
+    .post-meta { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .post-date { font-family:monospace; font-size:12px; opacity:0.55; letter-spacing:0.5px; }
+    .post-tags { display:flex; gap:6px; flex-wrap:wrap; }
+    .tag { font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:1px; padding:3px 8px; border-radius:4px; background:var(--primary); color:#000; border:2px solid var(--border); }
+    .post-title { font-size:clamp(1.2rem,2.5vw,1.65rem); font-weight:900; line-height:1.15; color:var(--text); margin-bottom:14px; font-family:"Sour Gummy",sans-serif; }
+    .post-content { font-size:1rem; line-height:1.75; color:var(--text); white-space:pre-wrap; word-break:break-word; }
+    .post-gallery { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:18px; }
+    .post-gallery img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:6px; border:2px solid var(--border); cursor:pointer; display:block; transition:opacity 0.15s; }
+    .post-gallery img:hover { opacity:0.85; }
+    .post-gallery img:only-child { grid-column:1/-1; aspect-ratio:16/9; }
+    .post-actions { display:flex; gap:10px; margin-top:20px; padding-top:16px; border-top:2px solid var(--accent); }
+    .post-actions button { font-size:14px; padding:7px 16px; }
+    .btn-danger { background:transparent; color:var(--primary); border:3px solid var(--primary); }
+    .btn-danger:hover { background:var(--primary); color:#000; }
+    .btn-ghost { background:transparent; color:var(--text); border:3px solid var(--border); }
+    .btn-ghost:hover { background:var(--accent); }
 
-    /* ===================== MODAL BASE ===================== */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.78); z-index: 200;
-      justify-content: center; align-items: flex-start;
-      padding: 30px 16px; overflow-y: auto;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--bg-soft); border: 3px solid var(--border);
-      border-radius: 8px; padding: 32px; width: 100%; max-width: 680px; margin: auto;
-    }
-    .modal-heading {
-      font-size: 1.4rem; font-weight: 900; color: var(--primary);
-      margin-bottom: 26px; font-family: "Sour Gummy", sans-serif;
-    }
-    .form-row { margin-bottom: 20px; }
-    .form-row label {
-      display: block; font-size: 11px; font-weight: 900;
-      text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.65;
-      margin-bottom: 8px; color: var(--text);
-    }
+    /* ===== MODALS ===== */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:200; justify-content:center; align-items:flex-start; padding:30px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:var(--bg-soft); border:3px solid var(--border); border-radius:8px; padding:32px; width:100%; max-width:680px; margin:auto; }
+    .modal-heading { font-size:1.4rem; font-weight:900; color:var(--primary); margin-bottom:26px; font-family:"Sour Gummy",sans-serif; }
+    .form-row { margin-bottom:20px; }
+    .form-row label { display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; opacity:0.65; margin-bottom:8px; color:var(--text); }
     .form-row input[type="text"],
     .form-row input[type="email"],
     .form-row input[type="password"],
     .form-row textarea {
-      width: 100%; padding: 12px 14px; border: 3px solid var(--border);
-      border-radius: 8px; background: var(--bg); color: var(--text);
-      font-family: "Sour Gummy", sans-serif; font-size: 1rem;
-      transition: border-color 0.2s; resize: vertical;
+      width:100%; padding:12px 14px; border:3px solid var(--border); border-radius:8px;
+      background:var(--bg); color:var(--text); font-family:"Sour Gummy",sans-serif;
+      font-size:1rem; transition:border-color 0.2s; resize:vertical;
     }
-    .form-row textarea { min-height: 220px; }
-    .form-row input:focus, .form-row textarea:focus { outline: none; border-color: var(--primary); }
+    .form-row textarea { min-height:220px; }
+    .form-row input:focus, .form-row textarea:focus { outline:none; border-color:var(--primary); }
+    .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:26px; }
 
-    /* ===================== UPLOAD ZONE ===================== */
-    .upload-zone {
-      border: 3px dashed var(--border); border-radius: 8px;
-      padding: 28px 20px; text-align: center; background: var(--bg);
-      cursor: pointer; position: relative; transition: border-color 0.2s;
-    }
-    .upload-zone:hover { border-color: var(--primary); }
-    .upload-zone input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
-    }
-    .upload-icon { font-size: 2rem; display: block; margin-bottom: 6px; pointer-events: none; }
-    .upload-label { font-size: 0.9rem; opacity: 0.65; pointer-events: none; }
-    .img-preview-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .preview-thumb { position: relative; width: 78px; height: 78px; }
-    .preview-thumb img {
-      width: 100%; height: 100%; object-fit: cover;
-      border-radius: 6px; border: 2px solid var(--border); display: block;
-    }
-    .thumb-remove {
-      position: absolute; top: -7px; right: -7px; width: 22px; height: 22px;
-      border-radius: 50%; background: var(--primary); color: #000;
-      border: 2px solid var(--border); font-size: 11px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; padding: 0; line-height: 1;
-    }
-    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; }
+    /* Upload zone */
+    .upload-zone { border:3px dashed var(--border); border-radius:8px; padding:28px 20px; text-align:center; background:var(--bg); cursor:pointer; position:relative; transition:border-color 0.2s; }
+    .upload-zone:hover { border-color:var(--primary); }
+    .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; width:100%; height:100%; cursor:pointer; }
+    .upload-icon { font-size:2rem; display:block; margin-bottom:6px; pointer-events:none; }
+    .upload-label { font-size:0.9rem; opacity:0.65; pointer-events:none; }
+    .img-preview-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .preview-thumb { position:relative; width:78px; height:78px; }
+    .preview-thumb img { width:100%; height:100%; object-fit:cover; border-radius:6px; border:2px solid var(--border); display:block; }
+    .thumb-remove { position:absolute; top:-7px; right:-7px; width:22px; height:22px; border-radius:50%; background:var(--primary); color:#000; border:2px solid var(--border); font-size:11px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
 
-    /* ===================== ADMIN LOGIN MODAL ===================== */
-    #admin-modal .modal-box { max-width: 380px; text-align: center; }
-    #admin-modal .modal-heading { margin-bottom: 8px; }
-    .admin-sub { font-size: 0.9rem; opacity: 0.6; margin-bottom: 20px; }
-    .admin-error { color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-top: 10px; display: none; }
-    .full-w { width: 100%; margin-bottom: 8px; }
+    /* Widget editor - link rows */
+    .link-row { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
+    .link-row .lr-icon { width:54px; flex-shrink:0; }
+    .link-row .lr-label { flex:1; }
+    .link-row .lr-url { flex:2; }
+    .link-row .lr-remove { width:34px; height:34px; padding:0; flex-shrink:0; font-size:13px; background:transparent; color:var(--primary); border:3px solid var(--primary); border-radius:6px; }
+    .link-row .lr-remove:hover { background:var(--primary); color:#000; }
+    .link-row input { padding:8px 10px; font-size:0.9rem; min-width:0; }
 
-    /* ===================== LIGHTBOX ===================== */
-    #lightbox {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.93); z-index: 400;
-      justify-content: center; align-items: center;
-    }
-    #lightbox.open { display: flex; }
-    #lightbox img { max-width: 92vw; max-height: 92vh; object-fit: contain; border-radius: 4px; border: 3px solid #ffffff33; }
-    #lightbox-close {
-      position: absolute; top: 20px; right: 20px;
-      width: 44px; height: 44px; border-radius: 50%;
-      background: var(--primary); color: #000; border: 3px solid #fff;
-      font-size: 1.1rem; font-weight: 900; display: flex;
-      align-items: center; justify-content: center; cursor: pointer; padding: 0;
-    }
+    /* Admin login */
+    #admin-modal .modal-box { max-width:380px; text-align:center; }
+    .admin-sub { font-size:0.9rem; opacity:0.6; margin-bottom:20px; }
+    .admin-error { color:var(--primary); font-size:0.85rem; font-weight:700; margin-top:10px; display:none; }
+    .full-w { width:100%; margin-bottom:8px; }
 
-    /* ===================== TOAST ===================== */
-    #toast-root {
-      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-      z-index: 999; display: flex; flex-direction: column; gap: 8px;
-      align-items: center; pointer-events: none;
-    }
-    .toast {
-      background: var(--primary); color: #000;
-      font-family: "Sour Gummy", sans-serif; font-size: 0.9rem; font-weight: 900;
-      padding: 10px 26px; border-radius: 8px; border: 3px solid var(--border);
-      white-space: nowrap; animation: toastIn 0.25s ease, toastFade 0.3s 2.4s ease forwards;
-    }
-    @keyframes toastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes toastFade { to { opacity:0; } }
+    /* Lightbox */
+    #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.93); z-index:400; justify-content:center; align-items:center; }
+    #lightbox.open { display:flex; }
+    #lightbox img { max-width:92vw; max-height:92vh; object-fit:contain; border-radius:4px; border:3px solid #ffffff33; }
+    #lightbox-close { position:absolute; top:20px; right:20px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#000; border:3px solid #fff; font-size:1.1rem; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
 
-    .blog-footer {
-      text-align: center; padding: 20px; border-top: 3px solid var(--border);
-      font-size: 0.82rem; opacity: 0.45; margin-top: 20px;
-      font-family: monospace; letter-spacing: 1px;
-    }
+    /* Toast */
+    #toast-root { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); z-index:999; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; }
+    .toast { background:var(--primary); color:#000; font-family:"Sour Gummy",sans-serif; font-size:0.9rem; font-weight:900; padding:10px 26px; border-radius:8px; border:3px solid var(--border); white-space:nowrap; animation:toastIn 0.25s ease, toastFade 0.3s 2.4s ease forwards; }
+    @keyframes toastIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes toastFade { to{opacity:0} }
 
-    @media (max-width: 600px) {
-      .blog-header { padding: 12px 14px; }
-      .site-wordmark { font-size: 1.3rem; }
-      .blog-hero { padding: 36px 16px; }
-      .post-body { padding: 18px 16px; }
-      .modal-box { padding: 22px 18px; }
-      .post-gallery { grid-template-columns: repeat(2,1fr); }
+    .blog-footer { text-align:center; padding:20px; border-top:3px solid var(--border); font-size:0.82rem; opacity:0.45; margin-top:20px; font-family:monospace; letter-spacing:1px; }
+
+    @media (max-width:900px) {
+      .blog-layout { grid-template-columns:1fr; }
+      .blog-sidebar { position:static; }
+    }
+    @media (max-width:600px) {
+      .blog-header { padding:12px 14px; }
+      .site-wordmark { font-size:1.3rem; }
+      .blog-hero { padding:36px 16px; }
+      .post-body { padding:18px 16px; }
+      .modal-box { padding:22px 18px; }
+      .post-gallery { grid-template-columns:repeat(2,1fr); }
     }
   </style>
 </head>
@@ -279,17 +219,62 @@
     <p class="hero-sub">Gaming. Coding. Streaming. Life. All of it.</p>
   </section>
 
-  <!-- FEED -->
-  <main>
-    <div class="posts-wrapper">
+  <!-- TWO-COLUMN LAYOUT -->
+  <div class="blog-layout">
+
+    <!-- MAIN: POSTS FEED -->
+    <main class="blog-main">
       <div id="posts-count" class="posts-count"></div>
       <div id="posts-feed"><div class="loading-state">Loading posts...</div></div>
-    </div>
-  </main>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="blog-sidebar">
+
+      <!-- About widget -->
+      <div class="widget">
+        <div class="widget-head">
+          <span id="wh-about">About</span>
+          <button class="btn-widget-edit" onclick="openWidgetEditor('about')" style="display:none" title="Edit widget">✏️</button>
+        </div>
+        <div class="widget-body" id="wb-about">
+          <p style="opacity:0.4;font-size:0.9rem">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Links widget -->
+      <div class="widget">
+        <div class="widget-head">
+          <span id="wh-links">Find Me</span>
+          <button class="btn-widget-edit" onclick="openWidgetEditor('links')" style="display:none" title="Edit widget">✏️</button>
+        </div>
+        <div class="widget-body" id="wb-links">
+          <p style="opacity:0.4;font-size:0.85rem">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Topics widget (auto from post tags) -->
+      <div class="widget">
+        <div class="widget-head"><span>Topics</span></div>
+        <div class="widget-body" id="wb-tags">
+          <p style="opacity:0.4;font-size:0.85rem">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Stats widget (auto) -->
+      <div class="widget">
+        <div class="widget-head"><span>Stats</span></div>
+        <div class="widget-body" id="wb-stats">
+          <p style="opacity:0.4;font-size:0.85rem">Loading...</p>
+        </div>
+      </div>
+
+    </aside>
+  </div>
 
   <footer class="blog-footer">tobyk1dd.com &mdash; all rights reserved</footer>
 
-  <!-- POST MODAL (New / Edit) -->
+  <!-- NEW / EDIT POST MODAL -->
   <div class="modal-overlay" id="post-modal">
     <div class="modal-box">
       <h2 class="modal-heading" id="post-modal-title">New Post</h2>
@@ -325,7 +310,7 @@
   <div class="modal-overlay" id="admin-modal">
     <div class="modal-box" style="max-width:380px;text-align:center">
       <h2 class="modal-heading">Admin Login</h2>
-      <p class="admin-sub">Sign in with your Supabase account to unlock write mode.</p>
+      <p class="admin-sub">Sign in to unlock write mode.</p>
       <div class="form-row" style="text-align:left">
         <label for="admin-email">Email</label>
         <input type="email" id="admin-email" placeholder="you@example.com"
@@ -342,6 +327,18 @@
     </div>
   </div>
 
+  <!-- WIDGET EDITOR MODAL -->
+  <div class="modal-overlay" id="widget-modal">
+    <div class="modal-box" style="max-width:500px">
+      <h2 class="modal-heading" id="widget-modal-title">Edit Widget</h2>
+      <div id="widget-modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn-ghost" onclick="closeWidgetModal()">Cancel</button>
+        <button id="widget-save-btn" onclick="saveWidget()">Save ✓</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LIGHTBOX -->
   <div id="lightbox">
     <button id="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -351,34 +348,31 @@
   <div id="toast-root"></div>
 
   <script>
-    /* ===================== SUPABASE CLIENT ===================== */
+    /* ===== SUPABASE ===== */
     const SUPABASE_URL  = 'https://jfxyzehiaynabzsnncjp.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmeHl6ZWhpYXluYWJ6c25uY2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDczNjIsImV4cCI6MjA5NjIyMzM2Mn0.k9nqufXZO-wu0UuKBYu5VVZ8y4t4QhCpLUNoSvTfi7I';
     const { createClient } = window.supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    /* ===================== STATE ===================== */
-    let isAdmin     = false;
-    let editingId   = null;   // uuid of post being edited
-    let draftImages = [];     // { type:'url', url:string } | { type:'file', file:File, preview:string }
+    /* ===== STATE ===== */
+    let isAdmin      = false;
+    let editingId    = null;
+    let editingWidget = null;
+    let draftImages  = [];
+    let widgetConfig = {};
 
-    /* ===================== INIT ===================== */
+    /* ===== INIT ===== */
     window.addEventListener('DOMContentLoaded', async () => {
-      // Dark mode
       if (localStorage.getItem('darkmode') === 'true') {
         document.body.classList.add('darkmode');
         document.getElementById('change-darkmode').textContent = '☀️';
       }
-
-      // Auth state listener — auto-restores session on reload
-      db.auth.onAuthStateChange((event, session) => {
-        setAdmin(!!session);
-      });
-
-      await loadPosts();
+      db.auth.onAuthStateChange((_event, session) => setAdmin(!!session));
+      await Promise.all([loadPosts(), loadConfig()]);
+      renderSidebar();
     });
 
-    /* ===================== DARK MODE ===================== */
+    /* ===== DARK MODE ===== */
     function toggleDark() {
       document.body.classList.toggle('darkmode');
       const on = document.body.classList.contains('darkmode');
@@ -386,13 +380,9 @@
       document.getElementById('change-darkmode').textContent = on ? '☀️' : '🌙';
     }
 
-    /* ===================== ADMIN TOGGLE ===================== */
+    /* ===== ADMIN ===== */
     function handleAdminBtn() {
-      if (isAdmin) {
-        signOut();
-      } else {
-        openAdminModal();
-      }
+      isAdmin ? signOut() : openAdminModal();
     }
 
     function setAdmin(on) {
@@ -400,38 +390,30 @@
       document.getElementById('new-post-btn').style.display = on ? 'inline-flex' : 'none';
       document.getElementById('admin-chip').style.display   = on ? 'inline'      : 'none';
       document.getElementById('admin-btn').textContent      = on ? '🔓'          : '🔐';
-      // Re-render to show/hide edit buttons
+      document.querySelectorAll('.btn-widget-edit').forEach(btn => {
+        btn.style.display = on ? 'inline' : 'none';
+      });
       renderPosts(window._cachedPosts || []);
     }
 
-    /* ===================== AUTH ===================== */
     function openAdminModal() {
       document.getElementById('admin-modal').classList.add('open');
       setTimeout(() => document.getElementById('admin-email').focus(), 80);
     }
-
     function closeAdminModal() {
       document.getElementById('admin-modal').classList.remove('open');
       document.getElementById('admin-email').value = '';
       document.getElementById('admin-pass').value  = '';
       document.getElementById('admin-error').style.display = 'none';
     }
-
     async function signIn() {
       const email = document.getElementById('admin-email').value.trim();
       const pass  = document.getElementById('admin-pass').value;
       const btn   = document.getElementById('sign-in-btn');
-
       if (!email || !pass) { toast('Enter email and password'); return; }
-
-      btn.textContent = 'Signing in...';
-      btn.disabled = true;
-
+      btn.textContent = 'Signing in...'; btn.disabled = true;
       const { error } = await db.auth.signInWithPassword({ email, password: pass });
-
-      btn.textContent = 'Sign In';
-      btn.disabled = false;
-
+      btn.textContent = 'Sign In'; btn.disabled = false;
       if (error) {
         document.getElementById('admin-error').style.display = 'block';
         document.getElementById('admin-pass').value = '';
@@ -440,67 +422,58 @@
         toast('Admin mode unlocked ✓');
       }
     }
-
     async function signOut() {
       await db.auth.signOut();
       toast('Signed out');
     }
 
-    /* ===================== LOAD POSTS ===================== */
+    /* ===== LOAD DATA ===== */
     async function loadPosts() {
-      const { data, error } = await db
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await db.from('blog_posts').select('*').order('created_at', { ascending: false });
       if (error) {
         document.getElementById('posts-feed').innerHTML =
-          '<div class="no-posts"><p>Could not load posts.<br><span style="font-size:0.85rem;opacity:0.6">' + error.message + '</span></p></div>';
+          `<div class="no-posts"><p>Could not load posts.<br><span style="font-size:0.85rem;opacity:0.6">${esc(error.message)}</span></p></div>`;
         return;
       }
-
       window._cachedPosts = data || [];
       renderPosts(window._cachedPosts);
     }
 
-    /* ===================== RENDER ===================== */
+    async function loadConfig() {
+      const { data } = await db.from('blog_config').select('*');
+      widgetConfig = {};
+      (data || []).forEach(row => { widgetConfig[row.key] = row.value; });
+    }
+
+    /* ===== RENDER POSTS ===== */
     function renderPosts(posts) {
       const feed  = document.getElementById('posts-feed');
       const count = document.getElementById('posts-count');
-
       if (!posts || posts.length === 0) {
         count.textContent = '';
         feed.innerHTML = `<div class="no-posts"><p>No posts yet.<br>
           <span style="font-size:0.88rem">Log in as admin to write your first post.</span></p></div>`;
         return;
       }
-
       count.textContent = `${posts.length} post${posts.length !== 1 ? 's' : ''}`;
       feed.innerHTML = posts.map(postCard).join('');
     }
 
     function postCard(p) {
-      const dateStr = new Date(p.created_at).toLocaleDateString('en-GB', {
-        day: 'numeric', month: 'long', year: 'numeric'
-      });
-
-      const tagsHtml = (p.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('');
-
+      const dateStr = new Date(p.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+      const tagsHtml = (p.tags||[]).map(t => `<span class="tag">${esc(t)}</span>`).join('');
       const heroHtml = p.images && p.images.length
         ? `<img class="post-hero-img lb-trigger" data-pid="${esc(p.id)}" data-idx="0" src="${esc(p.images[0])}" alt="Post image" />`
         : '';
-
-      const extraImgs = (p.images || []).slice(1).map((img, i) =>
-        `<img src="${esc(img)}" class="lb-trigger" data-pid="${esc(p.id)}" data-idx="${i + 1}" alt="Post image" />`
+      const extraImgs = (p.images||[]).slice(1).map((img,i) =>
+        `<img src="${esc(img)}" class="lb-trigger" data-pid="${esc(p.id)}" data-idx="${i+1}" alt="Post image" />`
       ).join('');
       const galleryHtml = extraImgs ? `<div class="post-gallery">${extraImgs}</div>` : '';
-
       const adminHtml = isAdmin ? `
         <div class="post-actions">
           <button class="btn-ghost" onclick="openEditModal('${esc(p.id)}')">✏️ Edit</button>
           <button class="btn-danger" onclick="deletePost('${esc(p.id)}')">🗑️ Delete</button>
         </div>` : '';
-
       return `
         <article class="post-card" id="post-${esc(p.id)}">
           ${heroHtml}
@@ -518,23 +491,157 @@
     }
 
     function esc(str) {
-      return String(str ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return String(str??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    /* ===================== LIGHTBOX (event delegation) ===================== */
+    /* ===== RENDER SIDEBAR ===== */
+    function renderSidebar() {
+      renderAboutWidget();
+      renderLinksWidget();
+      renderTagsWidget();
+      renderStatsWidget();
+    }
+
+    function renderAboutWidget() {
+      const d = widgetConfig.sidebar_about || { title:'About', text:'Hey, I\'m Toby. Streamer, coder, gamer. Based in Nuneaton, England.' };
+      document.getElementById('wh-about').textContent = d.title || 'About';
+      document.getElementById('wb-about').innerHTML = d.text
+        ? `<p style="font-size:0.92rem;line-height:1.65;opacity:0.85">${esc(d.text).replace(/\n/g,'<br>')}</p>`
+        : `<p style="opacity:0.4;font-size:0.9rem">No bio set yet.</p>`;
+    }
+
+    function renderLinksWidget() {
+      const d = widgetConfig.sidebar_links || { title:'Find Me', links:[] };
+      document.getElementById('wh-links').textContent = d.title || 'Find Me';
+      const body = document.getElementById('wb-links');
+      if (!d.links || d.links.length === 0) {
+        body.innerHTML = '<p style="opacity:0.4;font-size:0.85rem">No links added yet.</p>';
+        return;
+      }
+      body.innerHTML = d.links.map(l => `
+        <a href="${esc(l.url)}" target="_blank" rel="noopener" class="social-link">
+          ${l.icon ? `<span>${esc(l.icon)}</span>` : ''}
+          <span>${esc(l.label)}</span>
+        </a>`).join('');
+    }
+
+    function renderTagsWidget() {
+      const posts = window._cachedPosts || [];
+      const tags  = [...new Set(posts.flatMap(p => p.tags||[]))].sort();
+      const body  = document.getElementById('wb-tags');
+      body.innerHTML = tags.length
+        ? `<div class="tag-cloud">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>`
+        : `<p style="opacity:0.4;font-size:0.85rem">No topics yet.</p>`;
+    }
+
+    function renderStatsWidget() {
+      const posts = window._cachedPosts || [];
+      const tags  = [...new Set(posts.flatMap(p => p.tags||[]))];
+      document.getElementById('wb-stats').innerHTML = `
+        <div class="stat-row"><span>Total posts</span><strong>${posts.length}</strong></div>
+        <div class="stat-row"><span>Topics covered</span><strong>${tags.length}</strong></div>
+        <div class="stat-row"><span>Images</span><strong>${posts.reduce((n,p)=>n+(p.images||[]).length,0)}</strong></div>`;
+    }
+
+    /* ===== WIDGET EDITOR ===== */
+    function openWidgetEditor(key) {
+      editingWidget = key;
+      if (key === 'about') {
+        const d = widgetConfig.sidebar_about || { title:'About', text:'' };
+        document.getElementById('widget-modal-title').textContent = 'Edit About Widget';
+        document.getElementById('widget-modal-body').innerHTML = `
+          <div class="form-row">
+            <label>Widget Title</label>
+            <input type="text" id="we-title" value="${esc(d.title)}" placeholder="About" />
+          </div>
+          <div class="form-row">
+            <label>Bio Text</label>
+            <textarea id="we-text" style="min-height:140px" placeholder="Tell people who you are...">${esc(d.text)}</textarea>
+          </div>`;
+      } else if (key === 'links') {
+        const d = widgetConfig.sidebar_links || { title:'Find Me', links:[] };
+        document.getElementById('widget-modal-title').textContent = 'Edit Links Widget';
+        document.getElementById('widget-modal-body').innerHTML = `
+          <div class="form-row">
+            <label>Widget Title</label>
+            <input type="text" id="we-title" value="${esc(d.title)}" placeholder="Find Me" />
+          </div>
+          <div class="form-row">
+            <label>Links <span style="opacity:0.5;text-transform:none;font-weight:400">(icon · label · URL)</span></label>
+            <div id="we-links-list">${(d.links||[]).map(linkRow).join('')}</div>
+            <button class="btn-ghost" onclick="addLinkRow()" style="width:100%;margin-top:8px">+ Add Link</button>
+          </div>`;
+      }
+      document.getElementById('widget-modal').classList.add('open');
+    }
+
+    function linkRow(l) {
+      return `<div class="link-row">
+        <input type="text" class="lr-icon" placeholder="🎮" value="${esc(l.icon||'')}" maxlength="4" />
+        <input type="text" class="lr-label" placeholder="Label" value="${esc(l.label||'')}" />
+        <input type="text" class="lr-url" placeholder="https://..." value="${esc(l.url||'')}" />
+        <button class="lr-remove" onclick="this.closest('.link-row').remove()" title="Remove">✕</button>
+      </div>`;
+    }
+
+    function addLinkRow() {
+      const list = document.getElementById('we-links-list');
+      const div  = document.createElement('div');
+      div.innerHTML = linkRow({});
+      list.appendChild(div.firstElementChild);
+    }
+
+    async function saveWidget() {
+      const key = editingWidget;
+      let value;
+
+      if (key === 'about') {
+        value = {
+          title: document.getElementById('we-title').value.trim() || 'About',
+          text:  document.getElementById('we-text').value.trim()
+        };
+      } else if (key === 'links') {
+        const rows = document.querySelectorAll('#we-links-list .link-row');
+        value = {
+          title: document.getElementById('we-title').value.trim() || 'Find Me',
+          links: Array.from(rows).map(row => ({
+            icon:  row.querySelector('.lr-icon').value.trim(),
+            label: row.querySelector('.lr-label').value.trim(),
+            url:   row.querySelector('.lr-url').value.trim()
+          })).filter(l => l.label && l.url)
+        };
+      }
+
+      const dbKey = key === 'about' ? 'sidebar_about' : 'sidebar_links';
+      const btn = document.getElementById('widget-save-btn');
+      btn.textContent = 'Saving...'; btn.disabled = true;
+
+      const { error } = await db.from('blog_config')
+        .upsert({ key: dbKey, value }, { onConflict: 'key' });
+
+      btn.textContent = 'Save ✓'; btn.disabled = false;
+
+      if (error) { toast('Save failed: ' + error.message); return; }
+      widgetConfig[dbKey] = value;
+      renderSidebar();
+      closeWidgetModal();
+      toast('Widget saved ✓');
+    }
+
+    function closeWidgetModal() {
+      document.getElementById('widget-modal').classList.remove('open');
+      editingWidget = null;
+    }
+
+    /* ===== LIGHTBOX ===== */
     document.addEventListener('click', e => {
       const el = e.target.closest('.lb-trigger');
       if (!el) return;
       const pid = el.dataset.pid;
       const idx = Number(el.dataset.idx);
-      const post = (window._cachedPosts || []).find(p => p.id === pid);
+      const post = (window._cachedPosts||[]).find(p => p.id === pid);
       if (post && post.images[idx]) openLightbox(post.images[idx]);
     });
-
     function openLightbox(src) {
       document.getElementById('lightbox-img').src = src;
       document.getElementById('lightbox').classList.add('open');
@@ -547,22 +654,21 @@
       if (e.target === this) closeLightbox();
     });
 
-    /* ===================== POST MODAL ===================== */
-    function openPostModal(editId = null) {
+    /* ===== POST MODAL ===== */
+    function openPostModal(editId=null) {
       if (!isAdmin) return;
       editingId   = editId;
       draftImages = [];
       document.getElementById('img-preview-grid').innerHTML = '';
       document.getElementById('f-images').value = '';
-
       if (editId) {
-        const p = (window._cachedPosts || []).find(x => x.id === editId);
+        const p = (window._cachedPosts||[]).find(x => x.id===editId);
         if (!p) return;
         document.getElementById('post-modal-title').textContent = 'Edit Post';
         document.getElementById('f-title').value   = p.title;
-        document.getElementById('f-tags').value    = (p.tags || []).join(', ');
+        document.getElementById('f-tags').value    = (p.tags||[]).join(', ');
         document.getElementById('f-content').value = p.content;
-        draftImages = (p.images || []).map(url => ({ type: 'url', url }));
+        draftImages = (p.images||[]).map(url => ({ type:'url', url }));
         renderPreviews();
       } else {
         document.getElementById('post-modal-title').textContent = 'New Post';
@@ -570,106 +676,84 @@
         document.getElementById('f-tags').value    = '';
         document.getElementById('f-content').value = '';
       }
-
       document.getElementById('post-modal').classList.add('open');
       setTimeout(() => document.getElementById('f-title').focus(), 80);
     }
-
     function openEditModal(id) { openPostModal(id); }
-
     function closePostModal() {
-      // Revoke any object URLs we created
-      draftImages.forEach(img => {
-        if (img.type === 'file' && img.preview) URL.revokeObjectURL(img.preview);
-      });
+      draftImages.forEach(img => { if (img.type==='file'&&img.preview) URL.revokeObjectURL(img.preview); });
       document.getElementById('post-modal').classList.remove('open');
       editingId   = null;
       draftImages = [];
     }
 
-    /* ===================== IMAGE HANDLING ===================== */
+    /* ===== IMAGE HANDLING ===== */
     function handleImageUpload(files) {
       Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
+        if (!file.type.startsWith('image\/')) return;
         const preview = URL.createObjectURL(file);
-        draftImages.push({ type: 'file', file, preview });
+        draftImages.push({ type:'file', file, preview });
         renderPreviews();
       });
       document.getElementById('f-images').value = '';
     }
-
     function renderPreviews() {
-      document.getElementById('img-preview-grid').innerHTML = draftImages.map((img, i) => {
-        const src = img.type === 'url' ? img.url : img.preview;
+      document.getElementById('img-preview-grid').innerHTML = draftImages.map((img,i) => {
+        const src = img.type==='url' ? img.url : img.preview;
         return `<div class="preview-thumb">
           <img src="${src}" alt="Preview" />
           <button class="thumb-remove" onclick="removeImg(${i})">✕</button>
         </div>`;
       }).join('');
     }
-
     function removeImg(i) {
       const img = draftImages[i];
-      if (img.type === 'file' && img.preview) URL.revokeObjectURL(img.preview);
-      draftImages.splice(i, 1);
+      if (img.type==='file'&&img.preview) URL.revokeObjectURL(img.preview);
+      draftImages.splice(i,1);
       renderPreviews();
     }
-
-    /* Upload any pending files, return final URL array */
     async function resolveImages() {
       const urls = [];
       for (const img of draftImages) {
-        if (img.type === 'url') {
-          urls.push(img.url);
-        } else {
-          const ext  = img.file.name.split('.').pop().toLowerCase();
-          const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-          const { error } = await db.storage.from('blog-images').upload(path, img.file);
-          if (error) throw new Error('Image upload failed: ' + error.message);
-          const { data: { publicUrl } } = db.storage.from('blog-images').getPublicUrl(path);
-          urls.push(publicUrl);
-        }
+        if (img.type==='url') { urls.push(img.url); continue; }
+        const ext  = img.file.name.split('.').pop().toLowerCase();
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await db.storage.from('blog-images').upload(path, img.file);
+        if (error) throw new Error('Image upload failed: ' + error.message);
+        const { data:{publicUrl} } = db.storage.from('blog-images').getPublicUrl(path);
+        urls.push(publicUrl);
       }
       return urls;
     }
 
-    /* ===================== SAVE / DELETE POST ===================== */
+    /* ===== SAVE / DELETE POST ===== */
     async function savePost() {
       const title   = document.getElementById('f-title').value.trim();
       const content = document.getElementById('f-content').value.trim();
       const tagsRaw = document.getElementById('f-tags').value.trim();
-      const tags    = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
-
-      if (!title)   { toast('Add a title first!');         return; }
-      if (!content) { toast('Post needs some content!');   return; }
-
+      const tags    = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(Boolean) : [];
+      if (!title)   { toast('Add a title first!');       return; }
+      if (!content) { toast('Post needs some content!'); return; }
       const btn = document.getElementById('publish-btn');
-      btn.textContent = 'Publishing...';
-      btn.disabled    = true;
-
+      btn.textContent = 'Publishing...'; btn.disabled = true;
       try {
         const images = await resolveImages();
-
         if (editingId) {
-          const { error } = await db.from('blog_posts')
-            .update({ title, content, tags, images })
-            .eq('id', editingId);
+          const { error } = await db.from('blog_posts').update({ title, content, tags, images }).eq('id', editingId);
           if (error) throw error;
           toast('Post updated ✓');
         } else {
-          const { error } = await db.from('blog_posts')
-            .insert([{ title, content, tags, images }]);
+          const { error } = await db.from('blog_posts').insert([{ title, content, tags, images }]);
           if (error) throw error;
           toast('Post published ✓');
         }
-
         closePostModal();
         await loadPosts();
-      } catch (err) {
+        renderSidebar();
+      } catch(err) {
         toast('Error: ' + err.message);
       } finally {
-        btn.textContent = 'Publish ✓';
-        btn.disabled    = false;
+        btn.textContent = 'Publish ✓'; btn.disabled = false;
       }
     }
 
@@ -679,23 +763,21 @@
       if (error) { toast('Delete failed: ' + error.message); return; }
       toast('Post deleted');
       await loadPosts();
+      renderSidebar();
     }
 
-    /* ===================== TOAST ===================== */
+    /* ===== TOAST ===== */
     function toast(msg) {
       const el = document.createElement('div');
-      el.className  = 'toast';
-      el.textContent = msg;
+      el.className = 'toast'; el.textContent = msg;
       document.getElementById('toast-root').appendChild(el);
       setTimeout(() => el.remove(), 2800);
     }
 
-    /* ===================== KEYBOARD ===================== */
+    /* ===== KEYBOARD ===== */
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      closeLightbox();
-      closeAdminModal();
-      closePostModal();
+      closeLightbox(); closeAdminModal(); closePostModal(); closeWidgetModal();
     });
   </script>
 </body>
