@@ -633,6 +633,17 @@
       return urls;
     }
 
+    /* ===================== SLUG HELPER ===================== */
+    function slugify(str) {
+      return str
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        + '-' + Date.now();
+    }
+
     /* ===================== SAVE / DELETE POST ===================== */
     async function savePost() {
       const title   = document.getElementById('f-title').value.trim();
@@ -657,8 +668,9 @@
           if (error) throw error;
           toast('Post updated ✓');
         } else {
+          const slug = slugify(title);
           const { error } = await db.from('posts')
-            .insert([{ title, content, tags, images }]);
+            .insert([{ title, content, tags, images, slug }]);
           if (error) throw error;
           toast('Post published ✓');
         }
