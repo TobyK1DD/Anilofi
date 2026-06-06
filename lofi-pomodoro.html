@@ -1077,6 +1077,7 @@ function togglePlay() {
     document.getElementById('noteArea').classList.remove('visible');
     intervalId=setInterval(tick,1000);
   }
+  if(myRoomCode){broadcastState();renderPeers();}
 }
 
 function tick() {
@@ -1565,17 +1566,9 @@ function updateRoomNavBtn(inRoom) {
 })();
 
 // broadcast when timer state changes (hook into existing tick)
-const _origTick = tick;
+// broadcast when timer state changes — inlined into togglePlay, resetTimer, skipSession above
 // re-broadcast on play/pause/mode changes — we hook broadcastState
 // into togglePlay, setMode, resetTimer, skipSession via a wrapper
-// hook room broadcast into timer controls
-const _origTogglePlay = togglePlay;
-function togglePlay() { _origTogglePlay(); _afterAction(); }
-const _origReset = resetTimer;
-function resetTimer() { _origReset(); _afterAction(); }
-const _origSkip = skipSession;
-function skipSession() { _origSkip(); _afterAction(); }
-
 // ══════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════
