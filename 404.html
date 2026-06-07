@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | TobyK1DD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Dot grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, #222 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.45;
+      z-index: 0;
+    }
+
+    /* Red glow blob behind dialog */
+    body::after {
+      content: '';
+      position: fixed;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(246, 78, 78, 0.06) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Atmospheric ghost windows in background */
+    .bg-win {
+      position: fixed;
+      background: rgba(18, 18, 18, 0.5);
+      border: 1px solid rgba(35, 35, 35, 0.6);
+      border-radius: 8px;
+      z-index: 0;
+      animation: floatWin ease-in-out infinite;
+    }
+
+    .bg-win-bar {
+      height: 26px;
+      background: rgba(22, 22, 22, 0.7);
+      border-bottom: 1px solid rgba(35, 35, 35, 0.5);
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 10px;
+    }
+
+    .bg-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(60,60,60,0.6); }
+
+    .bg-win-1 { width: 220px; height: 130px; top: 7%;  left: 4%;  animation-duration: 7s;  animation-delay: 0s; }
+    .bg-win-2 { width: 160px; height: 100px; bottom: 10%; right: 5%; animation-duration: 9s;  animation-delay: 1.5s; }
+    .bg-win-3 { width: 130px; height: 80px;  top: 62%; left: 7%;  animation-duration: 11s; animation-delay: 3s; }
+    .bg-win-4 { width: 100px; height: 65px;  top: 15%; right: 9%; animation-duration: 8s;  animation-delay: 2s; }
+
+    @keyframes floatWin {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    /* Page centre content */
+    .page-centre {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.6rem;
+    }
+
+    /* Main Y2K error dialog */
+    .dialog {
+      background: #141414;
+      border: 1px solid #242424;
+      border-radius: 12px;
+      overflow: hidden;
+      width: 460px;
+      max-width: calc(100vw - 2rem);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 0 60px rgba(246, 78, 78, 0.05);
+      animation: dialogPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes dialogPop {
+      from { opacity: 0; transform: scale(0.8) translateY(30px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Title bar */
+    .dialog-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #222;
+    }
+
+    .tl { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .tl-r { background: #f64e4e; }
+    .tl-y { background: #f6c04e; }
+    .tl-g { background: #3fcf8e; }
+
+    .dialog-win-title {
+      font-family: 'Sour Gummy', cursive;
+      font-size: 0.78rem;
+      color: #505050;
+      margin-left: 7px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Dialog body */
+    .dialog-body {
+      padding: 2.8rem 2.2rem 2.2rem;
+      text-align: center;
+    }
+
+    .error-num {
+      font-family: 'Sour Gummy', cursive;
+      font-size: clamp(5rem, 15vw, 7rem);
+      font-weight: 900;
+      color: #f64e4e;
+      line-height: 1;
+      letter-spacing: -4px;
+      margin-bottom: 0.3rem;
+      animation: glitch 4s ease-in-out infinite;
+    }
+
+    @keyframes glitch {
+      0%, 90%, 100% { text-shadow: none; transform: none; }
+      91% { text-shadow: 3px 0 0 rgba(78,200,246,0.6), -3px 0 0 rgba(246,78,78,0.6); transform: skewX(-3deg); }
+      92% { text-shadow: -3px 0 0 rgba(78,200,246,0.6),  3px 0 0 rgba(246,78,78,0.6); transform: skewX(3deg); }
+      93% { text-shadow: none; transform: none; }
+    }
+
+    .error-subtitle {
+      font-family: 'Sour Gummy', cursive;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ccc;
+      margin-bottom: 1.1rem;
+    }
+
+    .error-msg {
+      color: #5a5a5a;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      margin-bottom: 2.2rem;
+    }
+
+    /* Buttons */
+    .dialog-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      font-family: 'Sour Gummy', cursive;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      background: #f64e4e;
+      padding: 10px 22px;
+      border-radius: 7px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-home:hover {
+      background: #d63c3c;
+      transform: translateY(-2px);
+    }
+
+    .btn-blog {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      font-family: 'Sour Gummy', cursive;
+      font-size: 0.9rem;
+      color: #666;
+      background: #1b1b1b;
+      border: 1px solid #272727;
+      padding: 10px 22px;
+      border-radius: 7px;
+      transition: color 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .btn-blog:hover {
+      color: #bbb;
+      border-color: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    /* Status bar */
+    .dialog-statusbar {
+      background: #101010;
+      border-top: 1px solid #1e1e1e;
+      padding: 7px 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-blink {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f64e4e;
+      animation: blink 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    .status-text {
+      font-size: 0.68rem;
+      color: #3a3a3a;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      letter-spacing: 0.04em;
+    }
+
+    /* Brand word below dialog */
+    .brand-wordmark {
+      font-family: 'Sour Gummy', cursive;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #252525;
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      transition: color 0.2s;
+    }
+
+    .brand-wordmark:hover {
+      color: #f64e4e;
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .bg-win { display: none; }
+      .error-num { letter-spacing: -2px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ghost windows floating in background for atmosphere -->
+  <div class="bg-win bg-win-1">
+    <div class="bg-win-bar">
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+    </div>
+  </div>
+  <div class="bg-win bg-win-2">
+    <div class="bg-win-bar">
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+    </div>
+  </div>
+  <div class="bg-win bg-win-3">
+    <div class="bg-win-bar">
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+    </div>
+  </div>
+  <div class="bg-win bg-win-4">
+    <div class="bg-win-bar">
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+      <div class="bg-dot"></div>
+    </div>
+  </div>
+
+  <div class="page-centre">
+
+    <div class="dialog">
+
+      <div class="dialog-titlebar">
+        <span class="tl tl-r"></span>
+        <span class="tl tl-y"></span>
+        <span class="tl tl-g"></span>
+        <span class="dialog-win-title">error_404.exe — Page Not Found</span>
+      </div>
+
+      <div class="dialog-body">
+        <div class="error-num">404</div>
+        <div class="error-subtitle">You've gone off the map.</div>
+        <p class="error-msg">
+          Whatever you were looking for doesn't live here.<br>
+          Maybe it moved. Maybe it never existed.<br>
+          Either way — you're lost.
+        </p>
+        <div class="dialog-actions">
+          <a href="/" class="btn-home">← Back to Home</a>
+          <a href="/Blog.html" class="btn-blog">Read the Blog</a>
+        </div>
+      </div>
+
+      <div class="dialog-statusbar">
+        <div class="status-blink"></div>
+        <span class="status-text">HTTP 404 · tobyk1dd.com · page not found</span>
+      </div>
+
+    </div>
+
+    <a href="/" class="brand-wordmark">TOBYK1DD.</a>
+
+  </div>
+
+</body>
+</html>
