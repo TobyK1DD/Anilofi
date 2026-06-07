@@ -3288,6 +3288,7 @@ function startMode(mode) {
     buildBatch();
   } else if (mode === 'quick5') {
     showQuizUI('batch');
+    progressWrap.style.display = 'block';
     // Ensure all domains active for quick quiz
     var qBank = getActiveBank();
     activeDomains = new Set(qBank.map(function(q){ return q.domain; }));
@@ -3304,12 +3305,7 @@ function startMode(mode) {
     // Hide the free lightning banner
     var flb = document.getElementById('free-lightning-banner');
     if (flb) flb.classList.remove('show');
-    var dq = getDailyQuestion(currentExam);
-    if (dq) {
-      loadingEl.style.display = 'none';
-      quizCard.style.display = 'block';
-      renderQuestion(dq);
-    }
+    loadNextQuestion();
   } else if (mode === 'bookmarked') {
     showQuizUI('lightning');
     lightningStats = {total:0, correct:0, wrong:0};
@@ -3650,6 +3646,12 @@ nextBtn.addEventListener('click', () => {
 let recentLightningIds = [];
 
 async function loadNextQuestion() {
+  // Daily question — pick today's fixed question instead of random
+  if (sessionMode === 'daily') {
+    var dq = getDailyQuestion(currentExam);
+    if (dq) { renderQuestion(dq); }
+    return;
+  }
   // Free lightning limit check
   if (!isPremium && sessionMode === 'lightning' && freeLightningCount >= FREE_LIGHTNING_LIMIT) {
     var modal = document.getElementById('free-lightning-done-modal');
@@ -4608,7 +4610,7 @@ function recordAnswer(q, isCorrect) {
   if (!isGuestSession && currentUser) saveUserData(currentUser, userData);
 
   // Batch tracking
-  if (sessionMode === 'batch') {
+  if (sessionMode === 'batch' || sessionMode === 'quick5') {
     batchResults.push({ q, correct: isCorrect, userAnswer: q._userAnswer, chosen: q._userAnswer });
   }
 }
