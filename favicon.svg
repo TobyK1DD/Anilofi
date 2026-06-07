@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background -->
+  <rect width="32" height="32" rx="7" fill="#111111"/>
+  <!-- T — horizontal bar -->
+  <rect x="5" y="8" width="22" height="4.5" rx="2" fill="#f64e4e"/>
+  <!-- T — vertical stem -->
+  <rect x="13.75" y="8" width="4.5" height="17" rx="2" fill="#f64e4e"/>
+</svg>
