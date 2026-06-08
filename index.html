@@ -1,491 +1,999 @@
 <!DOCTYPE html>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="main.css">
-        <title>TobyK1DD's World</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    </head>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tobyk1dd.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ════════════════════════════════════
+   VARS — Main.css light mode, exact
+════════════════════════════════════ */
+:root {
+  --bg:       #c8d0d3;
+  --bg-soft:  #e3edf0;
+  --bg-card:  #dce8ed;
+  --text:     #000000;
+  --text-mid: #444444;
+  --text-dim: #777777;
+  --primary:  #f64e4e;
+  --border:   #ffffff;
+  --accent:   #aac6d3;
+
+  /* overlay dot palette */
+  --dot-r:    #f78af2;
+  --dot-y:    #f6c14e;
+  --dot-g:    #aac6d3;
+
+  --green:    #3cba6f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Sour Gummy', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ════════════════════════════════════
+   WINDOW CHROME
+   From overlay: 4px solid white border,
+   border-radius 10px, red winbar
+════════════════════════════════════ */
+.win {
+  border: 4px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+}
+
+.winbar {
+  background: var(--primary);
+  border-bottom: 4px solid var(--border);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 36px;
+}
+
+.winbar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── circular dots from overlay ── */
+.wbtns { display: flex; gap: 5px; }
+.wbtn {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.wbtn:hover { opacity: 0.65; }
+.wbtn.r { background: var(--dot-r); }
+.wbtn.y { background: var(--dot-y); }
+.wbtn.g { background: var(--dot-g); }
+
+/* live badge from overlay .live-badge */
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+}
+.badge-live    { background: var(--green); color: #fff; }
+.badge-offline { background: rgba(0,0,0,0.15); color: rgba(255,255,255,0.7); }
+
+/* ════════════════════════════════════
+   BUTTONS — Main.css style exactly:
+   font Sour Gummy, 3px solid white,
+   border-radius 8px, padding 10px 20px
+════════════════════════════════════ */
+.btn {
+  font-family: 'Sour Gummy', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 3px solid var(--border);
+  background: var(--primary);
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.btn:hover {
+  background: var(--bg);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-outline {
+  background: var(--bg-soft);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-outline:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--border);
+}
+
+/* ════════════════════════════════════
+   NAV — matches screenshot exactly:
+   centered row of red buttons
+════════════════════════════════════ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--bg);
+  border-bottom: 3px solid var(--border);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.nav-link {
+  font-family: 'Sour Gummy', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 3px solid var(--border);
+  background: var(--primary);
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.nav-link:hover {
+  background: var(--bg-soft);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.nav-toggle {
+  font-family: 'Sour Gummy', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 3px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.2s;
+}
+.nav-toggle:hover { background: var(--bg); }
+
+/* ════════════════════════════════════
+   LAYOUT
+════════════════════════════════════ */
+main { }
+
+.section { padding: 20px 32px; }
+.section-sm { padding: 10px 32px 20px; }
+
+.s-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.s-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+.s-rule {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hero {
+  padding: 52px 32px 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Logo — solid red Sour Gummy + black dot, matching Blog.html header style */
+.hero-logo {
+  font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  animation: logoIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.logo-dot { color: var(--text); }
+
+@keyframes logoIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.hero-greeting {
+  margin-top: 36px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  animation: up 0.5s 0.3s both;
+}
+
+.hero-bio {
+  margin-top: 16px;
+  max-width: 800px;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-mid);
+  line-height: 1.75;
+  text-align: center;
+  animation: up 0.5s 0.45s both;
+}
+
+.hero-cta {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: up 0.5s 0.6s both;
+}
+
+/* quick stats panel */
+.hero-stats {
+  margin-top: 40px;
+  display: flex;
+  gap: 0;
+  border: 4px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  animation: up 0.5s 0.75s both;
+}
+
+.stat-cell {
+  padding: 16px 32px;
+  background: var(--bg-soft);
+  border-right: 4px solid var(--border);
+  text-align: center;
+}
+.stat-cell:last-child { border-right: none; }
+
+.stat-val {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+.stat-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 4px;
+}
+
+/* ════════════════════════════════════
+   DIVIDER
+════════════════════════════════════ */
+.divider {
+  height: 4px;
+  background: var(--border);
+  margin: 0 32px;
+  border-radius: 2px;
+}
+
+/* ════════════════════════════════════
+   SECTION HEADING — "Things I've Built"
+   with "Built" in red, matches screenshot
+════════════════════════════════════ */
+.section-heading {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.section-heading h2 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.section-heading h2 .red { color: var(--primary); }
+
+/* ════════════════════════════════════
+   PROJECT CARDS
+   Matches screenshot window chrome
+════════════════════════════════════ */
+.proj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.proj-win {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.proj-win:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+}
+
+/* preview area inside card — matches screenshot */
+.proj-preview {
+  height: 120px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 4px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-certready {
+  background: linear-gradient(135deg, #e8f0f5 0%, #dde8ed 100%);
+}
+.preview-certready::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%; height: 12px;
+  background: var(--primary);
+  border-radius: 6px;
+  box-shadow: 0 16px 0 rgba(246,78,78,0.5), 0 32px 0 rgba(246,78,78,0.3);
+}
+
+.preview-lofi {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.preview-lofi .timer-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #a855f7;
+  font-family: 'Sour Gummy', sans-serif;
+}
+.preview-lofi .wave {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 20px;
+}
+.wave span {
+  width: 4px;
+  background: rgba(168,85,247,0.6);
+  border-radius: 2px;
+  animation: wave 1.2s ease-in-out infinite;
+}
+.wave span:nth-child(2) { animation-delay: 0.15s; }
+.wave span:nth-child(3) { animation-delay: 0.3s; }
+.wave span:nth-child(4) { animation-delay: 0.15s; }
+.wave span:nth-child(5) { animation-delay: 0s; }
+@keyframes wave {
+  0%,100% { height: 6px; }
+  50%      { height: 18px; }
+}
+
+.preview-code {
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 16px;
+  gap: 4px;
+}
+.code-line {
+  font-family: monospace;
+  font-size: 11px;
+  display: flex;
+  gap: 10px;
+}
+.code-n { color: #555; width: 12px; text-align: right; flex-shrink: 0; }
+.code-txt { color: #aaa; }
+.code-txt .k { color: #f64e4e; }
+.code-txt .v { color: #aac6d3; }
+.code-txt .s { color: #f6c14e; }
+
+.proj-info {
+  padding: 16px 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.proj-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.proj-desc {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-mid);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+
+.tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+/* goal-strip from overlay — reused as card footer */
+.proj-strip {
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border-top: 4px solid var(--border);
+  padding: 8px 14px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.proj-live {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.proj-live::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid var(--border);
+  animation: dot-pulse 2s infinite;
+}
+
+.proj-link {
+  font-family: 'Sour Gummy', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  background: var(--primary);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  transition: all 0.15s;
+}
+.proj-link:hover { background: var(--bg); color: var(--primary); border-color: var(--primary); }
+
+/* ════════════════════════════════════
+   ABOUT WINDOW
+════════════════════════════════════ */
+.about-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 220px;
+}
+
+.about-left {
+  padding: 32px 36px;
+  border-right: 4px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.about-h {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.about-h em { color: var(--primary); font-style: normal; }
+
+.about-p {
+  font-size: 14px;
+  color: var(--text-mid);
+  line-height: 1.8;
+}
+
+/* skill bars — goal-strip pattern from overlay */
+.skills { display: flex; flex-direction: column; gap: 11px; }
+.skill-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+.skill-n {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.bar-bg {
+  background: var(--accent);
+  border-radius: 20px;
+  height: 14px;
+  border: 3px solid var(--border);
+  overflow: hidden;
+}
+.bar-fill {
+  background: var(--primary);
+  height: 100%;
+  border-radius: 20px;
+  animation: barGrow 1s ease-out both;
+}
+@keyframes barGrow { from { width: 0 !important; } }
+
+.about-right {
+  background: var(--bg-card);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.about-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(246,78,78,0.15) 0%, transparent 70%);
+}
+
+.char-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 20px;
+}
+.char-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--primary);
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ════════════════════════════════════
+   CONNECT ROW
+════════════════════════════════════ */
+.connect-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.connect-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.connect-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.connect-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.connect-desc {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.6;
+  flex: 1;
+}
+.connect-strip {
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border-top: 4px solid var(--border);
+  padding: 8px 14px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+}
+.connect-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+.connect-link:hover { text-decoration: underline; }
+
+/* ════════════════════════════════════
+   STATUS BAR
+   Exactly mirrors overlay .goal-strip
+════════════════════════════════════ */
+footer.statusbar {
+  background: var(--bg-soft);
+  border-top: 4px solid var(--border);
+  height: 44px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+}
+
+.sb-item {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.sb-goal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 280px;
+}
+
+.sb-bar {
+  flex: 1;
+  background: var(--accent);
+  border-radius: 20px;
+  height: 14px;
+  border: 3px solid var(--border);
+  overflow: hidden;
+}
+.sb-fill {
+  background: var(--primary);
+  height: 100%;
+  border-radius: 20px;
+  width: 47%;
+}
+.sb-nums {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.sb-spacer { flex: 1; }
+
+.sb-clock {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+/* ════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════ */
+@keyframes up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+</style>
+</head>
 <body>
-    <style>
-            .projects-section {
-      max-width: 1080px;
-      margin: 3rem auto;
-      padding: 0 1rem;
-    }
 
-    .projects-header {
-      margin-bottom: 2.5rem;
-    }
+<!-- ══════════════════════════════════
+     NAVBAR — centered button row,
+     matches screenshot exactly
+══════════════════════════════════ -->
+<nav class="navbar">
+  <a href="#"          class="nav-link">Home</a>
+  <a href="#about"     class="nav-link">About Me</a>
+  <a href="#connect"   class="nav-link">Blog</a>
+  <a href="#projects"  class="nav-link">My Work</a>
+  <a href="#connect"   class="nav-link">Contact</a>
+  <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+</nav>
 
-    .projects-eyebrow {
-      font-family: 'Sour Gummy', cursive;
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #f64e4e;
-      margin-bottom: 0.45rem;
-    }
+<main>
 
-    .projects-heading {
-      font-family: 'Sour Gummy', cursive;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 900;
-      color: #f0f0f0;
-      line-height: 1.1;
-    }
+  <!-- ══════════════════════════════════
+       HERO — outlined chunky logo
+  ══════════════════════════════════ -->
+  <section class="hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
 
-    .projects-heading em {
-      font-style: normal;
-      color: #f64e4e;
-    }
+    <p class="hero-greeting">Hi I'm TobyK1DD</p>
 
-    /* Grid */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 1.4rem;
-    }
+    <p class="hero-bio">
+      A self-taught developer and Twitch streamer from Nuneaton. I build web apps from scratch —
+      a CompTIA revision tool, a lofi study timer with real-time multiplayer rooms, a code learning platform —
+      and stream sports games when I'm not deep in a rabbit hole. Into anime, football on Thursdays, and
+      the feeling when something I built actually works. The blog is where I put the rest — sharing my journey.
+    </p>
 
-    /* Card */
-    .project-card {
-      background: #c8d0d3;
-      border: 1px solid #222;
-      border-radius: 10px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    }
-
-    .project-card:hover {
-      transform: translateY(-7px);
-      border-color: rgba(246, 78, 78, 0.35);
-      box-shadow:
-        0 16px 48px rgba(246, 78, 78, 0.1),
-        0 4px 16px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Y2K title bar */
-    .card-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 14px;
-      background: #ffffff;
-      border-bottom: 1px solid #222;
-      flex-shrink: 0;
-    }
-
-    .tl {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .tl-r { background: #f64e4e; }
-    .tl-y { background: #f6c04e; }
-    .tl-g { background: #3fcf8e; }
-
-    .card-window-name {
-      font-family: 'Sour Gummy', cursive;
-      font-size: 0.72rem;
-      color: #000000;
-      margin-left: 5px;
-      letter-spacing: 0.04em;
-    }
-
-    .card-live-badge {
-      margin-left: auto;
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: #3fcf8e;
-      background: rgba(63, 207, 142, 0.1);
-      border: 1px solid rgba(63, 207, 142, 0.22);
-      padding: 2px 7px;
-      border-radius: 20px;
-    }
-
-    /* Mini preview areas */
-    .card-preview {
-      height: 130px;
-      overflow: hidden;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    /* CertReady preview — mock quiz UI */
-    .preview-cert {
-      background: #c8d0d3;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 14px 18px;
-      gap: 7px;
-    }
-
-    .cert-q-bar {
-      height: 7px;
-      background: #2a2a2a;
-      border-radius: 4px;
-      width: 72%;
-      margin-bottom: 4px;
-    }
-
-    .cert-option {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #f64e4e;
-      border: 1px solid #2a2a2a;
-      border-radius: 5px;
-      padding: 5px 10px;
-    }
-
-    .cert-option.selected {
-      border-color: rgba(246, 78, 78, 0.45);
-      background: rgba(246, 78, 78, 0.07);
-    }
-
-    .cert-radio {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      border: 1.5px solid #3a3a3a;
-      flex-shrink: 0;
-    }
-
-    .cert-option.selected .cert-radio {
-      background: #f64e4e;
-      border-color: #f64e4e;
-    }
-
-    .cert-opt-text {
-      height: 5px;
-      border-radius: 2px;
-      background: #f64e4e;
-      flex: 1;
-    }
-
-    .cert-option.selected .cert-opt-text {
-      background: rgba(246, 78, 78, 0.3);
-    }
-
-    /* Lofi Pomodoro preview — timer + EQ bars */
-    .preview-lofi {
-      background: #c8d0d3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .lofi-timer-display {
-      font-family: 'Sour Gummy', cursive;
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #7a6fff;
-      letter-spacing: -2px;
-      line-height: 1;
-    }
-
-    .lofi-eq {
-      display: flex;
-      gap: 3px;
-      align-items: flex-end;
-      height: 26px;
-    }
-
-    .lofi-eq-bar {
-      width: 4px;
-      border-radius: 2px 2px 0 0;
-      background: #7a6fff;
-      opacity: 0.7;
-      animation: eqBounce 0.75s ease-in-out infinite alternate;
-    }
-
-    .lofi-eq-bar:nth-child(1) { height: 8px;  animation-delay: 0.00s; }
-    .lofi-eq-bar:nth-child(2) { height: 20px; animation-delay: 0.12s; }
-    .lofi-eq-bar:nth-child(3) { height: 14px; animation-delay: 0.06s; }
-    .lofi-eq-bar:nth-child(4) { height: 26px; animation-delay: 0.18s; }
-    .lofi-eq-bar:nth-child(5) { height: 10px; animation-delay: 0.03s; }
-    .lofi-eq-bar:nth-child(6) { height: 22px; animation-delay: 0.09s; }
-    .lofi-eq-bar:nth-child(7) { height: 16px; animation-delay: 0.15s; }
-    .lofi-eq-bar:nth-child(8) { height: 6px;  animation-delay: 0.21s; }
-    .lofi-eq-bar:nth-child(9) { height: 18px; animation-delay: 0.07s; }
-
-    @keyframes eqBounce {
-      from { transform: scaleY(0.35); opacity: 0.35; }
-      to   { transform: scaleY(1);    opacity: 0.85; }
-    }
-
-    /* Code School preview — mock editor */
-    .preview-code {
-      background: #c8d0d3;
-      padding: 13px 15px;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-size: 0.7rem;
-      line-height: 1.75;
-    }
-
-    .preview-code::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 40px;
-      background: linear-gradient(transparent, #0d1117);
-    }
-
-    .cl { display: flex; gap: 10px; }
-    .ln { color: #3d3d3d; min-width: 14px; text-align: right; user-select: none; }
-    .kw { color: #f64e4e; }
-    .fn { color: #4e9ef6; }
-    .st { color: #3fcf8e; }
-    .cm { color: #454545; }
-    .tx { color: #c9d1d9; }
-
-    /* Card content */
-    .card-content {
-      padding: 1.2rem 1.4rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .card-project-name {
-      font-family: 'Sour Gummy', cursive;
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: #f0f0f0;
-      margin-bottom: 0.35rem;
-    }
-
-    .card-desc {
-      color: #000000;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      margin-bottom: 1rem;
-    }
-
-    .card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-bottom: 1.2rem;
-      margin-top: auto;
-      padding-top: 0.75rem;
-    }
-
-    .card-tag {
-      font-size: 0.68rem;
-      color: #555;
-      background: #f64e4e;
-      border: 1px solid #252525;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
-
-    .card-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      font-family: 'Sour Gummy', cursive;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #fff;
-      background: #f64e4e;
-      padding: 9px 20px;
-      border-radius: 6px;
-      align-self: flex-start;
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .card-cta:hover {
-      background: #d63c3c;
-      transform: translateX(3px);
-    }
-
-    .card-cta svg {
-      transition: transform 0.15s;
-    }
-
-    .card-cta:hover svg {
-      transform: translateX(4px);
-    }
-    </style>
-    <br>
-    <div class="links"> 
-        <a href="index.html">Home</a>
-        <a href="About Me.html">About Me</a>
-        <a href="Blog.html">Blog</a>
-        <a href="My Work.html">My Work</a>
-        <a href="Contact.html">Contact</a>
-        <button id="themeToggle">🌙Light/Dark☀️</button>
-    </div>    
-</div>
-<br>
-<header><div class="header" style="padding: 0%;">
-        <img src="Header3.svg" width="99%" height="50%">
-    </div></header>
-<br>
-<div class="container" style="margin-top: 10px; text-align: center; align-items: center; align-content: center;">
-    <h1>Hi I'm TobyK1DD</h1>
-    <br>
-    <p>A self-taught developer and Twitch streamer from Coventry I build web apps from scratch — a CompTIA revision tool, a lofi study timer with real-time multiplayer rooms, a code learning platform — and stream sports games when I'm not deep in a rabbit hole. Into anime, football on Thursdays, and the feeling when something I built actually works. The blog is where I put the rest - sharing my journey..</p>
-    <br>
-    <section class="projects-section">
-
-  <div class="projects-header">
-    <p class="projects-eyebrow">// My Projects</p>
-    <h2 class="projects-heading">Things I've <em>Built</em></h2>
-  </div>
-
-  <div class="projects-grid">
-
-    <!-- ── CertReady ─────────────────────────────────────── -->
-    <div class="project-card">
-      <div class="card-titlebar">
-        <span class="tl tl-r"></span>
-        <span class="tl tl-y"></span>
-        <span class="tl tl-g"></span>
-        <span class="card-window-name">certready.app</span>
-        <span class="card-live-badge">LIVE</span>
-      </div>
-
-      <div class="card-preview preview-cert">
-        <div class="cert-q-bar"></div>
-        <div class="cert-option">
-          <div class="cert-radio"></div>
-          <div class="cert-opt-text" style="width:55%"></div>
-        </div>
-        <div class="cert-option selected">
-          <div class="cert-radio"></div>
-          <div class="cert-opt-text" style="width:68%"></div>
-        </div>
-        <div class="cert-option">
-          <div class="cert-radio"></div>
-          <div class="cert-opt-text" style="width:42%"></div>
-        </div>
-      </div>
-
-      <div class="card-content">
-        <h3 class="card-project-name">CertReady</h3>
-        <p class="card-desc">CompTIA A+ revision app with 560+ questions, timed practice exams, and free &amp; Pro tiers.</p>
-        <div class="card-tags">
-          <span class="card-tag">Supabase</span>
-          <span class="card-tag">Lemon Squeezy</span>
-          <span class="card-tag">CompTIA A+</span>
-        </div>
-        <!-- TODO: Replace href="#" with your CertReady URL -->
-        <a href="https://tobyk1dd.com/CertReady.html" class="card-cta">
-          Open App
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-      </div>
+    <div class="hero-cta">
+      <a href="#projects" class="btn">My Work</a>
+      <a href="https://twitch.tv/tobyk1dd" class="btn btn-outline" target="_blank">Watch Live</a>
     </div>
 
-    <!-- ── Lofi Pomodoro ──────────────────────────────────── -->
-    <div class="project-card">
-      <div class="card-titlebar">
-        <span class="tl tl-r"></span>
-        <span class="tl tl-y"></span>
-        <span class="tl tl-g"></span>
-        <span class="card-window-name">lofi-pomodoro.app</span>
-        <span class="card-live-badge">LIVE</span>
+    <div class="hero-stats">
+      <div class="stat-cell">
+        <div class="stat-val">3</div>
+        <div class="stat-lbl">Live Products</div>
       </div>
-
-      <div class="card-preview preview-lofi">
-        <div class="lofi-timer-display">25:00</div>
-        <div class="lofi-eq">
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-          <div class="lofi-eq-bar"></div>
-        </div>
+      <div class="stat-cell">
+        <div class="stat-val">60+</div>
+        <div class="stat-lbl">Lessons Shipped</div>
       </div>
-
-      <div class="card-content">
-        <h3 class="card-project-name">Lofi Pomodoro</h3>
-        <p class="card-desc">Pomodoro timer with lofi music streams and real-time Study With Me multiplayer rooms.</p>
-        <div class="card-tags">
-          <span class="card-tag">Ably</span>
-          <span class="card-tag">Web Audio API</span>
-          <span class="card-tag">PWA</span>
-        </div>
-        <!-- TODO: Replace href="#" with your Lofi Pomodoro URL -->
-        <a href="https://tobyk1dd.com/lofi-pomodoro.html" class="card-cta">
-          Open App
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
+      <div class="stat-cell">
+        <div class="stat-val">560</div>
+        <div class="stat-lbl">Practice Qs</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-val">47</div>
+        <div class="stat-lbl">Followers</div>
       </div>
     </div>
+  </section>
 
-    <!-- ── Code School ────────────────────────────────────── -->
-    <div class="project-card">
-      <div class="card-titlebar">
-        <span class="tl tl-r"></span>
-        <span class="tl tl-y"></span>
-        <span class="tl tl-g"></span>
-        <span class="card-window-name">code-school.app</span>
-        <span class="card-live-badge">LIVE</span>
-      </div>
+  <div class="divider"></div>
 
-      <div class="card-preview preview-code">
-        <div class="cl"><span class="ln">1</span><span class="cm">// build stuff. break things.</span></div>
-        <div class="cl"><span class="ln">2</span><span class="kw">const </span><span class="tx">learn = (</span><span class="fn">topic</span><span class="tx">) => {</span></div>
-        <div class="cl"><span class="ln">3</span><span class="tx">&nbsp;&nbsp;</span><span class="kw">return</span><span class="tx"> {</span></div>
-        <div class="cl"><span class="ln">4</span><span class="tx">&nbsp;&nbsp;&nbsp;&nbsp;html: </span><span class="st">'✓'</span><span class="tx">,</span></div>
-        <div class="cl"><span class="ln">5</span><span class="tx">&nbsp;&nbsp;&nbsp;&nbsp;css:&nbsp;&nbsp;</span><span class="st">'✓'</span><span class="tx">,</span></div>
-        <div class="cl"><span class="ln">6</span><span class="tx">&nbsp;&nbsp;&nbsp;&nbsp;js:&nbsp;&nbsp;&nbsp;</span><span class="st">'loading...'</span></div>
-      </div>
-
-      <div class="card-content">
-        <h3 class="card-project-name">Code School</h3>
-        <p class="card-desc">A web dev learning platform for self-taught devs — curated lessons, personal notes, and flashcards.</p>
-        <div class="card-tags">
-          <span class="card-tag">Vanilla JS</span>
-          <span class="card-tag">Kevin Powell</span>
-          <span class="card-tag">localStorage</span>
-        </div>
-        <!-- TODO: Replace href="#" with your Code School URL -->
-        <a href="https://tobyk1dd.com/code-school.html" class="card-cta">
-          Open App
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-      </div>
+  <!-- ══════════════════════════════════
+       PROJECTS
+  ══════════════════════════════════ -->
+  <section class="section" id="projects">
+    <div class="section-heading">
+      <p class="s-label">// MY PROJECTS</p>
+      <h2>Things I've <span class="red">Built</span></h2>
     </div>
 
-  </div>
-</section>
+    <div class="proj-grid">
+
+      <!-- CertReady -->
+      <div class="win proj-win">
+        <div class="winbar">
+          <div class="winbar-title">
+            certready.app
+            <span class="badge badge-live">LIVE</span>
+          </div>
+          <div class="wbtns">
+            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+          </div>
+        </div>
+        <div class="proj-preview preview-certready"></div>
+        <div class="proj-info">
+          <h3 class="proj-name">CertReady</h3>
+          <p class="proj-desc">CompTIA A+ revision app with 560+ questions, premium stats, flag-for-review, confetti on perfect scores, and Ably-powered multiplayer study rooms.</p>
+          <div class="tag-row">
+            <span class="tag">React</span>
+            <span class="tag">Supabase</span>
+            <span class="tag">Ably</span>
+            <span class="tag">Lemon Squeezy</span>
+          </div>
+        </div>
+        <div class="proj-strip">
+          <span class="proj-live">live</span>
+          <a href="#" class="proj-link">visit →</a>
+        </div>
+      </div>
+
+      <!-- Lofi Pomodoro -->
+      <div class="win proj-win">
+        <div class="winbar">
+          <div class="winbar-title">
+            lofi-pomodoro.app
+            <span class="badge badge-live">LIVE</span>
+          </div>
+          <div class="wbtns">
+            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+          </div>
+        </div>
+        <div class="proj-preview preview-lofi">
+          <span class="timer-text">25:00</span>
+          <div class="wave">
+            <span style="height:8px"></span>
+            <span style="height:14px"></span>
+            <span style="height:18px"></span>
+            <span style="height:12px"></span>
+            <span style="height:7px"></span>
+          </div>
+        </div>
+        <div class="proj-info">
+          <h3 class="proj-name">Lofi Pomodoro</h3>
+          <p class="proj-desc">Pomodoro timer with lofi music streams and real-time multiplayer rooms. Study together, stay in sync — powered by Ably.</p>
+          <div class="tag-row">
+            <span class="tag">JavaScript</span>
+            <span class="tag">Ably</span>
+            <span class="tag">CSS</span>
+          </div>
+        </div>
+        <div class="proj-strip">
+          <span class="proj-live">live</span>
+          <a href="#" class="proj-link">visit →</a>
+        </div>
+      </div>
+
+      <!-- Code School -->
+      <div class="win proj-win">
+        <div class="winbar">
+          <div class="winbar-title">
+            code-school.app
+            <span class="badge badge-live">LIVE</span>
+          </div>
+          <div class="wbtns">
+            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+          </div>
+        </div>
+        <div class="proj-preview preview-code">
+          <div class="code-line"><span class="code-n">1</span><span class="code-txt"><span class="code-txt">// build stuff. break things.</span></span></div>
+          <div class="code-line"><span class="code-n">2</span><span class="code-txt"><span class="k">const</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="v">topic</span></span></div>
+          <div class="code-line"><span class="code-n">3</span><span class="code-txt">&nbsp;&nbsp;<span class="k">return</span></span></div>
+          <div class="code-line"><span class="code-n">4</span><span class="code-txt">&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">'/'</span></span></div>
+          <div class="code-line"><span class="code-n">5</span><span class="code-txt">&nbsp;&nbsp;<span class="s">'/'</span></span></div>
+        </div>
+        <div class="proj-info">
+          <h3 class="proj-name">Code School</h3>
+          <p class="proj-desc">A web dev learning platform for self-taught developers. 60 lessons, full-text search, flashcard revision, per-lesson notes, and a debug lab.</p>
+          <div class="tag-row">
+            <span class="tag">Vanilla JS</span>
+            <span class="tag">HTML/CSS</span>
+            <span class="tag">GitHub Pages</span>
+          </div>
+        </div>
+        <div class="proj-strip">
+          <span class="proj-live">live</span>
+          <a href="#" class="proj-link">visit →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+</main>
+
+<!-- ══════════════════════════════════
+     STATUS BAR — overlay goal-strip
+══════════════════════════════════ -->
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Nuneaton, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+
 <script>
-  const toggleBtn = document.getElementById("themeToggle");
-
-  // Load saved theme on page load
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("darkmode");
+  // clock
+  function tick() {
+    const n = new Date();
+    const p = x => String(x).padStart(2,'0');
+    const el = document.getElementById('clock');
+    if (el) el.textContent = `${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
   }
+  tick(); setInterval(tick, 1000);
 
-  toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("darkmode");
-
-    // Save preference
-    if (document.body.classList.contains("darkmode")) {
-      localStorage.setItem("theme", "dark");
+  // dark/light toggle
+  const btn = document.getElementById('theme-btn');
+  let dark = false;
+  btn.addEventListener('click', () => {
+    dark = !dark;
+    const r = document.documentElement.style;
+    if (dark) {
+      r.setProperty('--bg',      '#121212');
+      r.setProperty('--bg-soft', '#1e1e1e');
+      r.setProperty('--bg-card', '#252525');
+      r.setProperty('--text',    '#ffffff');
+      r.setProperty('--text-mid','#aaaaaa');
+      r.setProperty('--text-dim','#666666');
+      r.setProperty('--border',  '#ffffff');
+      r.setProperty('--accent',  '#2a2a2a');
     } else {
-      localStorage.setItem("theme", "light");
+      r.setProperty('--bg',      '#c8d0d3');
+      r.setProperty('--bg-soft', '#e3edf0');
+      r.setProperty('--bg-card', '#dce8ed');
+      r.setProperty('--text',    '#000000');
+      r.setProperty('--text-mid','#444444');
+      r.setProperty('--text-dim','#777777');
+      r.setProperty('--border',  '#ffffff');
+      r.setProperty('--accent',  '#aac6d3');
     }
+    btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+  });
+
+  // window dot interactions
+  document.querySelectorAll('.wbtn.r').forEach(b => {
+    b.addEventListener('click', () => {
+      const w = b.closest('.win');
+      if (!w) return;
+      w.style.transition = 'opacity 0.3s, transform 0.3s';
+      w.style.opacity = '0.1'; w.style.transform = 'scale(0.97)';
+      w.style.pointerEvents = 'none';
+      setTimeout(() => { w.style.opacity='1'; w.style.transform=''; w.style.pointerEvents=''; }, 1800);
+    });
+  });
+  document.querySelectorAll('.wbtn.y').forEach(b => {
+    b.addEventListener('click', () => {
+      const w = b.closest('.win');
+      w.querySelectorAll(':scope > *:not(.winbar)').forEach(el => {
+        el.style.display = el.style.display === 'none' ? '' : 'none';
+      });
+    });
+  });
+
+  // scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animation = `up 0.45s ${(e.target.dataset.i||0)*0.09}s both`;
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.proj-win').forEach((el,i) => {
+    el.dataset.i = i; io.observe(el);
   });
 </script>
+
 </body>
 </html>
