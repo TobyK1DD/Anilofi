@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me — TobyK1DD</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a href="index.html"    class="nav-link">Home</a>
+  <a href="About Me.html" class="nav-link active">About Me</a>
+  <a href="Blog.html"     class="nav-link">Blog</a>
+  <a href="My Work.html"  class="nav-link">My Work</a>
+  <a href="Contact.html"  class="nav-link">Contact</a>
+  <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+</nav>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// about me</p>
+    <h2 class="page-title">A page all about <em>me?</em></h2>
+    <p class="page-sub">Seems a bit self-centred now doesn't it?</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── ABOUT WINDOW ── -->
+  <section class="page-section">
+    <div class="win">
+      <div class="winbar">
+        <div class="winbar-title">about.exe — tobyk1dd</div>
+        <div class="wbtns">
+          <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 340px;">
+
+        <!-- LEFT: bio + skills -->
+        <div style="padding:36px 40px; border-right:4px solid var(--border); display:flex; flex-direction:column; gap:22px;">
+
+          <div>
+            <p class="s-label" style="margin-bottom:10px;">// the short version</p>
+            <p style="font-size:15px; color:var(--text-mid); line-height:1.8;">
+              A self-taught developer and streamer from Nuneaton, UK — taught myself graphic design first,
+              now writing code. I love all things design, anime, and tech. When I'm not building something
+              I'm either on Twitch, playing football on Thursdays, or deep in an MMORPG.
+              Harold Finch energy: quiet, capable, self-sufficient.
+            </p>
+            <p style="font-size:15px; color:var(--text-mid); line-height:1.8; margin-top:14px;">
+              I used to have a real love for football — think more Thierry Henry and Steven Gerrard
+              than the modern era. If you know, you know.
+            </p>
+          </div>
+
+          <div>
+            <p class="s-label" style="margin-bottom:14px;">// current skills</p>
+            <div class="skills">
+              <div class="skill-row">
+                <span class="skill-n">HTML / CSS</span>
+                <div class="bar-bg"><div class="bar-fill" style="width:85%"></div></div>
+              </div>
+              <div class="skill-row">
+                <span class="skill-n">JavaScript</span>
+                <div class="bar-bg"><div class="bar-fill" style="width:75%"></div></div>
+              </div>
+              <div class="skill-row">
+                <span class="skill-n">React</span>
+                <div class="bar-bg"><div class="bar-fill" style="width:70%"></div></div>
+              </div>
+              <div class="skill-row">
+                <span class="skill-n">Supabase</span>
+                <div class="bar-bg"><div class="bar-fill" style="width:80%"></div></div>
+              </div>
+              <div class="skill-row">
+                <span class="skill-n">Graphic Design</span>
+                <div class="bar-bg"><div class="bar-fill" style="width:78%"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: quick-fire Q&A -->
+        <div style="background:var(--bg-card); display:flex; flex-direction:column;">
+          <div style="background:var(--bg); border-bottom:4px solid var(--border); padding:10px 16px;">
+            <p class="s-label">// quick-fire questions</p>
+          </div>
+          <div style="padding:16px; display:flex; flex-direction:column; gap:0; overflow-y:auto;">
+
+            <style>
+              .qa-row {
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:6px 12px;
+                padding:10px 0;
+                border-bottom:3px solid var(--border);
+                font-size:13px;
+              }
+              .qa-row:last-child { border-bottom:none; }
+              .qa-q { color:var(--text-dim); font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:0.08em; align-self:center; }
+              .qa-a { color:var(--primary); font-weight:700; font-size:13px; }
+            </style>
+
+            <div class="qa-row"><span class="qa-q">Favourite colour</span><span class="qa-a">Red 🔴</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite food</span><span class="qa-a">Rice &amp; Ribs</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite drink</span><span class="qa-a">7UP</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite animal</span><span class="qa-a">Tiger</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite sport</span><span class="qa-a">Football</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite movie</span><span class="qa-a">Gone Girl / Lion King '94</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite show</span><span class="qa-a">Brooklyn 99</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite song</span><span class="qa-a">I'm Sorry — Joyner Lucas</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite artist</span><span class="qa-a">Nas</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite game</span><span class="qa-a">FIFA 11 (if you know...)</span></div>
+            <div class="qa-row"><span class="qa-q">Favourite anime</span><span class="qa-a">DBZ / FMA Brotherhood</span></div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── STATUS BAR ── -->
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Nuneaton, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+
+<script>
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
+
+  document.addEventListener('DOMContentLoaded', function () {
+    function tick() {
+      var n = new Date(), p = x => String(x).padStart(2,'0');
+      var el = document.getElementById('clock');
+      if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+    }
+    tick(); setInterval(tick, 1000);
+
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.addEventListener('click', function () {
+        document.body.classList.toggle('darkmode');
+        var dark = document.body.classList.contains('darkmode');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      });
+    }
+
+    document.querySelectorAll('.wbtn.r').forEach(b => {
+      b.addEventListener('click', function () {
+        var w = b.closest('.win'); if (!w) return;
+        w.style.transition='opacity 0.3s,transform 0.3s'; w.style.opacity='0.1'; w.style.transform='scale(0.97)'; w.style.pointerEvents='none';
+        setTimeout(function(){w.style.opacity='1';w.style.transform='';w.style.pointerEvents='';}, 1800);
+      });
+    });
+    document.querySelectorAll('.wbtn.y').forEach(b => {
+      b.addEventListener('click', function () {
+        var w = b.closest('.win');
+        w.querySelectorAll(':scope > *:not(.winbar)').forEach(el => { el.style.display = el.style.display==='none' ? '' : 'none'; });
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

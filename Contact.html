@@ -1,61 +1,155 @@
 <!DOCTYPE html>
 <html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="main.css">
-        <script src="app.js"></script>
-        <title>TobyK1DD's World</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    </head>
-    </head>
-<body style="height: 100vh;">
-    <br>
-            <nav>
-      <div class="links"> 
-        <a href="index.html">Home</a>
-        <a href="About Me.html">About Me</a>
-        <a href="Blog.html">Blog</a>
-        <a href="My Work.html">My Work</a>
-        <a href="Contact.html">Contact</a>
-        <button id="themeToggle">🌙Light/Dark☀️</button>
-    </div></nav>
-    <header><div class="header" style="padding: 0%;">
-        <img src="Header3.svg" width="99%" height="100%">
-    </div></header>
-<div class="container" style="margin-top: 10px; text-align: center; align-items: center; align-content: center;">
-    <h2>Getting in contact with me</h2>
-    <br>
-    <p>okay so the best way to get in contact with me would be to click the button below</p>
-    <br>
-    <button><a href="mailto:tobykidd@hotmail.com">Email Me</a></button>
-    <br>
-</div>
-<footer>
-    <div class="footer">
-        <p>nothing here just yet</p>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — TobyK1DD</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a href="index.html"    class="nav-link">Home</a>
+  <a href="About Me.html" class="nav-link">About Me</a>
+  <a href="Blog.html"     class="nav-link">Blog</a>
+  <a href="My Work.html"  class="nav-link">My Work</a>
+  <a href="Contact.html"  class="nav-link active">Contact</a>
+  <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+</nav>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// get in touch</p>
+    <h2 class="page-title">Let's <em>connect</em></h2>
+    <p class="page-sub">Best way to reach me is via email — or catch me live on Twitch.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── CONTACT WINDOW ── -->
+  <section class="page-section" style="max-width:860px; margin:0 auto;">
+    <div class="win">
+      <div class="winbar">
+        <div class="winbar-title">contact.exe — tobyk1dd</div>
+        <div class="wbtns">
+          <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+        </div>
+      </div>
+
+      <!-- EMAIL ROW -->
+      <div style="padding:36px 40px; border-bottom:4px solid var(--border);">
+        <p class="s-label" style="margin-bottom:14px;">// primary</p>
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+          <div>
+            <p style="font-size:12px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">Email</p>
+            <p style="font-size:1.1rem; font-weight:700; color:var(--text);">tobykidd@hotmail.com</p>
+          </div>
+          <a href="mailto:tobykidd@hotmail.com" class="nav-link" style="margin-left:auto;">
+            Email Me →
+          </a>
+        </div>
+      </div>
+
+      <!-- LINKS GRID -->
+      <div style="padding:36px 40px;">
+        <p class="s-label" style="margin-bottom:18px;">// find me elsewhere</p>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+
+          <div class="win" style="box-shadow:none;">
+            <div class="winbar">
+              <div class="winbar-title">twitch.exe</div>
+              <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+            </div>
+            <div style="padding:16px 18px; flex:1; display:flex; flex-direction:column; gap:6px;">
+              <p style="font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em;">Watch live</p>
+              <p style="font-size:1.1rem; font-weight:700;">Twitch</p>
+              <p style="font-size:12px; color:var(--text-mid); line-height:1.5; flex:1;">Coding streams, MLB The Show, gaming variety.</p>
+            </div>
+            <div style="border-top:4px solid var(--border); padding:8px 14px; background:var(--bg-card);">
+              <a href="https://twitch.tv/tobyk1dd" target="_blank" style="font-size:12px; font-weight:700; color:var(--primary); text-decoration:none;">twitch.tv/tobyk1dd →</a>
+            </div>
+          </div>
+
+          <div class="win" style="box-shadow:none;">
+            <div class="winbar">
+              <div class="winbar-title">github.exe</div>
+              <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+            </div>
+            <div style="padding:16px 18px; flex:1; display:flex; flex-direction:column; gap:6px;">
+              <p style="font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em;">Code</p>
+              <p style="font-size:1.1rem; font-weight:700;">GitHub</p>
+              <p style="font-size:12px; color:var(--text-mid); line-height:1.5; flex:1;">Source for all projects, built in public.</p>
+            </div>
+            <div style="border-top:4px solid var(--border); padding:8px 14px; background:var(--bg-card);">
+              <a href="https://github.com/tobyk1dd" target="_blank" style="font-size:12px; font-weight:700; color:var(--primary); text-decoration:none;">github.com/tobyk1dd →</a>
+            </div>
+          </div>
+
+          <div class="win" style="box-shadow:none;">
+            <div class="winbar">
+              <div class="winbar-title">blog.exe</div>
+              <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+            </div>
+            <div style="padding:16px 18px; flex:1; display:flex; flex-direction:column; gap:6px;">
+              <p style="font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em;">Reading</p>
+              <p style="font-size:1.1rem; font-weight:700;">The Blog</p>
+              <p style="font-size:12px; color:var(--text-mid); line-height:1.5; flex:1;">Dev logs, build notes, random thoughts.</p>
+            </div>
+            <div style="border-top:4px solid var(--border); padding:8px 14px; background:var(--bg-card);">
+              <a href="Blog.html" style="font-size:12px; font-weight:700; color:var(--primary); text-decoration:none;">tobyk1dd.com/blog →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
+  </section>
+
+</main>
+
+<!-- ── STATUS BAR ── -->
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Nuneaton, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
 </footer>
+
 <script>
-  const toggleBtn = document.getElementById("themeToggle");
-
-  // Load saved theme on page load
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("darkmode");
-  }
-
-  toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("darkmode");
-
-    // Save preference
-    if (document.body.classList.contains("darkmode")) {
-      localStorage.setItem("theme", "dark");
-    } else {
-      localStorage.setItem("theme", "light");
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
+  document.addEventListener('DOMContentLoaded', function () {
+    function tick() {
+      var n = new Date(), p = x => String(x).padStart(2,'0');
+      var el = document.getElementById('clock');
+      if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
     }
+    tick(); setInterval(tick, 1000);
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.addEventListener('click', function () {
+        document.body.classList.toggle('darkmode');
+        var dark = document.body.classList.contains('darkmode');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      });
+    }
+    document.querySelectorAll('.wbtn.r').forEach(b => {
+      b.addEventListener('click', function () {
+        var w = b.closest('.win'); if (!w) return;
+        w.style.transition='opacity 0.3s,transform 0.3s'; w.style.opacity='0.1'; w.style.transform='scale(0.97)'; w.style.pointerEvents='none';
+        setTimeout(function(){w.style.opacity='1';w.style.transform='';w.style.pointerEvents='';}, 1800);
+      });
+    });
   });
 </script>
+
 </body>
 </html>

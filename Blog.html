@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TobyK1DD — Blog</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="Main.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — TobyK1DD</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
+    body { min-height:100vh; height:auto; padding:0; padding-bottom:80px; }
+
     body { min-height:100vh; height:auto; padding:0; padding-bottom:80px; }
 
     /* ===== HEADER ===== */
@@ -239,29 +240,45 @@
       .post-gallery { grid-template-columns:repeat(2,1fr); }
       .inline-row { grid-template-columns:1fr; }
     }
+  
+    /* Override old blog-header — replaced by .navbar */
+    .blog-header { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="blog-header">
-    <a class="site-wordmark" href="https://tobyk1dd.com">TOBYK1DD<span>.</span></a>
-    <div class="header-right">
-      <span id="admin-chip" class="admin-chip" style="display:none">Admin</span>
-      <button id="admin-btn" onclick="handleAdminBtn()" title="Admin login">🔐</button>
-      <button id="change-darkmode" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
-      <button id="new-post-btn" onclick="openPostModal()" style="display:none">+ New Post</button>
+<!-- ── NAVBAR (replaces .blog-header) ── -->
+<nav class="navbar">
+  <a href="index.html"    class="nav-link">Home</a>
+  <a href="About Me.html" class="nav-link">About Me</a>
+  <a href="Blog.html"     class="nav-link active">Blog</a>
+  <a href="My Work.html"  class="nav-link">My Work</a>
+  <a href="Contact.html"  class="nav-link">Contact</a>
+  <!-- blog admin controls inline -->
+  <span id="admin-chip" class="badge badge-live" style="display:none">Admin 🔐</span>
+  <button id="new-post-btn" class="nav-link" onclick="openPostModal()" style="display:none;cursor:pointer;border-style:solid;">+ New Post</button>
+  <button id="admin-btn" class="nav-toggle" onclick="handleAdminBtn()" title="Admin login">🔐</button>
+  <button id="theme-btn" class="nav-toggle">🌙 Light / Dark ☀️</button>
+</nav>
+
+<!-- ── BLOG HERO as a win window ── -->
+<div style="padding:20px 20px 0;">
+  <div class="win">
+    <div class="winbar">
+      <div class="winbar-title">blog.exe — tobyk1dd</div>
+      <div class="wbtns">
+        <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+      </div>
     </div>
-  </header>
+    <div class="blog-hero" style="border-radius:0; border:none; box-shadow:none;">
+      <span class="hero-tag">Personal Blog</span>
+      <h1 class="hero-heading">Thoughts, <em>Wins</em><br>&amp; Random Stuff</h1>
+      <p class="hero-sub">Gaming. Coding. Streaming. Life. All of it.</p>
+    </div>
+  </div>
+</div>
 
-  <!-- HERO -->
-  <section class="blog-hero">
-    <span class="hero-tag">Personal Blog</span>
-    <h1 class="hero-heading">Thoughts, <em>Wins</em><br>&amp; Random Stuff</h1>
-    <p class="hero-sub">Gaming. Coding. Streaming. Life. All of it.</p>
-  </section>
-
-  <!-- LAYOUT -->
+<!-- LAYOUT -->
   <div class="blog-layout">
     <main class="blog-main">
       <div id="posts-count" class="posts-count"></div>
@@ -453,7 +470,68 @@
 
   <div id="toast-root"></div>
 
-  <script>
+
+
+<!-- ── STATUS BAR (replaces blog-footer) ── -->
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Nuneaton, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+<div id="toast-root"></div>
+
+<script>
+  /* theme init before render */
+  (function() {
+    var dark = localStorage.getItem('theme') === 'dark' || localStorage.getItem('darkmode') === 'true';
+    if (dark) document.body.classList.add('darkmode');
+  })();
+
+  /* clock */
+  function _tick() {
+    var n = new Date(), p = x => String(x).padStart(2,'0');
+    var el = document.getElementById('clock');
+    if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  }
+  _tick(); setInterval(_tick, 1000);
+
+  /* theme toggle (replaces old toggleDark) */
+  function toggleDark() {
+    document.body.classList.toggle('darkmode');
+    var on = document.body.classList.contains('darkmode');
+    localStorage.setItem('theme', on ? 'dark' : 'light');
+    localStorage.setItem('darkmode', on);
+    var btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = on ? '\u2600\uFE0F Light / Dark \uD83C\uDF19' : '\uD83C\uDF19 Light / Dark \u2600\uFE0F';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '\u2600\uFE0F Light / Dark \uD83C\uDF19' : '\uD83C\uDF19 Light / Dark \u2600\uFE0F';
+      btn.addEventListener('click', toggleDark);
+    }
+    document.querySelectorAll('.wbtn.r').forEach(b => {
+      b.addEventListener('click', function() {
+        var w = b.closest('.win'); if (!w) return;
+        w.style.transition='opacity 0.3s,transform 0.3s'; w.style.opacity='0.1'; w.style.transform='scale(0.97)'; w.style.pointerEvents='none';
+        setTimeout(function(){w.style.opacity='1';w.style.transform='';w.style.pointerEvents='';}, 1800);
+      });
+    });
+    document.querySelectorAll('.wbtn.y').forEach(b => {
+      b.addEventListener('click', function() {
+        var w = b.closest('.win');
+        w.querySelectorAll(':scope > *:not(.winbar)').forEach(el => { el.style.display = el.style.display==='none' ? '' : 'none'; });
+      });
+    });
+  });
+</script>
+
+<script>
+
     /* ===== SUPABASE ===== */
     const SUPABASE_URL  = 'https://jfxyzehiaynabzsnncjp.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmeHl6ZWhpYXluYWJ6c25uY2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDczNjIsImV4cCI6MjA5NjIyMzM2Mn0.k9nqufXZO-wu0UuKBYu5VVZ8y4t4QhCpLUNoSvTfi7I';
@@ -979,6 +1057,8 @@
       if(e.key!=='Escape')return;
       closeLightbox();closeAdminModal();closePostModal();closeWidgetModal();
     });
-  </script>
+  
+</script>
+
 </body>
 </html>

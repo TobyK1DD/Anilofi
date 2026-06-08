@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Work — TobyK1DD</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    /* ── card preview areas ── */
+    .preview-cert {
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 14px 18px;
+      gap: 7px;
+    }
+    .cert-q-bar { height: 7px; background: var(--accent); border-radius: 4px; width: 72%; margin-bottom: 4px; }
+    .cert-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-soft);
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
+    .cert-option.sel { background: var(--primary); border-color: var(--border); }
+    .cert-radio { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; background: transparent; }
+    .cert-option.sel .cert-radio { background: #fff; }
+    .cert-opt-bar { height: 5px; border-radius: 2px; background: var(--accent); flex: 1; }
+    .cert-option.sel .cert-opt-bar { background: rgba(255,255,255,0.6); }
+
+    .preview-lofi {
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .lofi-timer { font-size: 2.2rem; font-weight: 700; color: #7a6fff; line-height: 1; }
+    .lofi-eq { display: flex; gap: 3px; align-items: flex-end; height: 24px; }
+    .lofi-eq span {
+      width: 4px;
+      border-radius: 2px 2px 0 0;
+      background: #7a6fff;
+      opacity: 0.75;
+      animation: eqB 0.8s ease-in-out infinite alternate;
+    }
+    .lofi-eq span:nth-child(2) { animation-delay: 0.12s; }
+    .lofi-eq span:nth-child(3) { animation-delay: 0.06s; }
+    .lofi-eq span:nth-child(4) { animation-delay: 0.18s; }
+    .lofi-eq span:nth-child(5) { animation-delay: 0.03s; }
+    .lofi-eq span:nth-child(6) { animation-delay: 0.09s; }
+    .lofi-eq span:nth-child(7) { animation-delay: 0.15s; }
+    @keyframes eqB {
+      from { transform: scaleY(0.3); opacity: 0.3; }
+      to   { transform: scaleY(1);   opacity: 0.85; }
+    }
+
+    .preview-code {
+      background: #1a1a1a;
+      padding: 12px 15px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.68rem;
+      line-height: 1.7;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .cl { display: flex; gap: 10px; }
+    .ln { color: #444; min-width: 12px; text-align: right; user-select: none; }
+    .kw { color: #f64e4e; }
+    .fn { color: #4e9ef6; }
+    .st { color: #3cba6f; }
+    .cm { color: #555; }
+    .tx { color: #ccc; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a href="index.html"    class="nav-link">Home</a>
+  <a href="About Me.html" class="nav-link">About Me</a>
+  <a href="Blog.html"     class="nav-link">Blog</a>
+  <a href="My Work.html"  class="nav-link active">My Work</a>
+  <a href="Contact.html"  class="nav-link">Contact</a>
+  <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+</nav>
+
+<main>
+
+  <!-- ── HERO ── -->
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// my projects</p>
+    <h2 class="page-title">Things I've <em>Built</em></h2>
+    <p class="page-sub">Three live products — each one built and shipped solo.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── PROJECTS ── -->
+  <section class="page-section">
+    <div class="proj-grid">
+
+      <!-- CertReady -->
+      <div class="win proj-win">
+        <div class="winbar">
+          <div class="winbar-title">
+            certready.app
+            <span class="badge badge-live">LIVE</span>
+          </div>
+          <div class="wbtns">
+            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+          </div>
+        </div>
+        <div class="proj-preview preview-cert">
+          <div class="cert-q-bar"></div>
+          <div class="cert-option"><div class="cert-radio"></div><div class="cert-opt-bar" style="width:55%"></div></div>
+          <div class="cert-option sel"><div class="cert-radio"></div><div class="cert-opt-bar" style="width:70%"></div></div>
+          <div class="cert-option"><div class="cert-radio"></div><div class="cert-opt-bar" style="width:40%"></div></div>
+        </div>
+        <div class="proj-info">
+          <span class="proj-type">SaaS Platform</span>
+          <h3 class="proj-name">CertReady</h3>
+          <p class="proj-desc">CompTIA A+ revision app with 560+ questions, timed practice exams, premium stats, flag-for-review, and Ably-powered multiplayer study rooms.</p>
+          <div class="tag-row">
+            <span class="tag">Supabase</span>
+            <span class="tag">Lemon Squeezy</span>
+            <span class="tag">Ably</span>
+            <span class="tag">CompTIA A+</span>
+          </div>
+        </div>
+        <div class="proj-strip">
+          <span class="proj-live">live</span>
+          <a href="https://tobyk1dd.com/CertReady.html" class="proj-cta">
+            Open App
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Lofi Pomodoro -->
+      <div class="win proj-win">
+        <div class="winbar">
+          <div class="winbar-title">
+            lofi-pomodoro.app
+            <span class="badge badge-live">LIVE</span>
+          </div>
+          <div class="wbtns">
+            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+          </div>
+        </div>
+        <div class="proj-preview preview-lofi">
+          <div class="lofi-timer">25:00</div>
+          <div class="lofi-eq">
+            <span style="height:8px"></span>
+            <span style="height:20px"></span>
+            <span style="height:14px"></span>
+            <span style="height:24px"></span>
+            <span style="height:10px"></span>
+            <span style="height:18px"></span>
+            <span style="height:6px"></span>
+          </div>
+        </div>
+        <div class="proj-info">
+          <span class="proj-type">Productivity Tool</span>
+          <h3 class="proj-name">Lofi Pomodoro</h3>
+          <p class="proj-desc">Pomodoro timer with lofi music streams and real-time Study With Me multiplayer rooms — all powered by Ably.</p>
+          <div class="tag-row">
+            <span class="tag">Ably</span>
+            <span class="tag">Web Audio API</span>
+            <span class="tag">PWA</span>
+          </div>
+        </div>
+        <div class="proj-strip">
+          <span class="proj-live">live</span>
+          <a href="https://tobyk1dd.com/lofi-pomodoro.html" class="proj-cta">
+            Open App
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Code School -->
+      <div class="win proj-win">
+        <div class="winbar">
+          <div class="winbar-title">
+            code-school.app
+            <span class="badge badge-live">LIVE</span>
+          </div>
+          <div class="wbtns">
+            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+          </div>
+        </div>
+        <div class="proj-preview preview-code">
+          <div class="cl"><span class="ln">1</span><span class="cm">// build stuff. break things.</span></div>
+          <div class="cl"><span class="ln">2</span><span class="kw">const </span><span class="tx">learn = (</span><span class="fn">topic</span><span class="tx">) => {</span></div>
+          <div class="cl"><span class="ln">3</span><span class="tx">&nbsp;&nbsp;</span><span class="kw">return</span><span class="tx"> {</span></div>
+          <div class="cl"><span class="ln">4</span><span class="tx">&nbsp;&nbsp;&nbsp;&nbsp;html: </span><span class="st">'✓'</span><span class="tx">,</span></div>
+          <div class="cl"><span class="ln">5</span><span class="tx">&nbsp;&nbsp;&nbsp;&nbsp;js:&nbsp;&nbsp;&nbsp;</span><span class="st">'loading...'</span></div>
+        </div>
+        <div class="proj-info">
+          <span class="proj-type">Learning Platform</span>
+          <h3 class="proj-name">Code School</h3>
+          <p class="proj-desc">Web dev learning platform for self-taught devs — 60 lessons, full-text search, flashcard revision, per-lesson notes, and a debug lab.</p>
+          <div class="tag-row">
+            <span class="tag">Vanilla JS</span>
+            <span class="tag">HTML / CSS</span>
+            <span class="tag">GitHub Pages</span>
+          </div>
+        </div>
+        <div class="proj-strip">
+          <span class="proj-live">live</span>
+          <a href="https://tobyk1dd.com/code-school.html" class="proj-cta">
+            Open App
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ── STATUS BAR ── -->
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Nuneaton, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+
+<script>
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
+  document.addEventListener('DOMContentLoaded', function () {
+    function tick() {
+      var n = new Date(), p = x => String(x).padStart(2,'0');
+      var el = document.getElementById('clock');
+      if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+    }
+    tick(); setInterval(tick, 1000);
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.addEventListener('click', function () {
+        document.body.classList.toggle('darkmode');
+        var dark = document.body.classList.contains('darkmode');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      });
+    }
+    document.querySelectorAll('.wbtn.r').forEach(b => {
+      b.addEventListener('click', function () {
+        var w = b.closest('.win'); if (!w) return;
+        w.style.transition='opacity 0.3s,transform 0.3s'; w.style.opacity='0.1'; w.style.transform='scale(0.97)'; w.style.pointerEvents='none';
+        setTimeout(function(){w.style.opacity='1';w.style.transform='';w.style.pointerEvents='';}, 1800);
+      });
+    });
+    document.querySelectorAll('.wbtn.y').forEach(b => {
+      b.addEventListener('click', function () {
+        var w = b.closest('.win');
+        w.querySelectorAll(':scope > *:not(.winbar)').forEach(el => { el.style.display = el.style.display==='none' ? '' : 'none'; });
+      });
+    });
+    // scroll reveal
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e, i) {
+        if (e.isIntersecting) {
+          e.target.style.animation = 'up 0.45s '+(e.target.dataset.i||0)*0.1+'s both';
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.proj-win').forEach(function(el, i) { el.dataset.i = i; io.observe(el); });
+  });
+</script>
+
+</body>
+</html>
