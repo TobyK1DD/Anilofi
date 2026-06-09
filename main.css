@@ -147,7 +147,7 @@ button:hover, .links a:hover, #navigation a:hover, .Button:hover, .Button2:hover
 }
 
 /* ═══════════════════════════════════
-   NAVBAR — centered red button row
+   NAVBAR — wordmark left, links centre, controls right
 ═══════════════════════════════════ */
 .navbar {
   position: sticky;
@@ -158,10 +158,39 @@ button:hover, .links a:hover, #navigation a:hover, .Button:hover, .Button2:hover
   padding: 10px 24px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
   flex-wrap: wrap;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.site-wordmark {
+  font-family: 'Sour Gummy', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--primary);
+  text-decoration: none;
+  line-height: 1;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.site-wordmark span { color: var(--text); }
+.site-wordmark:hover { opacity: 0.8; }
+
+.navbar-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.navbar-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .nav-link {

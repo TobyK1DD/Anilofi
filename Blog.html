@@ -16,8 +16,7 @@
 
     /* ===== HEADER ===== */
     .blog-header { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:3px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:14px 24px; }
-    .site-wordmark { font-family:"Sour Gummy",sans-serif; font-size:1.7rem; font-weight:900; letter-spacing:2px; color:var(--primary); text-decoration:none; line-height:1; }
-    .site-wordmark span { color:var(--text); }
+    /* site-wordmark styles live in main.css */
     .header-right { display:flex; align-items:center; gap:10px; }
     .admin-chip { font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; padding:4px 10px; border-radius:4px; background:var(--primary); color:#000; border:2px solid var(--border); }
     #change-darkmode { position:static; width:42px; height:42px; }
@@ -233,7 +232,7 @@
     }
     @media (max-width:600px) {
       .blog-header { padding:12px 14px; }
-      .site-wordmark { font-size:1.3rem; }
+      /* site-wordmark responsive handled by main.css */
       .blog-hero { padding:36px 16px; }
       .post-body { padding:16px 14px; }
       .modal-box { padding:20px 16px; }
@@ -254,9 +253,9 @@
   <!-- Page links centre -->
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">
     <a href="index.html"    class="nav-link">Home</a>
-    <a href="About_Me.html" class="nav-link">About Me</a>
-    <a href="Blog.html"     class="nav-link">Blog</a>
-    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link active">Blog</a>
+    <a href="My Work.html"  class="nav-link">My Work</a>
     <a href="Contact.html"  class="nav-link">Contact</a>
   </div>
   <!-- Controls right -->
@@ -473,7 +472,7 @@
 <!-- ── STATUS BAR (replaces blog-footer) ── -->
 <footer class="statusbar">
   <span class="sb-item">tobyk1dd.com</span>
-  <span class="sb-item">Nuneaton, UK</span>
+  <span class="sb-item">Coventry, UK</span>
   <div class="sb-spacer"></div>
   <span class="sb-clock" id="clock">--:--:--</span>
 </footer>
@@ -726,7 +725,7 @@
     }
 
     function renderAboutWidget() {
-      const d = widgetConfig.sidebar_about || { title:'About', text:'Hey, I\'m Toby. Streamer, coder, gamer. Based in Nuneaton, England.' };
+      const d = widgetConfig.sidebar_about || { title:'About', text:'Hey, I\'m Toby. Streamer, coder, gamer. Based in Coventry, England.' };
       document.getElementById('wh-about').textContent = d.title || 'About';
       document.getElementById('wb-about').innerHTML = d.text
         ? `<p style="font-size:0.92rem;line-height:1.65;opacity:0.85">${esc(d.text).replace(/\n/g,'<br>')}</p>`

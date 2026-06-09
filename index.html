@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
-    <meta name="description" content="Self-taught developer and Twitch streamer from Nuneaton, UK. Building web apps solo — CertReady, Lofi Pomodoro, and Code School.">
+    <meta name="description" content="Self-taught developer and Twitch streamer from Coventry, UK. Building web apps solo — CertReady, Lofi Pomodoro, and Code School.">
   <meta property="og:type"        content="website">
   <meta property="og:title"       content="TobyK1DD — Self-taught Dev & Twitch Streamer">
-  <meta property="og:description" content="Self-taught developer and Twitch streamer from Nuneaton, UK. Building web apps solo — CertReady, Lofi Pomodoro, and Code School.">
+  <meta property="og:description" content="Self-taught developer and Twitch streamer from Coventry, UK. Building web apps solo — CertReady, Lofi Pomodoro, and Code School.">
   <meta property="og:url"         content="https://tobyk1dd.com/">
   <meta property="og:image"       content="https://tobyk1dd.com/og-image.png">
   <meta property="og:image:width"  content="1200">
@@ -148,12 +148,17 @@
 
 <!-- ── NAVBAR ── -->
 <nav class="navbar">
-  <a href="index.html"    class="nav-link">Home</a>
-  <a href="About_Me.html" class="nav-link">About Me</a>
-  <a href="Blog.html"     class="nav-link">Blog</a>
-  <a href="My_Work.html"  class="nav-link">My Work</a>
-  <a href="Contact.html"  class="nav-link">Contact</a>
-  <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <div class="navbar-links">
+    <a href="index.html" class="nav-link active">Home</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html" class="nav-link">Blog</a>
+    <a href="My Work.html" class="nav-link">My Work</a>
+    <a href="Contact.html" class="nav-link">Contact</a>
+  </div>
+  <div class="navbar-controls">
+    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+  </div>
 </nav>
 
 <main>
@@ -165,7 +170,7 @@
     <p class="hero-greeting">Hi I'm TobyK1DD</p>
 
     <p class="hero-bio">
-      A self-taught developer and Twitch streamer from Coventry I build web apps from scratch —
+      A self-taught developer and Twitch streamer from Coventry. I build web apps from scratch —
       a CompTIA revision tool, a lofi study timer with real-time multiplayer rooms, a code learning platform —
       and stream sports games when I'm not deep in a rabbit hole. Into anime, football on Thursdays, and
       the feeling when something I built actually works. The blog is where I put the rest — sharing my journey.
@@ -312,7 +317,7 @@
 <!-- ── STATUS BAR ── -->
 <footer class="statusbar">
   <span class="sb-item">tobyk1dd.com</span>
-  <span class="sb-item">Nuneaton, UK</span>
+  <span class="sb-item">Coventry, UK</span>
   <div class="sb-spacer"></div>
   <span class="sb-clock" id="clock">--:--:--</span>
 </footer>
