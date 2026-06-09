@@ -36,9 +36,9 @@
     .blog-main { min-width:0; padding:40px 32px 40px 48px; }
 
     /* ===== SIDEBAR ===== */
-    .blog-sidebar { border-left:3px solid var(--border); background:var(--bg-soft); padding:20px 14px 40px 14px; position:sticky; top:71px; height:calc(100vh - 71px); overflow-y:auto; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; }
-    .blog-sidebar::-webkit-scrollbar { width:4px; }
-    .blog-sidebar::-webkit-scrollbar-thumb { background:var(--accent); border-radius:4px; }
+    .blog-sidebar { border-left:3px solid var(--border); background:var(--bg-soft); padding:20px 14px 40px 14px; position:sticky; top:62px; height:calc(100vh - 62px); overflow-y:auto; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; scrollbar-color: var(--primary) var(--bg); }
+    .blog-sidebar::-webkit-scrollbar { width:6px; }
+    .blog-sidebar::-webkit-scrollbar-thumb { background:var(--primary); border-radius:3px; }
 
     /* ===== WIDGETS ===== */
     .widget { background:var(--bg); border:3px solid var(--border); border-radius:8px; overflow:hidden; flex-shrink:0; }
@@ -60,6 +60,15 @@
     .newsletter-form input[type="email"] { width:100%; padding:10px 12px; border:3px solid var(--border); border-radius:8px; background:var(--bg-soft); color:var(--text); font-family:"Sour Gummy",sans-serif; font-size:0.9rem; transition:border-color 0.2s; }
     .newsletter-form input:focus { outline:none; border-color:var(--primary); }
     .newsletter-form button { width:100%; font-size:14px; padding:9px; }
+
+    /* Current Status widget */
+    .status-card { display:flex; align-items:center; gap:12px; }
+    .status-emoji { font-size:2.2rem; line-height:1; flex-shrink:0; }
+    .status-text { flex:1; min-width:0; }
+    .status-title { font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; opacity:0.55; margin-bottom:2px; }
+    .status-line { font-size:0.95rem; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .status-dot { width:10px; height:10px; border-radius:50%; background:#44bb44; flex-shrink:0; animation:pulseDot 2.5s infinite; }
+    @keyframes pulseDot { 0%,100%{box-shadow:0 0 0 0 rgba(68,187,68,0.5)} 50%{box-shadow:0 0 0 6px rgba(68,187,68,0)} }
 
     /* Now Playing / Now Watching */
     .now-card { display:flex; gap:12px; align-items:flex-start; }
@@ -239,17 +248,24 @@
 <body>
 
 <!-- ── NAVBAR (replaces .blog-header) ── -->
-<nav class="navbar">
-  <a href="index.html"    class="nav-link">Home</a>
-  <a href="About_Me.html" class="nav-link active">About Me</a>
-  <a href="Blog.html"     class="nav-link">Blog</a>
-  <a href="My_Work.html"  class="nav-link">My Work</a>
-  <a href="Contact.html"  class="nav-link">Contact</a>
-  <!-- blog admin controls inline -->
-  <span id="admin-chip" class="badge badge-live" style="display:none">Admin 🔐</span>
-  <button id="new-post-btn" class="nav-link" onclick="openPostModal()" style="display:none;cursor:pointer;border-style:solid;">+ New Post</button>
-  <button id="admin-btn" class="nav-toggle" onclick="handleAdminBtn()" title="Admin login">🔐</button>
-  <button id="theme-btn" class="nav-toggle">🌙 Light / Dark ☀️</button>
+<nav class="navbar" style="justify-content:space-between;">
+  <!-- Logo left -->
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <!-- Page links centre -->
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">
+    <a href="index.html"    class="nav-link">Home</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link active">Blog</a>
+    <a href="My Work.html"  class="nav-link">My Work</a>
+    <a href="Contact.html"  class="nav-link">Contact</a>
+  </div>
+  <!-- Controls right -->
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span id="admin-chip" class="badge badge-live" style="display:none">Admin 🔐</span>
+    <button id="new-post-btn" class="nav-link" onclick="openPostModal()" style="display:none;cursor:pointer;border-style:solid;">+ New Post</button>
+    <button id="admin-btn" class="nav-toggle" onclick="handleAdminBtn()" title="Admin login">🔐</button>
+    <button id="theme-btn" class="nav-toggle">🌙 Light / Dark ☀️</button>
+  </div>
 </nav>
 
 <!-- ── BLOG HERO as a win window ── -->
@@ -312,15 +328,6 @@
             <button id="nl-btn" onclick="subscribe()">Subscribe</button>
           </div>
         </div>
-      </div>
-
-      <!-- 4. CURRENT STATUS -->
-      <div class="widget">
-        <div class="widget-head">
-          <span>Status</span>
-          <button class="btn-widget-edit" onclick="openWidgetEditor('status')" style="display:none">✏️</button>
-        </div>
-        <div class="widget-body" id="wb-status"><p style="opacity:0.4;font-size:0.9rem">Loading...</p></div>
       </div>
 
       <!-- 5. NOW PLAYING -->
@@ -712,7 +719,6 @@
     /* ===== RENDER SIDEBAR ===== */
     function renderSidebar() {
       renderAboutWidget();
-      renderStatusWidget();
       renderNowPlayingWidget();
       renderNowWatchingWidget();
       renderQuoteWidget();
@@ -725,19 +731,6 @@
       document.getElementById('wb-about').innerHTML = d.text
         ? `<p style="font-size:0.92rem;line-height:1.65;opacity:0.85">${esc(d.text).replace(/\n/g,'<br>')}</p>`
         : `<p style="opacity:0.4;font-size:0.9rem">No bio set yet.</p>`;
-    }
-
-    function renderStatusWidget() {
-      const d = widgetConfig.sidebar_status || { emoji:'🎮', title:'Currently', line:'Working on the blog!' };
-      document.getElementById('wb-status').innerHTML = `
-        <div class="status-card">
-          <span class="status-emoji">${esc(d.emoji||'🎮')}</span>
-          <div class="status-text">
-            <div class="status-title">${esc(d.title||'Currently')}</div>
-            <div class="status-line">${esc(d.line||'')}</div>
-          </div>
-          <div class="status-dot"></div>
-        </div>`;
     }
 
     function renderNowPlayingWidget() {
@@ -821,16 +814,6 @@
             <button class="btn-ghost" onclick="addLinkRow()" style="width:100%;margin-top:8px">+ Add Link</button>
           </div>`;
 
-      } else if (key === 'status') {
-        const d = widgetConfig.sidebar_status || { emoji:'🎮', title:'Currently', line:'' };
-        document.getElementById('widget-modal-title').textContent = 'Edit Status';
-        body.innerHTML = `
-          <div class="inline-row">
-            <div class="form-row"><label>Emoji</label><input type="text" id="we-emoji" value="${esc(d.emoji)}" maxlength="4" placeholder="🎮" /></div>
-            <div class="form-row"><label>Status Label</label><input type="text" id="we-status-title" value="${esc(d.title)}" placeholder="Currently" /></div>
-          </div>
-          <div class="form-row"><label>What you're doing</label><input type="text" id="we-status-line" value="${esc(d.line)}" placeholder="Playing MLB The Show 26..." /></div>`;
-
       } else if (key === 'now_playing') {
         const d = widgetConfig.sidebar_now_playing || { title:'', image:'', hours:'', rating:0 };
         document.getElementById('widget-modal-title').textContent = 'Edit Now Playing';
@@ -889,9 +872,6 @@
         dbKey = 'sidebar_links';
         const rows = document.querySelectorAll('#we-links-list .link-row');
         value = { title: document.getElementById('we-title').value.trim()||'Find Me', links: Array.from(rows).map(r=>({ icon:r.querySelector('.lr-icon').value.trim(), label:r.querySelector('.lr-label').value.trim(), url:r.querySelector('.lr-url').value.trim() })).filter(l=>l.label&&l.url) };
-      } else if (key === 'status') {
-        dbKey = 'sidebar_status';
-        value = { emoji: document.getElementById('we-emoji').value.trim()||'🎮', title: document.getElementById('we-status-title').value.trim()||'Currently', line: document.getElementById('we-status-line').value.trim() };
       } else if (key === 'now_playing') {
         dbKey = 'sidebar_now_playing';
         value = { title: document.getElementById('we-np-title').value.trim(), image: document.getElementById('we-np-image').value.trim(), hours: document.getElementById('we-np-hours').value.trim(), rating: parseInt(document.getElementById('we-np-rating').value)||0 };

@@ -176,10 +176,55 @@ button:hover, .links a:hover, #navigation a:hover, .Button:hover, .Button2:hover
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
-.nav-link:hover, .nav-link.active {
+.nav-link:hover {
   background: var(--bg-soft);
   color: var(--primary);
   border-color: var(--primary);
+}
+
+/* Active page: stays red but underlined so it's clearly "you are here", not "hover me" */
+.nav-link.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--border);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════
+   .btn / .btn-outline
+   Used on anchor tags as styled buttons
+═══════════════════════════════════ */
+.btn {
+  font-family: 'Sour Gummy', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 3px solid var(--border);
+  background: var(--primary);
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.btn:hover {
+  background: var(--bg);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline {
+  background: var(--bg-soft);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-outline:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--border);
 }
 
 .nav-toggle {
