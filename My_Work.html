@@ -1,7 +1,20 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <meta charset="UTF-8">
+  <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
+    <meta name="description" content="Three live products built solo: CertReady (CompTIA A+ SaaS), Lofi Pomodoro (multiplayer timer), and Code School (JS learning platform).">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="My Work — TobyK1DD">
+  <meta property="og:description" content="Three live products built solo: CertReady (CompTIA A+ SaaS), Lofi Pomodoro (multiplayer timer), and Code School (JS learning platform).">
+  <meta property="og:url"         content="https://tobyk1dd.com/My%20Work.html">
+  <meta property="og:image"       content="https://tobyk1dd.com/og-image.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="My Work — TobyK1DD">
+  <meta name="twitter:description" content="Three live products built solo: CertReady (CompTIA A+ SaaS), Lofi Pomodoro (multiplayer timer), and Code School (JS learning platform).">
+  <meta name="twitter:image"       content="https://tobyk1dd.com/og-image.png">
+    <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Work — TobyK1DD</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,9 +99,9 @@
 <!-- ── NAVBAR ── -->
 <nav class="navbar">
   <a href="index.html"    class="nav-link">Home</a>
-  <a href="About_Me.html" class="nav-link">About Me</a>
+  <a href="About Me.html" class="nav-link">About Me</a>
   <a href="Blog.html"     class="nav-link">Blog</a>
-  <a href="My_Work.html"  class="nav-link">My Work</a>
+  <a href="My Work.html"  class="nav-link active">My Work</a>
   <a href="Contact.html"  class="nav-link">Contact</a>
   <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
 </nav>
@@ -239,7 +252,6 @@
 </footer>
 
 <script>
-  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
   document.addEventListener('DOMContentLoaded', function () {
     function tick() {
       var n = new Date(), p = x => String(x).padStart(2,'0');
@@ -283,5 +295,7 @@
   });
 </script>
 
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 </body>
 </html>
