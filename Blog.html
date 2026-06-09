@@ -31,12 +31,13 @@
     .hero-sub { font-size:1rem; opacity:0.6; max-width:420px; margin:0 auto; line-height:1.5; }
 
     /* ===== LAYOUT ===== */
-    .blog-layout { display:grid; grid-template-columns:1fr 295px; gap:0; align-items:start; }
+    .blog-layout { display:grid; grid-template-columns:1fr 295px; gap:0; align-items:start; margin-right:20px; }
     .blog-main { min-width:0; padding:40px 32px 40px 48px; }
 
     /* ===== SIDEBAR ===== */
-    .blog-sidebar { border-left:3px solid var(--border); background:var(--bg-soft); padding:20px 14px 40px 14px; position:sticky; top:62px; height:calc(100vh - 62px); overflow-y:auto; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; scrollbar-color: var(--primary) var(--bg); }
+    .blog-sidebar { border-left:3px solid var(--border); background:var(--bg-soft); padding:20px 10px 40px 14px; position:sticky; top:62px; height:calc(100vh - 62px); overflow-y:auto; display:flex; flex-direction:column; gap:12px; scrollbar-width:thin; scrollbar-color: var(--primary) var(--bg-soft); }
     .blog-sidebar::-webkit-scrollbar { width:6px; }
+    .blog-sidebar::-webkit-scrollbar-track { background:var(--bg-soft); }
     .blog-sidebar::-webkit-scrollbar-thumb { background:var(--primary); border-radius:3px; }
 
     /* ===== WIDGETS ===== */
@@ -253,9 +254,9 @@
   <!-- Page links centre -->
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">
     <a href="index.html"    class="nav-link">Home</a>
-    <a href="About_Me.html" class="nav-link">About Me</a>
-    <a href="Blog.html"     class="nav-link">Blog</a>
-    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link active">Blog</a>
+    <a href="My Work.html"  class="nav-link">My Work</a>
     <a href="Contact.html"  class="nav-link">Contact</a>
   </div>
   <!-- Controls right -->
