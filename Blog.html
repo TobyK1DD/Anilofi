@@ -192,6 +192,10 @@
 
     .post-card { background:var(--bg-soft); border:3px solid var(--border); border-radius:8px; margin-bottom:28px; overflow:hidden; transition:transform 0.15s,box-shadow 0.15s; }
     .post-card:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.12); }
+    .post-title-link { color:var(--text); text-decoration:none; transition:color 0.15s; }
+    .post-title-link:hover { color:var(--primary); }
+    .read-more-btn { font-family:"Sour Gummy",sans-serif; font-size:0.8rem; font-weight:700; color:var(--primary); text-decoration:none; border-bottom:2px solid transparent; transition:border-color 0.15s; }
+    .read-more-btn:hover { border-color:var(--primary); }
     .post-hero-img { width:100%; max-height:340px; object-fit:cover; display:block; cursor:pointer; border-bottom:3px solid var(--border); transition:opacity 0.15s; }
     .post-hero-img:hover { opacity:0.9; }
     .post-body { padding:22px 24px 18px; }
@@ -353,9 +357,9 @@
   <!-- Page links centre -->
   <div class="navbar-links" id="nav-links">
     <a href="index.html"    class="nav-link">Home</a>
-    <a href="About_Me.html" class="nav-link">About Me</a>
-    <a href="Blog.html"     class="nav-link">Blog</a>
-    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link active">Blog</a>
+    <a href="My Work.html"  class="nav-link">My Work</a>
     <a href="Contact.html"  class="nav-link">Contact</a>
   </div>
   <!-- Controls right -->
@@ -1171,7 +1175,7 @@
       const extraImgs = (p.images||[]).slice(1).map((img,i) => `<img src="${esc(img)}" class="lb-trigger" data-pid="${esc(p.id)}" data-idx="${i+1}" alt="Post image" />`).join('');
       const galleryHtml = extraImgs ? `<div class="post-gallery">${extraImgs}</div>` : '';
       const adminHtml = isAdmin ? `<div class="post-actions"><button class="btn-ghost" onclick="openEditModal('${esc(p.id)}')">✏️ Edit</button><button class="btn-danger" onclick="deletePost('${esc(p.id)}')">🗑️ Delete</button></div>` : '';
-      return `<article class="post-card" id="post-${esc(p.id)}">${heroHtml}<div class="post-body"><div class="post-meta"><span class="post-date">${dateStr}</span><div class="post-tags">${tagsHtml}</div></div><h2 class="post-title">${esc(p.title)}</h2><div class="post-content">${renderContent(p.content)}</div>${galleryHtml}${adminHtml}</div><div class="comment-toggle-row"><button class="comment-toggle-btn" onclick="toggleComments('${p.id}')">💬 <span id="cmt-count-${p.id}">·</span> Comments</button></div><div class="comments-section" id="comments-${p.id}"></div></article>`;
+      return `<article class="post-card" id="post-${esc(p.id)}">${heroHtml}<div class="post-body"><div class="post-meta"><span class="post-date">${dateStr}</span><div class="post-tags">${tagsHtml}</div></div><h2 class="post-title"><a href="post.html?id=${esc(p.id)}" class="post-title-link">${esc(p.title)}</a></h2><div class="post-content">${renderContent(p.content)}</div>${galleryHtml}${adminHtml}<div style="padding:10px 0 4px"><a href="post.html?id=${esc(p.id)}" class="read-more-btn">Read post →</a></div></div><div class="comment-toggle-row"><button class="comment-toggle-btn" onclick="toggleComments('${p.id}')">💬 <span id="cmt-count-${p.id}">·</span> Comments</button></div><div class="comments-section" id="comments-${p.id}"></div></article>`;
     }
 
     function renderContent(c) {
