@@ -85,6 +85,52 @@
     .quote-text { font-size:0.88rem; line-height:1.6; font-style:italic; margin-bottom:8px; opacity:0.9; }
     .quote-cite { font-size:0.75rem; opacity:0.55; font-weight:700; font-style:normal; }
 
+    /* Ko-fi widget */
+    .kofi-msg { font-size:0.83rem; color:var(--text-mid); line-height:1.55; margin-bottom:12px; }
+    .kofi-btn {
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      width:100%; padding:11px 16px;
+      background:var(--primary); color:#fff;
+      border:3px solid var(--border); border-radius:8px;
+      font-family:'Sour Gummy',sans-serif; font-size:0.9rem; font-weight:700;
+      text-decoration:none; transition:all 0.2s;
+    }
+    .kofi-btn:hover { background:var(--bg); color:var(--primary); border-color:var(--primary); }
+
+    /* Affiliate widget */
+    .aff-disclaimer {
+      font-size:0.7rem; color:var(--text-dim); line-height:1.45;
+      padding:6px 10px; background:var(--bg-card);
+      border-radius:6px; margin-bottom:10px; border-left:3px solid var(--primary);
+    }
+    .aff-link {
+      display:flex; align-items:center; gap:10px;
+      padding:9px 6px; text-decoration:none;
+      border-bottom:2px solid var(--border);
+      transition:background 0.15s; border-radius:4px;
+    }
+    .aff-link:last-child { border-bottom:none; }
+    .aff-link:hover { background:var(--bg-card); }
+    .aff-icon { font-size:1.1rem; flex-shrink:0; width:22px; text-align:center; }
+    .aff-name { display:block; font-size:0.82rem; font-weight:700; color:var(--text); }
+    .aff-desc { display:block; font-size:0.7rem; color:var(--text-dim); line-height:1.3; margin-top:1px; }
+
+
+    /* Affiliate section — full width below posts */
+    .affiliate-section { padding:0 48px 28px; margin-top:32px; }
+    .aff-disclaimer { font-size:0.72rem; color:var(--text-dim); line-height:1.45; padding:7px 10px; background:var(--bg-card); border-radius:6px; margin-bottom:14px; border-left:3px solid var(--primary); }
+    .aff-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+    .aff-card {
+      display:flex; flex-direction:column; align-items:center; text-align:center;
+      padding:18px 12px 14px; background:var(--bg-card);
+      border:3px solid var(--border); border-radius:8px;
+      text-decoration:none; transition:all 0.2s; gap:6px;
+    }
+    .aff-card:hover { border-color:var(--primary); transform:translateY(-3px); box-shadow:0 4px 16px rgba(246,78,78,0.12); }
+    .aff-card-icon { font-size:1.8rem; }
+    .aff-card-name { font-size:0.85rem; font-weight:700; color:var(--text); }
+    .aff-card-desc { font-size:0.7rem; color:var(--text-dim); line-height:1.4; }
+
     /* Social links */
     .social-link { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:6px; border:2px solid var(--border); background:var(--bg-soft); color:var(--text); text-decoration:none; font-size:0.88rem; font-weight:700; margin-bottom:7px; transition:background 0.15s,color 0.15s; font-family:"Sour Gummy",sans-serif; }
     .social-link:last-child { margin-bottom:0; }
@@ -259,9 +305,9 @@
   <!-- Page links centre -->
   <div class="navbar-links" id="nav-links">
     <a href="index.html"    class="nav-link">Home</a>
-    <a href="About_Me.html" class="nav-link">About Me</a>
-    <a href="Blog.html"     class="nav-link">Blog</a>
-    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link active">Blog</a>
+    <a href="My Work.html"  class="nav-link">My Work</a>
     <a href="Contact.html"  class="nav-link">Contact</a>
   </div>
   <!-- Controls right -->
@@ -327,13 +373,25 @@
         </div>
       </div>
 
-      <!-- 4. NOW PLAYING -->
+      <!-- KO-FI -->
+      <div class="widget">
+        <div class="widget-head"><span>☕ Support</span></div>
+        <div class="widget-body">
+          <p class="kofi-msg">If a post helped you out or you just want to show some love — a coffee goes a long way.</p>
+          <!-- Replace the href with your Ko-fi URL once set up at ko-fi.com -->
+          <a href="https://ko-fi.com/tobyk1dd" target="_blank" rel="noopener" class="kofi-btn">
+            ☕ Buy me a coffee
+          </a>
+        </div>
+      </div>
+
+      <!-- 4. QUOTE OF THE WEEK -->
       <div class="widget">
         <div class="widget-head">
-          <span>Now Playing</span>
-          <button class="btn-widget-edit" onclick="openWidgetEditor('now_playing')" style="display:none">✏️</button>
+          <span>Quote of the Week</span>
+          <button class="btn-widget-edit" onclick="openWidgetEditor('quote')" style="display:none">✏️</button>
         </div>
-        <div class="widget-body" id="wb-now-playing"><p style="opacity:0.4;font-size:0.85rem">Loading...</p></div>
+        <div class="widget-body" id="wb-quote"><p style="opacity:0.4;font-size:0.85rem">Loading...</p></div>
       </div>
 
       <!-- 5. NOW WATCHING -->
@@ -345,15 +403,72 @@
         <div class="widget-body" id="wb-now-watching"><p style="opacity:0.4;font-size:0.85rem">Loading...</p></div>
       </div>
 
-      <!-- 6. QUOTE OF THE WEEK -->
+      <!-- 6. NOW PLAYING -->
       <div class="widget">
         <div class="widget-head">
-          <span>Quote of the Week</span>
-          <button class="btn-widget-edit" onclick="openWidgetEditor('quote')" style="display:none">✏️</button>
+          <span>Now Playing</span>
+          <button class="btn-widget-edit" onclick="openWidgetEditor('now_playing')" style="display:none">✏️</button>
         </div>
-        <div class="widget-body" id="wb-quote"><p style="opacity:0.4;font-size:0.85rem">Loading...</p></div>
+        <div class="widget-body" id="wb-now-playing"><p style="opacity:0.4;font-size:0.85rem">Loading...</p></div>
       </div>
+
+
     </aside>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       AFFILIATE LINKS — full width, below posts
+  ═══════════════════════════════════════ -->
+  <div class="affiliate-section">
+    <div class="win">
+      <div class="winbar">
+        <div class="winbar-title">useful-links.exe — affiliate disclosure</div>
+        <div class="wbtns">
+          <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+        </div>
+      </div>
+      <div style="padding:16px 20px 22px;">
+        <p class="aff-disclaimer">⚠️ Some of these are affiliate links — I only recommend things I actually use. I earn a small commission at no extra cost to you.</p>
+        <div class="aff-cards">
+
+          <!-- Namecheap — replace href with your affiliate URL from namecheap.com/affiliates -->
+          <a href="https://namecheap.pxf.io/tobyk1dd" target="_blank" rel="noopener sponsored" class="aff-card">
+            <span class="aff-card-icon">🌐</span>
+            <span class="aff-card-name">Namecheap</span>
+            <span class="aff-card-desc">Domains I use for all my projects</span>
+          </a>
+
+          <!-- NordVPN — replace href with your affiliate URL from nordvpn.com/affiliate -->
+          <a href="https://go.nordvpn.net/tobyk1dd" target="_blank" rel="noopener sponsored" class="aff-card">
+            <span class="aff-card-icon">🛡️</span>
+            <span class="aff-card-name">NordVPN</span>
+            <span class="aff-card-desc">VPN I use for streaming &amp; privacy</span>
+          </a>
+
+          <!-- Udemy — replace href with your affiliate URL from udemy.com/affiliate -->
+          <a href="https://click.linksynergy.com/tobyk1dd" target="_blank" rel="noopener sponsored" class="aff-card">
+            <span class="aff-card-icon">📚</span>
+            <span class="aff-card-name">Udemy</span>
+            <span class="aff-card-desc">Best value coding courses — wait for sales</span>
+          </a>
+
+          <!-- Codecademy — replace href with your affiliate URL via Impact.com -->
+          <a href="https://codecademy.com" target="_blank" rel="noopener sponsored" class="aff-card">
+            <span class="aff-card-icon">💻</span>
+            <span class="aff-card-name">Codecademy</span>
+            <span class="aff-card-desc">Where I started learning to code</span>
+          </a>
+
+          <!-- Amazon Associates UK — replace href with your Associates link -->
+          <a href="https://amzn.to/tobyk1dd" target="_blank" rel="noopener sponsored" class="aff-card">
+            <span class="aff-card-icon">🛍️</span>
+            <span class="aff-card-name">Amazon UK</span>
+            <span class="aff-card-desc">My gear &amp; setup recommendations</span>
+          </a>
+
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer class="blog-footer">tobyk1dd.com &mdash; all rights reserved</footer>
