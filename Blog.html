@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta name="theme-color" content="#f64e4e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TobyK1DD">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog — TobyK1DD</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,6 +175,13 @@
     .rich-editor a { color:var(--primary); text-decoration:underline; }
     .rich-editor pre { background:var(--accent); padding:10px; border-radius:6px; font-family:monospace; font-size:0.9rem; overflow-x:auto; margin:6px 0; }
     .rich-editor:empty:before { content:attr(data-placeholder); opacity:0.4; pointer-events:none; }
+    .editor-footer { display:flex; justify-content:space-between; align-items:center; padding:5px 12px; border-top:2px solid var(--border); background:var(--bg-soft); }
+    .word-count { font-size:11px; color:var(--text-dim); font-family:"Sour Gummy",sans-serif; }
+    .draft-indicator { font-size:11px; color:var(--green); opacity:0; transition:opacity 0.4s; }
+    .draft-indicator.show { opacity:1; }
+    .notify-row { display:flex; align-items:center; gap:10px; padding:8px 0 0; }
+    .notify-row input[type="checkbox"] { width:17px; height:17px; accent-color:var(--primary); cursor:pointer; }
+    .notify-row label { font-size:14px; cursor:pointer; color:var(--text); }
 
     /* Upload */
     .upload-zone { border:3px dashed var(--border); border-radius:8px; padding:22px 20px; text-align:center; background:var(--bg); cursor:pointer; position:relative; transition:border-color 0.2s; }
@@ -243,19 +257,20 @@
   <!-- Logo left -->
   <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
   <!-- Page links centre -->
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;">
+  <div class="navbar-links" id="nav-links">
     <a href="index.html"    class="nav-link">Home</a>
-    <a href="About_Me.html" class="nav-link">About Me</a>
-    <a href="Blog.html"     class="nav-link">Blog</a>
-    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="About Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link active">Blog</a>
+    <a href="My Work.html"  class="nav-link">My Work</a>
     <a href="Contact.html"  class="nav-link">Contact</a>
   </div>
   <!-- Controls right -->
-  <div style="display:flex;gap:8px;align-items:center;">
+  <div class="navbar-controls">
     <span id="admin-chip" class="badge badge-live" style="display:none">Admin 🔐</span>
     <button id="new-post-btn" class="nav-link" onclick="openPostModal()" style="display:none;cursor:pointer;border-style:solid;">+ New Post</button>
     <button id="admin-btn" class="nav-toggle" onclick="handleAdminBtn()" title="Admin login">🔐</button>
     <button id="theme-btn" class="nav-toggle">🌙 Light / Dark ☀️</button>
+    <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
@@ -379,9 +394,25 @@
             <button class="tb-btn" onclick="fmt('insertOrderedList')" title="Numbered list">1. List</button>
             <div class="tb-sep"></div>
             <button class="tb-btn" onclick="insertLink()" title="Insert link">🔗 Link</button>
+            <div class="tb-sep"></div>
+            <button class="tb-btn" onclick="document.execCommand('justifyLeft')"   title="Align left">⬅</button>
+            <button class="tb-btn" onclick="document.execCommand('justifyCenter')" title="Align centre">⬌</button>
+            <button class="tb-btn" onclick="document.execCommand('justifyRight')"  title="Align right">➡</button>
+            <div class="tb-sep"></div>
+            <button class="tb-btn" onclick="insertHR()"         title="Divider line">─</button>
+            <button class="tb-btn" onclick="insertInlineCode()" title="Inline code">`&nbsp;`</button>
+            <div class="tb-sep"></div>
+            <button class="tb-btn" onclick="document.execCommand('undo')" title="Undo">↩</button>
+            <button class="tb-btn" onclick="document.execCommand('redo')" title="Redo">↪</button>
+            <div class="tb-sep"></div>
             <button class="tb-btn" onclick="fmt('removeFormat')" title="Clear all formatting" style="opacity:0.65">✕ Clear</button>
           </div>
           <div id="f-content-editor" class="rich-editor" contenteditable="true" data-placeholder="Write your post here..."></div>
+          <div class="editor-footer">
+            <span class="word-count" id="word-count">0 words</span>
+            <span class="draft-indicator" id="draft-indicator">Draft saved</span>
+            <button class="tb-btn" onclick="clearDraft()" style="font-size:11px;padding:3px 8px;opacity:0.6" title="Clear draft">Clear draft</button>
+          </div>
         </div>
       </div>
       <div class="form-row">
@@ -585,9 +616,90 @@
         toast(error.code === '23505' ? 'Already subscribed!' : 'Error: ' + error.message);
         return;
       }
+      // Send welcome email via Supabase Edge Function + Resend
+      try {
+        await fetch(SUPABASE_URL + '/functions/v1/send-newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+          body: JSON.stringify({ type: 'welcome', email })
+        });
+      } catch(e) { console.warn('Welcome email skipped:', e.message); }
       document.getElementById('nl-email').value = '';
       toast('Subscribed ✓ Thanks!');
     }
+
+    async function notifySubscribers(title, content) {
+      const excerpt = content.replace(/<[^>]+>/g, '').replace(/\s+/g,' ').trim().slice(0, 220);
+      try {
+        const res = await fetch(SUPABASE_URL + '/functions/v1/send-newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON },
+          body: JSON.stringify({
+            type: 'new_post',
+            post_title: title,
+            post_excerpt: excerpt + (excerpt.length === 220 ? '...' : ''),
+            post_url: 'https://tobyk1dd.com/Blog.html'
+          })
+        });
+        const d = await res.json().catch(()=>({}));
+        toast('Subscribers notified ✓' + (d.sent ? ' (' + d.sent + ')' : ''));
+      } catch(e) { toast('Notify failed: ' + e.message); }
+    }
+
+    /* ===== EDITOR HELPERS ===== */
+    function updateWordCount() {
+      const editor = document.getElementById('f-content-editor');
+      if (!editor) return;
+      const text = editor.innerText.replace(/\s+/g,' ').trim();
+      const words = text ? text.split(' ').length : 0;
+      const el = document.getElementById('word-count');
+      if (el) el.textContent = words + ' word' + (words !== 1 ? 's' : '');
+    }
+
+    function insertHR() {
+      document.getElementById('f-content-editor').focus();
+      document.execCommand('insertHTML', false,
+        '<hr style="border:none;border-top:3px solid var(--primary);margin:16px 0"><p></p>');
+    }
+
+    function insertInlineCode() {
+      const sel = window.getSelection();
+      const selected = sel && sel.toString() ? sel.toString() : 'code';
+      document.getElementById('f-content-editor').focus();
+      document.execCommand('insertHTML', false,
+        `<code style="background:var(--accent);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em">${selected}</code>`);
+    }
+
+    function clearDraft() {
+      localStorage.removeItem('blog_draft_content');
+      localStorage.removeItem('blog_draft_title');
+      document.getElementById('f-content-editor').innerHTML = '';
+      document.getElementById('f-title').value = '';
+      updateWordCount();
+      toast('Draft cleared');
+    }
+
+    // Wire up word count + auto-save once DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      const editor = document.getElementById('f-content-editor');
+      if (!editor) return;
+      let saveTimer;
+      editor.addEventListener('input', () => {
+        updateWordCount();
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          localStorage.setItem('blog_draft_content', editor.innerHTML);
+          const t = document.getElementById('f-title');
+          if (t) localStorage.setItem('blog_draft_title', t.value);
+          const ind = document.getElementById('draft-indicator');
+          if (ind) { ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 1800); }
+        }, 800);
+      });
+      const titleInput = document.getElementById('f-title');
+      if (titleInput) titleInput.addEventListener('input', () => {
+        localStorage.setItem('blog_draft_title', titleInput.value);
+      });
+    });
 
     /* ===== SEARCH ===== */
     function searchPosts(query) {
@@ -894,7 +1006,14 @@ function renderStars(rating) {
         document.getElementById('f-title').value='';
         document.getElementById('f-tags').value='';
         editor.innerHTML='';
+        // Restore auto-saved draft if one exists
+        const draftC = localStorage.getItem('blog_draft_content');
+        const draftT = localStorage.getItem('blog_draft_title');
+        if (draftC) { editor.innerHTML = draftC; }
+        if (draftT) { document.getElementById('f-title').value = draftT; }
+        if (draftC || draftT) toast('Draft restored ✓');
       }
+      updateWordCount();
       document.getElementById('post-modal').classList.add('open');
       setTimeout(()=>document.getElementById('f-title').focus(),80);
     }
@@ -903,6 +1022,7 @@ function renderStars(rating) {
       draftImages.forEach(img=>{if(img.type==='file'&&img.preview)URL.revokeObjectURL(img.preview);});
       document.getElementById('post-modal').classList.remove('open');
       editingId=null; draftImages=[];
+      document.getElementById('word-count').textContent = '0 words';
     }
 
     /* ===== IMAGE HANDLING ===== */
@@ -954,6 +1074,10 @@ function renderStars(rating) {
         } else {
           const{error}=await db.from('blog_posts').insert([{title,content,tags,images}]);
           if(error)throw error; toast('Post published ✓');
+          // Clear draft and optionally notify subscribers
+          localStorage.removeItem('blog_draft_content');
+          localStorage.removeItem('blog_draft_title');
+          if(document.getElementById('notify-subs')?.checked) await notifySubscribers(title, content);
         }
         closePostModal(); currentPage=1;
         await loadPosts(); renderSidebar();

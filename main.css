@@ -560,17 +560,137 @@ footer, .footer {
 .darkmode .modal-content { background: #1e1e1e; color: white; }
 
 /* ═══════════════════════════════════
-   RESPONSIVE
+   HAMBURGER BUTTON (mobile nav)
+═══════════════════════════════════ */
+.hamburger {
+  display: none;
+  background: var(--primary);
+  border: 3px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: background 0.2s;
+}
+.hamburger:hover { background: var(--bg-soft); }
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+.hamburger:hover span { background: var(--primary); }
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+/* ═══════════════════════════════════
+   RESPONSIVE — TABLET (≤900px)
 ═══════════════════════════════════ */
 @media (max-width: 900px) {
   .proj-grid { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 600px) {
-  .proj-grid { grid-template-columns: 1fr; }
-  .navbar { padding: 8px 12px; gap: 6px; }
-  .nav-link { font-size: 13px; padding: 6px 10px; }
+
+/* ═══════════════════════════════════
+   RESPONSIVE — MOBILE (≤768px)
+═══════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Navbar ── */
+  .hamburger { display: flex; }
+
+  .navbar-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 0 4px;
+    order: 10;
+  }
+  .navbar-links.open { display: flex; }
+  .navbar-links .nav-link { text-align: center; width: 100%; }
+
+  /* ── Hero ── */
+  .page-hero { padding: 32px 16px 24px; }
+  .hero-logo  { font-size: clamp(2.8rem, 10vw, 5rem); }
+
+  /* ── Hero stats: 2 × 2 wrap ── */
+  .hero-stats { flex-wrap: wrap; }
+  .stat-cell  {
+    flex: 1 1 calc(50% - 4px);
+    border-right: 4px solid var(--border);
+    border-bottom: 4px solid var(--border);
+  }
+  .stat-cell:nth-child(even)  { border-right: none; }
+  .stat-cell:nth-child(n+3)   { border-bottom: none; }
+
+  /* ── Index hero window: hide character art panel ── */
+  .hero-body  { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-left  { border-right: none; padding: 32px 24px; }
+
+  /* ── About Me: stack columns ── */
+  .about-body { grid-template-columns: 1fr; }
+  .about-left { border-right: none; padding: 24px; }
+  .about-right { display: none; }
+
+  /* ── Contact link grid ── */
+  .connect-grid { grid-template-columns: 1fr; }
+
+  /* ── Sections ── */
   .page-section { padding: 16px; }
-  h1 { font-size: 2rem; }
+  .section      { padding: 16px; }
+  .divider      { margin: 0 16px; }
+
+  /* ── Project cards ── */
+  .proj-grid { grid-template-columns: 1fr; }
+
+  /* ── Blog: stack layout, un-stick sidebar ── */
+  .blog-layout {
+    grid-template-columns: 1fr;
+    margin-right: 0;
+  }
+  .blog-sidebar {
+    position: static;
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+    border-left: none;
+    border-top: 4px solid var(--border);
+    scrollbar-width: none;
+  }
+  .blog-sidebar::-webkit-scrollbar { display: none; }
+  .blog-main { padding: 20px 16px; }
+
+  /* ── Status bar: trim on small screens ── */
+  .statusbar { padding: 0 14px; gap: 8px; }
+  .sb-item + .sb-item { display: none; }
+
+  /* ── Scroll-to-top: move above status bar ── */
+  #scroll-top { bottom: 54px; right: 14px; }
+}
+
+/* ═══════════════════════════════════
+   RESPONSIVE — SMALL PHONE (≤480px)
+═══════════════════════════════════ */
+@media (max-width: 480px) {
+  .hero-logo    { font-size: clamp(2.2rem, 12vw, 3.5rem); }
+  .site-wordmark { font-size: 1.15rem; }
+  .nav-link     { font-size: 14px; padding: 8px 14px; }
+  .nav-toggle   { font-size: 12px; padding: 7px 10px; }
+  .stat-cell    { padding: 12px 14px; }
+  .stat-val     { font-size: 1.6rem; }
+  .win          { border-radius: 8px; border-width: 3px; }
+  .winbar       { height: 30px; }
+  .winbar-title { font-size: 11px; }
+  .wbtn         { width: 11px; height: 11px; }
+  h1            { font-size: 1.8rem; }
 }
 
 /* ═══════════════════════════════════
