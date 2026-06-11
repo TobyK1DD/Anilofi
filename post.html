@@ -5,6 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Post — TobyK1DD</title>
+  <meta name="description"          content="A blog post from TobyK1DD — dev, streamer, builder from Coventry.">
+  <meta property="og:type"          content="article">
+  <meta property="og:site_name"     content="TobyK1DD Blog">
+  <meta property="og:title"         content="Post — TobyK1DD">
+  <meta property="og:description"   content="A blog post from TobyK1DD — dev, streamer, builder from Coventry.">
+  <meta property="og:url"           content="https://tobyk1dd.com/post.html">
+  <meta property="og:image"         content="https://tobyk1dd.com/og-image.png">
+  <meta property="og:image:width"   content="1200">
+  <meta property="og:image:height"  content="630">
+  <meta name="twitter:card"         content="summary_large_image">
+  <meta name="twitter:title"        content="Post — TobyK1DD">
+  <meta name="twitter:description"  content="A blog post from TobyK1DD — dev, streamer, builder from Coventry.">
+  <meta name="twitter:image"        content="https://tobyk1dd.com/og-image.png">
   <meta name="theme-color" content="#f64e4e">
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-192.png">
@@ -262,6 +275,29 @@ async function loadPost() {
   // Update page title + winbar
   document.title = post.title + ' — TobyK1DD Blog';
   document.getElementById('post-winbar-title').textContent = 'post.exe — ' + post.title;
+
+  // ── Dynamic og / twitter meta ──────────────────────────────────────────
+  // Updates tags so Discord, Twitter, and Slack show the real post title
+  // and description when someone shares the link
+  const excerpt  = (post.content || '').replace(/<[^>]+>/g, '').replace(/\s+/g,' ').trim().slice(0, 200);
+  const ogImage  = (post.images && post.images.length) ? post.images[0] : 'https://tobyk1dd.com/og-image.png';
+  const ogUrl    = window.location.href;
+
+  function setMeta(attr, attrVal, content) {
+    let el = document.querySelector(`meta[${attr}="${attrVal}"]`);
+    if (!el) { el = document.createElement('meta'); el.setAttribute(attr, attrVal); document.head.appendChild(el); }
+    el.setAttribute('content', content);
+  }
+
+  setMeta('property', 'og:title',         post.title + ' — TobyK1DD Blog');
+  setMeta('property', 'og:description',   excerpt + (excerpt.length === 200 ? '...' : ''));
+  setMeta('property', 'og:url',           ogUrl);
+  setMeta('property', 'og:image',         ogImage);
+  setMeta('name',     'description',      excerpt + (excerpt.length === 200 ? '...' : ''));
+  setMeta('name',     'twitter:title',    post.title + ' — TobyK1DD Blog');
+  setMeta('name',     'twitter:description', excerpt + (excerpt.length === 200 ? '...' : ''));
+  setMeta('name',     'twitter:image',    ogImage);
+  // ────────────────────────────────────────────────────────────────────────
 
   // Build hero image
   const heroHtml = post.images && post.images.length
