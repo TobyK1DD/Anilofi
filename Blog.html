@@ -232,7 +232,7 @@
     /* ===== MODALS ===== */
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:200; justify-content:center; align-items:flex-start; padding:30px 16px; overflow-y:auto; }
     .modal-overlay.open { display:flex; }
-    .modal-box { background:var(--bg-soft); border:3px solid var(--border); border-radius:8px; padding:32px; width:100%; max-width:760px; margin:auto; }
+    .modal-box { background:var(--bg-soft); border:3px solid var(--border); border-radius:8px; padding:28px 32px; width:100%; max-width:960px; margin:auto; }
     .modal-heading { font-size:1.4rem; font-weight:900; color:var(--primary); margin-bottom:22px; font-family:"Sour Gummy",sans-serif; }
     .form-row { margin-bottom:18px; }
     .form-row label { display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; opacity:0.65; margin-bottom:7px; color:var(--text); }
@@ -254,7 +254,8 @@
     .editor-wrap:focus-within { border-color:var(--primary); }
     .editor-toolbar { display:flex; flex-wrap:wrap; gap:3px; padding:8px 10px; border-bottom:2px solid var(--border); background:var(--bg-soft); align-items:center; row-gap:4px; }
     .tb-btn { min-width:30px; height:30px; border:2px solid transparent; background:var(--bg); border-radius:5px; cursor:pointer; font-size:13px; font-weight:700; color:var(--text); display:flex; align-items:center; justify-content:center; padding:0 8px; transition:all 0.12s; font-family:"Sour Gummy",sans-serif; white-space:nowrap; }
-    .tb-btn:hover { background:var(--primary); color:#000; border-color:var(--primary); }
+    .tb-btn:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .tb-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
     .tb-btn.tb-b { font-weight:900; }
     .tb-btn.tb-i { font-style:italic; }
     .tb-btn.tb-u { text-decoration:underline; }
@@ -262,7 +263,7 @@
     .tb-sep { width:1px; background:var(--accent); margin:0 4px; align-self:stretch; flex-shrink:0; }
     .tb-select { border:2px solid var(--border); border-radius:5px; background:var(--bg); color:var(--text); font-family:"Sour Gummy",sans-serif; font-size:12px; padding:0 8px; cursor:pointer; height:30px; width:auto; }
     .tb-select:focus { outline:none; border-color:var(--primary); }
-    .rich-editor { min-height:260px; max-height:500px; overflow-y:auto; padding:16px 18px; outline:none; font-family:"Sour Gummy",sans-serif; font-size:1rem; line-height:1.75; color:var(--text); background:var(--bg); }
+    .rich-editor { min-height:380px; max-height:600px; overflow-y:auto; padding:16px 18px; outline:none; font-family:"Sour Gummy",sans-serif; font-size:1rem; line-height:1.75; color:var(--text); background:var(--bg); }
     .rich-editor h1 { font-size:1.7rem; font-weight:900; margin:14px 0 8px; }
     .rich-editor h2 { font-size:1.35rem; font-weight:900; margin:12px 0 6px; }
     .rich-editor h3 { font-size:1.1rem; font-weight:900; margin:10px 0 4px; }
@@ -274,6 +275,52 @@
     .rich-editor pre { background:var(--accent); padding:10px; border-radius:6px; font-family:monospace; font-size:0.9rem; overflow-x:auto; margin:6px 0; }
     .rich-editor:empty:before { content:attr(data-placeholder); opacity:0.4; pointer-events:none; }
     .editor-footer { display:flex; justify-content:space-between; align-items:center; padding:5px 12px; border-top:2px solid var(--border); background:var(--bg-soft); }
+    /* ── EDIT / PREVIEW TABS ── */
+    .editor-tabs { display:flex; border-bottom:3px solid var(--border); background:var(--bg-soft); }
+    .editor-tab { font-family:"Sour Gummy",sans-serif; font-size:0.8rem; font-weight:700; padding:7px 18px; cursor:pointer; border:none; background:transparent; color:var(--text-dim); border-bottom:3px solid transparent; margin-bottom:-3px; transition:all 0.15s; }
+    .editor-tab:hover { color:var(--text); }
+    .editor-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+
+    /* ── PREVIEW PANE ── */
+    .preview-pane { display:none; min-height:380px; max-height:600px; overflow-y:auto; padding:16px 18px; background:var(--bg); font-size:1rem; line-height:1.75; color:var(--text); }
+    .preview-pane.open { display:block; }
+    .preview-pane h1 { font-size:1.7rem; font-weight:900; margin:14px 0 8px; }
+    .preview-pane h2 { font-size:1.35rem; font-weight:900; margin:12px 0 6px; }
+    .preview-pane h3 { font-size:1.1rem; font-weight:900; margin:10px 0 4px; }
+    .preview-pane blockquote { border-left:4px solid var(--primary); margin:8px 0; padding:4px 14px; opacity:0.8; font-style:italic; }
+    .preview-pane pre { background:var(--accent); padding:10px; border-radius:6px; font-family:monospace; font-size:0.9rem; overflow-x:auto; margin:6px 0; }
+    .preview-pane a { color:var(--primary); text-decoration:underline; }
+    .preview-pane ul { margin:4px 0 4px 20px; list-style:disc; }
+    .preview-pane ol { margin:4px 0 4px 20px; list-style:decimal; }
+    .preview-pane hr { border:none; border-top:3px solid var(--primary); margin:16px 0; }
+    .preview-pane img { max-width:100%; border-radius:6px; }
+
+    /* ── FULLSCREEN ── */
+    #post-modal .modal-box.is-fullscreen { position:fixed; top:0; left:0; right:0; bottom:0; max-width:100% !important; width:100%; border-radius:0; margin:0; overflow-y:auto; z-index:600; display:flex; flex-direction:column; }
+    .modal-box.is-fullscreen .rich-editor { flex:1; min-height:0 !important; max-height:none !important; }
+    .modal-box.is-fullscreen .preview-pane { flex:1; min-height:0 !important; max-height:none !important; }
+
+    /* ── COLOR PICKER BUTTON ── */
+    .tb-color-btn { position:relative; cursor:pointer; }
+    .tb-color-swatch { width:16px; height:4px; border-radius:2px; background:var(--primary); margin-top:2px; pointer-events:none; }
+    .tb-color-input { position:absolute; opacity:0; width:30px; height:30px; top:0; left:0; cursor:pointer; }
+
+    /* ── CALLOUT BLOCKS ── */
+    .rich-editor .callout, .preview-pane .callout { display:flex; gap:10px; padding:10px 14px; margin:10px 0; border-radius:6px; border-left:4px solid; align-items:flex-start; }
+    .rich-editor .callout-info, .preview-pane .callout-info { border-color:#4e8ff6; background:rgba(78,143,246,0.09); }
+    .rich-editor .callout-tip,  .preview-pane .callout-tip  { border-color:#3cba6f; background:rgba(60,186,111,0.09); }
+    .rich-editor .callout-warn, .preview-pane .callout-warn { border-color:#f6c14e; background:rgba(246,193,78,0.1); }
+    .rich-editor .callout p, .preview-pane .callout p { margin:0; font-size:0.92rem; line-height:1.6; }
+    .callout-icon { font-size:1.1rem; flex-shrink:0; margin-top:1px; }
+
+    /* ── YOUTUBE EMBED ── */
+    .rich-editor .yt-embed, .preview-pane .yt-embed { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; margin:12px 0; border-radius:8px; border:3px solid var(--border); }
+    .rich-editor .yt-embed iframe, .preview-pane .yt-embed iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
+
+    /* ── CHAR COUNT ON TITLE ── */
+    .title-row { position:relative; }
+    .title-charcount { position:absolute; right:0; top:-20px; font-size:10px; color:var(--text-dim); font-weight:700; }
+
     .word-count { font-size:11px; color:var(--text-dim); font-family:"Sour Gummy",sans-serif; }
     .draft-indicator { font-size:11px; color:var(--green); opacity:0; transition:opacity 0.4s; }
     .draft-indicator.show { opacity:1; }
@@ -530,9 +577,14 @@
   <div class="modal-overlay" id="post-modal">
     <div class="modal-box">
       <h2 class="modal-heading" id="post-modal-title">New Post</h2>
-      <div class="form-row">
+      <div class="form-row title-row">
+        <span class="title-charcount" id="title-chars">100 left</span>
         <label for="f-title">Title</label>
-        <input type="text" id="f-title" placeholder="What's on your mind?" />
+        <input type="text" id="f-title" placeholder="What's on your mind?" maxlength="100" />
+      </div>
+      <div class="form-row">
+        <label for="f-excerpt">Excerpt <span style="opacity:0.45;font-weight:400;text-transform:none">(optional — shows on blog card instead of content preview)</span></label>
+        <input type="text" id="f-excerpt" placeholder="A one-line summary of your post..." maxlength="200" />
       </div>
       <div class="form-row">
         <label for="f-tags">Tags <span style="opacity:0.45;font-weight:400;text-transform:none">(comma separated)</span></label>
@@ -541,7 +593,15 @@
       <div class="form-row">
         <label>Content</label>
         <div class="editor-wrap">
+          <!-- Edit / Preview tabs -->
+          <div class="editor-tabs">
+            <button class="editor-tab active" data-tab="write" onclick="switchEditorTab('write')">✏️ Write</button>
+            <button class="editor-tab" data-tab="preview" onclick="switchEditorTab('preview')">👁 Preview</button>
+            <div style="flex:1"></div>
+            <button class="tb-btn" id="fullscreen-btn" onclick="toggleEditorFullscreen()" title="Fullscreen" style="margin:4px 8px 0 0;font-size:15px">⊞</button>
+          </div>
           <div class="editor-toolbar">
+            <!-- Format -->
             <select class="tb-select" onchange="fmtBlock(this.value);this.value=''">
               <option value="">Format ▾</option>
               <option value="p">Normal</option>
@@ -549,34 +609,51 @@
               <option value="h2">Heading 2</option>
               <option value="h3">Heading 3</option>
               <option value="blockquote">Quote</option>
-              <option value="pre">Code</option>
+              <option value="pre">Code block</option>
             </select>
             <div class="tb-sep"></div>
-            <button class="tb-btn tb-b" onclick="fmt('bold')" title="Bold">B</button>
-            <button class="tb-btn tb-i" onclick="fmt('italic')" title="Italic">I</button>
-            <button class="tb-btn tb-u" onclick="fmt('underline')" title="Underline">U</button>
-            <button class="tb-btn tb-s" onclick="fmt('strikeThrough')" title="Strikethrough">S</button>
+            <!-- Text style -->
+            <button class="tb-btn tb-b" data-cmd="bold"          onclick="fmt('bold')"          title="Bold (Ctrl+B)">B</button>
+            <button class="tb-btn tb-i" data-cmd="italic"        onclick="fmt('italic')"        title="Italic (Ctrl+I)">I</button>
+            <button class="tb-btn tb-u" data-cmd="underline"     onclick="fmt('underline')"     title="Underline (Ctrl+U)">U</button>
+            <button class="tb-btn tb-s" data-cmd="strikeThrough" onclick="fmt('strikeThrough')" title="Strikethrough">S</button>
+            <!-- Text colour -->
+            <label class="tb-btn tb-color-btn" title="Text colour">
+              A<div class="tb-color-swatch" id="color-swatch"></div>
+              <input class="tb-color-input" type="color" value="#f64e4e" oninput="applyTextColor(this.value)" onchange="applyTextColor(this.value)">
+            </label>
             <div class="tb-sep"></div>
+            <!-- Lists -->
             <button class="tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet list">• List</button>
-            <button class="tb-btn" onclick="fmt('insertOrderedList')" title="Numbered list">1. List</button>
+            <button class="tb-btn" onclick="fmt('insertOrderedList')"   title="Numbered list">1. List</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" onclick="insertLink()" title="Insert link">🔗 Link</button>
+            <!-- Insert -->
+            <button class="tb-btn" onclick="insertLink()"       title="Insert link">🔗 Link</button>
+            <button class="tb-btn" onclick="insertHR()"         title="Divider line">─</button>
+            <button class="tb-btn" onclick="insertInlineCode()" title="Inline code">`&nbsp;`</button>
             <div class="tb-sep"></div>
+            <!-- Callouts -->
+            <button class="tb-btn" onclick="insertCallout('info')" title="Info callout"  style="color:#4e8ff6">ℹ️</button>
+            <button class="tb-btn" onclick="insertCallout('tip')"  title="Tip callout"   style="color:#3cba6f">✅</button>
+            <button class="tb-btn" onclick="insertCallout('warn')" title="Warning callout" style="color:#f6c14e">⚠️</button>
+            <div class="tb-sep"></div>
+            <!-- Media -->
+            <button class="tb-btn" onclick="insertYouTube()" title="Embed YouTube video" style="color:#f64e4e">▶ YT</button>
+            <button class="tb-btn" onclick="openPollBuilder()" title="Insert poll" style="color:var(--primary)">📊 Poll</button>
+            <div class="tb-sep"></div>
+            <!-- Align -->
             <button class="tb-btn" onclick="document.execCommand('justifyLeft')"   title="Align left">⬅</button>
             <button class="tb-btn" onclick="document.execCommand('justifyCenter')" title="Align centre">⬌</button>
             <button class="tb-btn" onclick="document.execCommand('justifyRight')"  title="Align right">➡</button>
             <div class="tb-sep"></div>
-            <button class="tb-btn" onclick="insertHR()"         title="Divider line">─</button>
-            <button class="tb-btn" onclick="insertInlineCode()" title="Inline code">`&nbsp;`</button>
-            <div class="tb-sep"></div>
-            <button class="tb-btn" onclick="document.execCommand('undo')" title="Undo">↩</button>
-            <button class="tb-btn" onclick="document.execCommand('redo')" title="Redo">↪</button>
+            <!-- History & clear -->
+            <button class="tb-btn" onclick="document.execCommand('undo')" title="Undo (Ctrl+Z)">↩</button>
+            <button class="tb-btn" onclick="document.execCommand('redo')" title="Redo (Ctrl+Y)">↪</button>
             <div class="tb-sep"></div>
             <button class="tb-btn" onclick="fmt('removeFormat')" title="Clear all formatting" style="opacity:0.65">✕ Clear</button>
-            <div class="tb-sep"></div>
-            <button class="tb-btn" onclick="openPollBuilder()" title="Insert poll" style="color:var(--primary)">📊 Poll</button>
           </div>
           <div id="f-content-editor" class="rich-editor" contenteditable="true" data-placeholder="Write your post here..."></div>
+          <div class="preview-pane" id="editor-preview"></div>
           <div class="editor-footer">
             <span class="word-count" id="word-count">0 words</span>
             <span class="draft-indicator" id="draft-indicator">Draft saved</span>
@@ -1390,6 +1467,7 @@ function renderStars(rating) {
       } else {
         document.getElementById('post-modal-title').textContent='New Post';
         document.getElementById('f-title').value='';
+        if(document.getElementById('f-excerpt')) document.getElementById('f-excerpt').value='';
         document.getElementById('f-tags').value='';
         editor.innerHTML='';
         // Restore auto-saved draft if one exists
@@ -1455,10 +1533,10 @@ function renderStars(rating) {
       try {
         const images=await resolveImages();
         if(editingId){
-          const{error}=await db.from('blog_posts').update({title,content,tags,images}).eq('id',editingId);
+          const{error}=await db.from('blog_posts').update(postData).eq('id',editingId);
           if(error)throw error; toast('Post updated ✓');
         } else {
-          const{error}=await db.from('blog_posts').insert([{title,content,tags,images}]);
+          const{error}=await db.from('blog_posts').insert([postData]);
           if(error)throw error; toast('Post published ✓');
           // Clear draft and optionally notify subscribers
           localStorage.removeItem('blog_draft_content');
