@@ -49,7 +49,11 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
+
+main { flex: 1; }
 
 a, p, h1, h2, h3, h4, ol {
   color: var(--text);
