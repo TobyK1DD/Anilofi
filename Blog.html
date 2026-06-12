@@ -1642,6 +1642,8 @@ function renderStars(rating) {
       btn.textContent='Publishing...';btn.disabled=true;
       try {
         const images=await resolveImages();
+        const excerpt=(document.getElementById('f-excerpt')?.value||'').trim();
+        const postData={title,content,tags,images,...(excerpt&&{excerpt})};
         if(editingId){
           const{error}=await db.from('blog_posts').update(postData).eq('id',editingId);
           if(error)throw error; toast('Post updated ✓');
