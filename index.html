@@ -85,70 +85,6 @@
     .section-heading h2 { font-size: 2.2rem; font-weight: 700; color: var(--text); }
     .section-heading .red { color: var(--primary); }
 
-    /* CertReady preview */
-    .preview-certready {
-      background: var(--bg-card);
-      flex-direction: column;
-      justify-content: center;
-      padding: 14px 18px;
-      gap: 7px;
-    }
-    .preview-certready::before {
-      content: '';
-      position: absolute;
-      top: 30%; left: 50%;
-      transform: translate(-50%, 0);
-      width: 75%; height: 10px;
-      background: var(--accent);
-      border-radius: 5px;
-    }
-    .preview-certready::after {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, 0);
-      width: 75%; height: 38px;
-      background: var(--primary);
-      border-radius: 6px;
-      opacity: 0.75;
-      box-shadow: 0 18px 0 rgba(246,78,78,0.4), 0 36px 0 rgba(246,78,78,0.2);
-    }
-
-    /* Lofi Pomodoro preview */
-    .preview-lofi {
-      background: #1a1a2e;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .timer-text { font-size: 2rem; font-weight: 700; color: #7a6fff; }
-    .wave { display: flex; gap: 3px; align-items: flex-end; height: 22px; }
-    .wave span {
-      width: 4px;
-      background: rgba(122, 111, 255, 0.7);
-      border-radius: 2px;
-      animation: waveA 1.2s ease-in-out infinite;
-    }
-    .wave span:nth-child(2) { animation-delay: 0.15s; }
-    .wave span:nth-child(3) { animation-delay: 0.30s; }
-    .wave span:nth-child(4) { animation-delay: 0.15s; }
-    @keyframes waveA { 0%,100%{height:6px} 50%{height:18px} }
-
-    /* Code School preview */
-    .preview-code {
-      background: #1a1a1a;
-      flex-direction: column;
-      padding: 12px 14px;
-      gap: 1px;
-      font-family: 'JetBrains Mono', 'Courier New', monospace;
-      font-size: 0.68rem;
-      line-height: 1.7;
-    }
-    .code-line { display: flex; gap: 10px; }
-    .code-n { color: #444; min-width: 12px; text-align: right; user-select: none; }
-    .k { color: #f64e4e; }
-    .v { color: #aac6d3; }
-    .s { color: #3cba6f; }
-    .code-txt { color: #ccc; }
   </style>
 </head>
 <body>
@@ -209,116 +145,6 @@
     </div>
   </section>
 
-  <div class="divider"></div>
-
-  <!-- ── PROJECTS ── -->
-  <section class="section" id="projects">
-    <div class="section-heading">
-      <p class="s-label">// MY PROJECTS</p>
-      <h2>Things I've <span class="red">Built</span></h2>
-    </div>
-
-    <div class="proj-grid">
-
-      <!-- CertReady -->
-      <div class="win proj-win">
-        <div class="winbar">
-          <div class="winbar-title">
-            certready.app
-            <span class="badge badge-live">LIVE</span>
-          </div>
-          <div class="wbtns">
-            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
-          </div>
-        </div>
-        <div class="proj-preview preview-certready"></div>
-        <div class="proj-info">
-          <h3 class="proj-name">CertReady</h3>
-          <p class="proj-desc">CompTIA A+ revision app with 560+ questions, premium stats, flag-for-review, confetti on perfect scores, and Ably-powered multiplayer study rooms.</p>
-          <div class="tag-row">
-            <span class="tag">React</span>
-            <span class="tag">Supabase</span>
-            <span class="tag">Ably</span>
-            <span class="tag">Lemon Squeezy</span>
-          </div>
-        </div>
-        <div class="proj-strip">
-          <span class="proj-live">live</span>
-          <a href="https://tobyk1dd.com/CertReady.html" class="proj-cta">visit →</a>
-        </div>
-      </div>
-
-      <!-- Lofi Pomodoro -->
-      <div class="win proj-win">
-        <div class="winbar">
-          <div class="winbar-title">
-            lofi-pomodoro.app
-            <span class="badge badge-live">LIVE</span>
-          </div>
-          <div class="wbtns">
-            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
-          </div>
-        </div>
-        <div class="proj-preview preview-lofi">
-          <span class="timer-text">25:00</span>
-          <div class="wave">
-            <span style="height:8px"></span>
-            <span style="height:14px"></span>
-            <span style="height:18px"></span>
-            <span style="height:12px"></span>
-            <span style="height:7px"></span>
-          </div>
-        </div>
-        <div class="proj-info">
-          <h3 class="proj-name">Lofi Pomodoro</h3>
-          <p class="proj-desc">Pomodoro timer with lofi music streams and real-time multiplayer rooms. Study together, stay in sync — powered by Ably.</p>
-          <div class="tag-row">
-            <span class="tag">JavaScript</span>
-            <span class="tag">Ably</span>
-            <span class="tag">CSS</span>
-          </div>
-        </div>
-        <div class="proj-strip">
-          <span class="proj-live">live</span>
-          <a href="https://tobyk1dd.com/lofi-pomodoro.html" class="proj-cta">visit →</a>
-        </div>
-      </div>
-
-      <!-- Code School -->
-      <div class="win proj-win">
-        <div class="winbar">
-          <div class="winbar-title">
-            code-school.app
-            <span class="badge badge-live">LIVE</span>
-          </div>
-          <div class="wbtns">
-            <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
-          </div>
-        </div>
-        <div class="proj-preview preview-code">
-          <div class="code-line"><span class="code-n">1</span><span class="code-txt">// build stuff. break things.</span></div>
-          <div class="code-line"><span class="code-n">2</span><span class="code-txt"><span class="k">const</span> learn = (<span class="v">topic</span>) => {</span></div>
-          <div class="code-line"><span class="code-n">3</span><span class="code-txt">&nbsp;&nbsp;<span class="k">return</span> {</span></div>
-          <div class="code-line"><span class="code-n">4</span><span class="code-txt">&nbsp;&nbsp;&nbsp;&nbsp;html: <span class="s">'✓'</span>,</span></div>
-          <div class="code-line"><span class="code-n">5</span><span class="code-txt">&nbsp;&nbsp;&nbsp;&nbsp;js:&nbsp;&nbsp;&nbsp;<span class="s">'loading...'</span></span></div>
-        </div>
-        <div class="proj-info">
-          <h3 class="proj-name">Code School</h3>
-          <p class="proj-desc">A web dev learning platform for self-taught developers. 60 lessons, full-text search, flashcard revision, per-lesson notes, and a debug lab.</p>
-          <div class="tag-row">
-            <span class="tag">Vanilla JS</span>
-            <span class="tag">HTML/CSS</span>
-            <span class="tag">GitHub Pages</span>
-          </div>
-        </div>
-        <div class="proj-strip">
-          <span class="proj-live">live</span>
-          <a href="https://tobyk1dd.com/code-school.html" class="proj-cta">visit →</a>
-        </div>
-      </div>
-
-    </div>
-  </section>
 
 </main>
 
@@ -371,16 +197,6 @@
       });
     });
 
-    /* Scroll reveal on project cards */
-    var io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting) {
-          e.target.style.animation = 'up 0.45s '+(e.target.dataset.i||0)*0.1+'s both';
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.08 });
-    document.querySelectorAll('.proj-win').forEach(function(el, i) { el.dataset.i = i; io.observe(el); });
   });
 </script>
 
