@@ -594,13 +594,13 @@
         <label>Content</label>
         <div class="editor-wrap">
           <!-- Edit / Preview tabs -->
-          <div class="editor-tabs">
+          <div class="editor-tabs" onmousedown="event.preventDefault()">
             <button class="editor-tab active" data-tab="write" onclick="switchEditorTab('write')">✏️ Write</button>
             <button class="editor-tab" data-tab="preview" onclick="switchEditorTab('preview')">👁 Preview</button>
             <div style="flex:1"></div>
             <button class="tb-btn" id="fullscreen-btn" onclick="toggleEditorFullscreen()" title="Fullscreen" style="margin:4px 8px 0 0;font-size:15px">⊞</button>
           </div>
-          <div class="editor-toolbar">
+          <div class="editor-toolbar" onmousedown="if(!event.target.classList.contains('tb-color-input'))event.preventDefault()">
             <!-- Format -->
             <select class="tb-select" onchange="fmtBlock(this.value);this.value=''">
               <option value="">Format ▾</option>
@@ -618,7 +618,7 @@
             <button class="tb-btn tb-u" data-cmd="underline"     onclick="fmt('underline')"     title="Underline (Ctrl+U)">U</button>
             <button class="tb-btn tb-s" data-cmd="strikeThrough" onclick="fmt('strikeThrough')" title="Strikethrough">S</button>
             <!-- Text colour -->
-            <label class="tb-btn tb-color-btn" title="Text colour">
+            <label class="tb-btn tb-color-btn" title="Text colour" onmousedown="saveEditorSel()">
               A<div class="tb-color-swatch" id="color-swatch"></div>
               <input class="tb-color-input" type="color" value="#f64e4e" oninput="applyTextColor(this.value)" onchange="applyTextColor(this.value)">
             </label>
@@ -939,6 +939,116 @@
       document.execCommand('insertHTML', false,
         `<code style="background:var(--accent);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:0.9em">${selected}</code>`);
     }
+
+
+    function saveEditorSel() {
+      const sel = window.getSelection();
+      window._editorSavedRange = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
+    }
+    function restoreEditorSel() {
+      if (!window._editorSavedRange) return;
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(window._editorSavedRange);
+    }
+
+    /* Active toolbar states — highlights B/I/U/S when cursor is in styled text */
+    document.addEventListener('selectionchange', function() {
+      const editor = document.getElementById('f-content-editor');
+      if (!editor) return;
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount || !editor.contains(sel.anchorNode)) return;
+      ['bold','italic','underline','strikeThrough'].forEach(function(cmd) {
+        const btn = document.querySelector('.tb-btn[data-cmd="' + cmd + '"]');
+        if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
+      });
+    });
+
+    /* Edit / Preview tab toggle */
+    function switchEditorTab(tab) {
+      var modal   = document.getElementById('post-modal');
+      var editor  = document.getElementById('f-content-editor');
+      var preview = document.getElementById('editor-preview');
+      var toolbar = modal ? modal.querySelector('.editor-toolbar') : null;
+      var footer  = modal ? modal.querySelector('.editor-footer')  : null;
+      if (tab === 'preview') {
+        var raw = editor ? editor.innerHTML.trim() : '';
+        if (preview) {
+          preview.innerHTML = raw || '<p style="opacity:0.4;font-style:italic;padding:16px">Nothing to preview yet.</p>';
+          preview.classList.add('open');
+        }
+        if (editor)  editor.style.display = 'none';
+        if (toolbar) { toolbar.style.opacity = '0.35'; toolbar.style.pointerEvents = 'none'; }
+        if (footer)  footer.style.display = 'none';
+        // Re-render polls in preview
+        if (preview) initPollsInPost(preview).catch(function(){});
+      } else {
+        if (editor)  editor.style.display = '';
+        if (preview) preview.classList.remove('open');
+        if (toolbar) { toolbar.style.opacity = ''; toolbar.style.pointerEvents = ''; }
+        if (footer)  footer.style.display = '';
+        if (editor)  editor.focus();
+      }
+      document.querySelectorAll('.editor-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+    }
+
+    /* Fullscreen mode */
+    function toggleEditorFullscreen() {
+      var box = document.querySelector('#post-modal .modal-box');
+      var btn = document.getElementById('fullscreen-btn');
+      if (!box) return;
+      box.classList.toggle('is-fullscreen');
+      var on = box.classList.contains('is-fullscreen');
+      if (btn) { btn.textContent = on ? '⊡' : '⊞'; btn.title = on ? 'Exit fullscreen' : 'Fullscreen'; }
+    }
+
+    /* Text colour — restore selection first so foreColor applies correctly */
+    function applyTextColor(color) {
+      var swatch = document.getElementById('color-swatch');
+      if (swatch) swatch.style.background = color;
+      var editor = document.getElementById('f-content-editor');
+      if (editor) editor.focus();
+      restoreEditorSel();
+      document.execCommand('foreColor', false, color);
+    }
+
+    /* Callout blocks */
+    function insertCallout(type) {
+      var icons  = { info:'ℹ️', tip:'✅', warn:'⚠️' };
+      var labels = { info:'Add your info here...', tip:'Add your tip here...', warn:'Add your warning here...' };
+      var editor = document.getElementById('f-content-editor');
+      if (editor) editor.focus();
+      document.execCommand('insertHTML', false,
+        '<div class="callout callout-' + type + '"><span class="callout-icon">' + icons[type] + '</span>' +
+        '<p>' + labels[type] + '</p></div><p><br></p>');
+    }
+
+    /* YouTube embed */
+    function insertYouTube() {
+      var url = prompt('Paste YouTube URL:');
+      if (!url) return;
+      var match = url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+      if (!match) { toast('Could not find a YouTube video ID — paste the full URL'); return; }
+      var id = match[1];
+      var editor = document.getElementById('f-content-editor');
+      if (editor) editor.focus();
+      document.execCommand('insertHTML', false,
+        '<div class="yt-embed"><iframe src="https://www.youtube.com/embed/' + id + '" allowfullscreen loading="lazy"></iframe></div><p><br></p>');
+      toast('Video embedded ✓');
+    }
+
+    /* Title char counter */
+    document.addEventListener('DOMContentLoaded', function() {
+      var titleInput = document.getElementById('f-title');
+      if (titleInput) {
+        titleInput.addEventListener('input', function() {
+          var el = document.getElementById('title-chars');
+          if (el) el.textContent = (100 - this.value.length) + ' left';
+        });
+      }
+    });
 
     function clearDraft() {
       localStorage.removeItem('blog_draft_content');
