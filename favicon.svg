@@ -1,8 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Dark background -->
-  <rect width="32" height="32" rx="7" fill="#111111"/>
-  <!-- T — horizontal bar -->
-  <rect x="5" y="8" width="22" height="4.5" rx="2" fill="#f64e4e"/>
-  <!-- T — vertical stem -->
-  <rect x="13.75" y="8" width="4.5" height="17" rx="2" fill="#f64e4e"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Red background with rounded corners -->
+  <rect width="100" height="100" rx="18" fill="#f64e4e"/>
+  <!-- Darker top strip (winbar nod) -->
+  <rect width="100" height="13" rx="18" fill="#d43c3c"/>
+  <rect x="0" y="7" width="100" height="6" fill="#d43c3c"/>
+  <!-- TK text -->
+  <text
+    x="50" y="72"
+    font-family="Arial Black, Arial, sans-serif"
+    font-weight="900"
+    font-size="54"
+    text-anchor="middle"
+    fill="#ffffff"
+    letter-spacing="-2"
+  >TK</text>
+  <!-- Black dot below — on-brand -->
+  <circle cx="50" cy="90" r="4" fill="#000000"/>
 </svg>

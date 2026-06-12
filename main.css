@@ -725,6 +725,19 @@ footer, .footer {
 }
 #scroll-top.visible { display: flex; }
 
+/* ── About Me grid — stacks on mobile ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+}
+
+@media (max-width: 768px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-grid-left { border-right: none !important; padding: 24px !important; }
+  .about-grid-right { border-top: 4px solid var(--border); max-height: none !important; overflow-y: visible !important; }
+  .about-grid-right > div { overflow-y: visible !important; max-height: none !important; }
+}
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
