@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -343,7 +344,7 @@ footer { background-color:var(--bg);color:var(--text);text-align:center;margin-t
       <button class="auth-link"   onclick="switchToForgot()">Forgot password?</button>
       <div class="auth-msg" id="liMsg"></div>
     </div>
-    <div class="supabase-note">🔗 Cross-device sync coming soon via Supabase</div>
+    <div class="supabase-note">🔗 Your sessions sync across all devices</div>
   </div>
 </div>
 
@@ -359,7 +360,7 @@ footer { background-color:var(--bg);color:var(--text);text-align:center;margin-t
       <button class="auth-submit" onclick="doSignup()">Create Account</button>
       <div class="auth-msg" id="suMsg"></div>
     </div>
-    <div class="supabase-note">🔗 Cross-device sync coming soon via Supabase</div>
+    <div class="supabase-note">🔗 Your sessions sync across all devices</div>
   </div>
 </div>
 
@@ -386,7 +387,7 @@ footer { background-color:var(--bg);color:var(--text);text-align:center;margin-t
     <p style="font-size:20px;font-weight:900;margin-bottom:4px;color:var(--text);" id="accUsername"></p>
     <p style="font-size:12px;opacity:0.55;margin-bottom:20px;color:var(--text);" id="accEmail"></p>
     <button class="auth-submit" onclick="doLogout()">Sign Out</button>
-    <div class="supabase-note">🔗 Cross-device sync coming soon via Supabase</div>
+    <div class="supabase-note">🔗 Your sessions sync across all devices</div>
   </div>
 </div>
 
@@ -643,17 +644,30 @@ function todayKey() { return new Date().toISOString().slice(0,10); }
 
 function recordSession(task, note) {
   const st = getStats();
-  st.sessions.push({
+  const entry = {
     date: todayKey(),
     ts:   Date.now(),
     task: task || '',
     note: note || '',
     mins: Math.round(totalTime / 60),
     mode: currentMode,
-  });
+  };
+  st.sessions.push(entry);
   saveStats(st);
   updateSidebar();
   renderHeatmap();
+  // write to Supabase if logged in
+  if (currentUser) {
+    sb.from('lofi_sessions').insert({
+      user_id: currentUser.id,
+      date:    entry.date,
+      ts:      entry.ts,
+      task:    entry.task,
+      note:    entry.note,
+      mins:    entry.mins,
+      mode:    entry.mode,
+    }).then(()=>{});
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -711,6 +725,10 @@ function setGoal() {
   document.getElementById('goalInput').value = v;
   const st = getStats(); st.goal = v; saveStats(st);
   updateSidebar();
+  // save to cloud if logged in
+  if (currentUser) {
+    sb.from('profiles').update({ lofi_goal: v }).eq('id', currentUser.id).then(()=>{});
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1184,73 +1202,181 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 });
 
 // ══════════════════════════════════════════════
-//  AUTH
+//  SUPABASE AUTH
 // ══════════════════════════════════════════════
-function hashPass(p){ let h=5381; for(let i=0;i<p.length;i++) h=((h<<5)+h)^p.charCodeAt(i); return(h>>>0).toString(36); }
-function getUsers()     { return JSON.parse(localStorage.getItem('lofi_users')||'{}'); }
-function saveUsers(u)   { localStorage.setItem('lofi_users',JSON.stringify(u)); }
-function getSession()   { return JSON.parse(localStorage.getItem('lofi_session')||'null'); }
-function saveSession(s) { localStorage.setItem('lofi_session',JSON.stringify(s)); }
-function clearSession() { localStorage.removeItem('lofi_session'); }
+const SUPABASE_URL  = 'https://bllxvirgcrpngspmkbtt.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbHh2aXJnY3JwbmdzcG1rYnR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2Njk4NjIsImV4cCI6MjA5NTI0NTg2Mn0.dMKkl2a5tN-nNo_G8emXFXM4oSfJwFtuGaUvmNkAXpo';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-function openLogin()   { clearMsg('liMsg'); openModal('loginModal'); }
-function openSignup()  { clearMsg('suMsg'); openModal('signupModal'); }
-function openAccount() { const s=getSession(); if(s){ document.getElementById('accUsername').textContent=s.username; document.getElementById('accEmail').textContent=s.email; openModal('accountModal'); } }
+let currentUser   = null; // supabase auth user
+let currentProfile = null; // profiles row { id, username, email, lofi_goal }
+
+// ── modal helpers ─────────────────────────────
+function openLogin()    { clearMsg('liMsg'); openModal('loginModal'); }
+function openSignup()   { clearMsg('suMsg'); openModal('signupModal'); }
 function switchToForgot(){ closeModal('loginModal'); clearMsg('fpMsg'); openModal('forgotModal'); }
 function switchToLogin() { closeModal('forgotModal'); clearMsg('liMsg'); openModal('loginModal'); }
 
-function clearMsg(id){ const el=document.getElementById(id); if(el){el.textContent='';el.className='auth-msg';} }
-function setMsg(id,msg,type){ const el=document.getElementById(id); el.textContent=msg; el.className='auth-msg '+(type||''); }
+function openAccount() {
+  if (currentProfile) {
+    document.getElementById('accUsername').textContent = currentProfile.username;
+    document.getElementById('accEmail').textContent    = currentUser.email;
+    openModal('accountModal');
+  }
+}
 
-function doLogin(){
-  const username=document.getElementById('liUser').value.trim();
-  const pass=document.getElementById('liPass').value;
-  if(!username||!pass) return setMsg('liMsg','Please fill in all fields.','err');
-  const users=getUsers();
-  if(!users[username]) return setMsg('liMsg','No account found for that username.','err');
-  if(users[username].passwordHash!==hashPass(pass)) return setMsg('liMsg','Incorrect password.','err');
-  const s={username,email:users[username].email};
-  saveSession(s); updateAcctBtns(s);
+function clearMsg(id) { const el=document.getElementById(id); if(el){el.textContent='';el.className='auth-msg';} }
+function setMsg(id,msg,type) { const el=document.getElementById(id); el.textContent=msg; el.className='auth-msg '+(type||''); }
+
+// ── sign up ───────────────────────────────────
+async function doSignup() {
+  const username = document.getElementById('suUser').value.trim();
+  const email    = document.getElementById('suEmail').value.trim().toLowerCase();
+  const pass     = document.getElementById('suPass').value;
+  if (!username||!email||!pass) return setMsg('suMsg','Please fill in all fields.','err');
+  if (pass.length<6) return setMsg('suMsg','Password must be at least 6 characters.','err');
+  if (!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
+
+  setMsg('suMsg','Creating account…','');
+
+  // check username not taken
+  const { data: existing } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+  if (existing) return setMsg('suMsg','That username is already taken.','err');
+
+  // create auth user
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+  if (error) return setMsg('suMsg', error.message, 'err');
+
+  // insert profile row
+  await sb.from('profiles').insert({
+    id:       data.user.id,
+    username: username,
+    email:    email,
+  });
+
+  setMsg('suMsg','Account created! Welcome, '+username+' ✿','ok');
+  currentUser    = data.user;
+  currentProfile = { id: data.user.id, username, email, lofi_goal: 4 };
+  updateAcctBtns(currentProfile);
+  await syncSessionsToCloud(); // push any local sessions up
+  setTimeout(()=>closeModal('signupModal'), 1400);
+}
+
+// ── login (username + password) ───────────────
+async function doLogin() {
+  const username = document.getElementById('liUser').value.trim();
+  const pass     = document.getElementById('liPass').value;
+  if (!username||!pass) return setMsg('liMsg','Please fill in all fields.','err');
+
+  setMsg('liMsg','Signing in…','');
+
+  // look up email by username
+  const { data: profile, error: profileErr } = await sb
+    .from('profiles').select('email').eq('username', username).maybeSingle();
+  if (profileErr || !profile) return setMsg('liMsg','No account found for that username.','err');
+
+  const { data, error } = await sb.auth.signInWithPassword({ email: profile.email, password: pass });
+  if (error) return setMsg('liMsg','Incorrect password.','err');
+
+  await onSignedIn(data.user);
   setMsg('liMsg','Welcome back, '+username+'! ✿','ok');
-  setTimeout(()=>closeModal('loginModal'),1200);
+  setTimeout(()=>closeModal('loginModal'), 1200);
 }
 
-function doSignup(){
-  const username=document.getElementById('suUser').value.trim();
-  const email=document.getElementById('suEmail').value.trim().toLowerCase();
-  const pass=document.getElementById('suPass').value;
-  if(!username||!email||!pass) return setMsg('suMsg','Please fill in all fields.','err');
-  if(pass.length<6) return setMsg('suMsg','Password must be at least 6 characters.','err');
-  if(!/\S+@\S+\.\S+/.test(email)) return setMsg('suMsg','Please enter a valid email.','err');
-  const users=getUsers();
-  if(users[username]) return setMsg('suMsg','That username is already taken.','err');
-  if(Object.values(users).some(u=>u.email===email)) return setMsg('suMsg','Email already in use.','err');
-  users[username]={email,passwordHash:hashPass(pass)}; saveUsers(users);
-  const s={username,email}; saveSession(s); updateAcctBtns(s);
-  setMsg('suMsg','Welcome, '+username+'! ✿','ok');
-  setTimeout(()=>closeModal('signupModal'),1400);
+// ── forgot password ───────────────────────────
+async function doForgot() {
+  const email = document.getElementById('fpEmail').value.trim().toLowerCase();
+  if (!email) return setMsg('fpMsg','Please enter your email.','err');
+  setMsg('fpMsg','Sending reset email…','');
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if (error) return setMsg('fpMsg', error.message, 'err');
+  setMsg('fpMsg','Reset email sent! Check your inbox ✿','ok');
 }
 
-function doForgot(){
-  const email=document.getElementById('fpEmail').value.trim().toLowerCase();
-  if(!email) return setMsg('fpMsg','Please enter your email.','err');
-  const users=getUsers();
-  const entry=Object.entries(users).find(([,v])=>v.email===email);
-  if(!entry) return setMsg('fpMsg','No account found with that email.','err');
-  const tempPass='reset'+Math.random().toString(36).slice(2,8);
-  users[entry[0]].passwordHash=hashPass(tempPass); saveUsers(users);
-  setMsg('fpMsg','Temp code: '+tempPass+' — login with username "'+entry[0]+'" and this code.','ok');
+// ── logout ────────────────────────────────────
+async function doLogout() {
+  await sb.auth.signOut();
+  currentUser    = null;
+  currentProfile = null;
+  updateAcctBtns(null);
+  closeModal('accountModal');
+  showToast('Signed out ✿');
 }
 
-function doLogout(){ clearSession(); updateAcctBtns(null); closeModal('accountModal'); showToast('Signed out ✿'); }
+// ── on signed in ─────────────────────────────
+async function onSignedIn(user) {
+  currentUser = user;
+  // load profile
+  const { data: prof } = await sb.from('profiles')
+    .select('id,username,email,lofi_goal').eq('id', user.id).maybeSingle();
+  currentProfile = prof;
+  updateAcctBtns(prof);
 
-function updateAcctBtns(s){
-  const wrap=document.getElementById('auth-btns'),lbl=document.getElementById('acct-label');
-  if(s){wrap.classList.add('logged-in');lbl.textContent=s.username;}
-  else{wrap.classList.remove('logged-in');lbl.textContent='';}
+  // pull goal from cloud
+  if (prof && prof.lofi_goal) {
+    const st = getStats(); st.goal = prof.lofi_goal; saveStats(st);
+    const gi = document.getElementById('goalInput');
+    if (gi) gi.value = prof.lofi_goal;
+  }
+
+  await loadSessionsFromCloud();
+  updateSidebar();
+  renderHeatmap();
 }
 
-(function(){ const s=getSession(); if(s) updateAcctBtns(s); })();
+// ── sync: local → cloud ───────────────────────
+async function syncSessionsToCloud() {
+  if (!currentUser) return;
+  const st = getStats();
+  if (!st.sessions.length) return;
+  // upsert all local focus sessions
+  const rows = st.sessions.map(s => ({
+    user_id: currentUser.id,
+    date:    s.date,
+    ts:      s.ts,
+    task:    s.task || '',
+    note:    s.note || '',
+    mins:    s.mins,
+    mode:    s.mode,
+  }));
+  await sb.from('lofi_sessions').upsert(rows, { onConflict: 'user_id,ts' }).select();
+}
+
+// ── sync: cloud → local ───────────────────────
+async function loadSessionsFromCloud() {
+  if (!currentUser) return;
+  const { data, error } = await sb.from('lofi_sessions')
+    .select('date,ts,task,note,mins,mode')
+    .eq('user_id', currentUser.id)
+    .order('ts', { ascending: true });
+  if (error || !data) return;
+  const st = getStats();
+  // merge: use cloud as source of truth, dedupe by ts
+  const existing = new Set(st.sessions.map(s=>s.ts));
+  data.forEach(s => { if (!existing.has(s.ts)) st.sessions.push(s); });
+  st.sessions.sort((a,b)=>a.ts-b.ts);
+  saveStats(st);
+}
+
+// ── update buttons ────────────────────────────
+function updateAcctBtns(prof) {
+  const wrap = document.getElementById('auth-btns');
+  const lbl  = document.getElementById('acct-label');
+  if (prof) { wrap.classList.add('logged-in');    lbl.textContent = prof.username; }
+  else      { wrap.classList.remove('logged-in'); lbl.textContent = ''; }
+}
+
+// ── restore session on page load ─────────────
+(async function() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await onSignedIn(session.user);
+
+  // listen for auth state changes (e.g. tab focus after password reset)
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) await onSignedIn(session.user);
+    if (event === 'SIGNED_OUT') { currentUser=null; currentProfile=null; updateAcctBtns(null); }
+  });
+})();
 
 // ══════════════════════════════════════════════
 //  CODE VIEWER
