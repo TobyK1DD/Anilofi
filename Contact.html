@@ -46,7 +46,7 @@
     <a href="Contact.html"   class="nav-link">Contact</a>
   </div>
   <div class="navbar-controls">
-    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+    <button class="nav-toggle" id="theme-btn" title="Toggle light / dark mode" aria-label="Toggle light / dark mode">🌙</button>
     <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -118,7 +118,7 @@
               <p style="font-size:12px; color:var(--text-mid); line-height:1.5; flex:1;">AMA - Ask me anything.</p>
             </div>
             <div style="border-top:4px solid var(--border); padding:8px 14px; background:var(--bg-card);">
-              <a href="https://tobyk1dd.com/FAQ" target="_blank" style="font-size:12px; font-weight:700; color:var(--primary); text-decoration:none;">tobyk1dd.com/FAQ →</a>
+              <a href="https://tobyk1dd.com/faq" target="_blank" style="font-size:12px; font-weight:700; color:var(--primary); text-decoration:none;">tobyk1dd.com/FAQ →</a>
             </div>
           </div>
 
@@ -162,12 +162,12 @@
     tick(); setInterval(tick, 1000);
     var btn = document.getElementById('theme-btn');
     if (btn) {
-      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️' : '🌙';
       btn.addEventListener('click', function () {
         document.body.classList.toggle('darkmode');
         var dark = document.body.classList.contains('darkmode');
         localStorage.setItem('theme', dark ? 'dark' : 'light');
-        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+        btn.textContent = dark ? '☀️' : '🌙';
       });
     }
     document.querySelectorAll('.wbtn.r').forEach(b => {
