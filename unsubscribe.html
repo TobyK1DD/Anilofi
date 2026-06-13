@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unsubscribe — TobyK1DD</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <div class="navbar-links" id="nav-links">
+    <a href="index.html"    class="nav-link">Home</a>
+    <a href="About_Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link">Blog</a>
+    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="Contact.html"  class="nav-link">Contact</a>
+  </div>
+  <div class="navbar-controls">
+    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+    <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main style="display:flex;align-items:center;justify-content:center;padding:40px 24px;">
+  <div class="win" style="max-width:480px;width:100%">
+    <div class="winbar">
+      <div class="winbar-title" id="winbar-txt">unsubscribe.exe</div>
+      <div class="wbtns">
+        <span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span>
+      </div>
+    </div>
+    <div style="padding:36px 40px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;">
+
+      <div id="state-loading">
+        <p style="color:var(--text-mid);font-size:0.9rem">Loading...</p>
+      </div>
+
+      <div id="state-confirm" style="display:none;flex-direction:column;align-items:center;gap:16px;">
+        <p style="font-size:2rem">📭</p>
+        <h2 style="font-size:1.4rem;font-weight:700;color:var(--text)">Unsubscribe</h2>
+        <p style="font-size:0.9rem;color:var(--text-mid);line-height:1.7">
+          You're about to unsubscribe <strong id="show-email" style="color:var(--primary)"></strong>
+          from the TobyK1DD newsletter. You won't receive any more emails.
+        </p>
+        <button onclick="doUnsubscribe()" class="btn" style="width:100%;margin-top:4px">Confirm unsubscribe</button>
+        <a href="Blog.html" style="font-size:0.8rem;color:var(--text-dim);text-decoration:none">← Back to the blog</a>
+      </div>
+
+      <div id="state-done" style="display:none;flex-direction:column;align-items:center;gap:16px;">
+        <p style="font-size:2.5rem">✅</p>
+        <h2 style="font-size:1.4rem;font-weight:700;color:var(--text)">You're unsubscribed</h2>
+        <p style="font-size:0.9rem;color:var(--text-mid);line-height:1.7">
+          Done — you won't hear from us again. If you change your mind you can always re-subscribe from the blog.
+        </p>
+        <a href="Blog.html" class="btn" style="width:100%;text-align:center">Back to the blog</a>
+      </div>
+
+      <div id="state-error" style="display:none;flex-direction:column;align-items:center;gap:16px;">
+        <p style="font-size:2rem">⚠️</p>
+        <h2 style="font-size:1.3rem;font-weight:700;color:var(--text)">Something went wrong</h2>
+        <p id="error-msg" style="font-size:0.9rem;color:var(--text-mid)"></p>
+        <a href="Blog.html" class="btn btn-outline" style="width:100%;text-align:center">Back to the blog</a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+
+<script>
+const SUPABASE_URL  = 'https://jfxyzehiaynabzsnncjp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmeHl6ZWhpYXluYWJ6c25uY2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDczNjIsImV4cCI6MjA5NjIyMzM2Mn0.k9nqufXZO-wu0UuKBYu5VVZ8y4t4QhCpLUNoSvTfi7I';
+const { createClient } = window.supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+var email = null;
+
+function show(id) {
+  ['state-loading','state-confirm','state-done','state-error'].forEach(function(s) {
+    var el = document.getElementById(s);
+    if (el) el.style.display = s === id ? 'flex' : 'none';
+  });
+}
+
+async function doUnsubscribe() {
+  var btn = document.querySelector('#state-confirm button');
+  if (btn) { btn.disabled = true; btn.textContent = 'Removing...'; }
+  var res = await db.from('newsletter_subscribers').delete().eq('email', email);
+  if (res.error) {
+    document.getElementById('error-msg').textContent = res.error.message;
+    show('state-error');
+  } else {
+    show('state-done');
+    document.getElementById('winbar-txt').textContent = 'unsubscribe.exe — done ✓';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Clock
+  function tick() {
+    var n = new Date(), p = x => String(x).padStart(2,'0');
+    var el = document.getElementById('clock');
+    if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Theme
+  var btn = document.getElementById('theme-btn');
+  if (btn) {
+    btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+    btn.addEventListener('click', function() {
+      document.body.classList.toggle('darkmode');
+      var dark = document.body.classList.contains('darkmode');
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+    });
+  }
+
+  // Read email from URL
+  var params = new URLSearchParams(window.location.search);
+  email = params.get('email');
+
+  if (!email || !email.includes('@')) {
+    document.getElementById('error-msg').textContent = 'No valid email address found in this link. Please use the unsubscribe link from your email.';
+    show('state-error');
+    return;
+  }
+
+  document.getElementById('show-email').textContent = email;
+  show('state-confirm');
+});
+</script>
+
+</body>
+</html>

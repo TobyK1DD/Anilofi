@@ -129,6 +129,9 @@
 </head>
 <body>
 
+<!-- Scroll progress bar -->
+<div id="read-progress" style="position:fixed;top:52px;left:0;width:0%;height:3px;background:var(--primary);z-index:999;transition:width 0.08s linear;pointer-events:none;"></div>
+
 <!-- ── NAVBAR ── -->
 <nav class="navbar">
   <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
@@ -483,6 +486,14 @@ async function deleteComment(id) {
   toast('Comment deleted');
   await loadComments();
 }
+
+/* Scroll progress bar */
+window.addEventListener('scroll', function() {
+  var bar = document.getElementById('read-progress');
+  if (!bar) return;
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (h > 0 ? Math.min((window.scrollY / h) * 100, 100) : 0) + '%';
+});
 
 loadPost();
 </script>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guestbook — TobyK1DD</title>
+  <meta name="description" content="Sign the TobyK1DD guestbook — leave a message for Toby Kidd (TobyK1DD), self-taught developer and Twitch streamer from Coventry.">
+  <meta name="theme-color" content="#f64e4e">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    .gb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; margin-top:20px; }
+    .gb-entry { background:var(--bg-soft); border:3px solid var(--border); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px; animation:up 0.4s both; }
+    .gb-name { font-size:0.9rem; font-weight:700; color:var(--primary); }
+    .gb-msg { font-size:0.85rem; color:var(--text); line-height:1.6; flex:1; }
+    .gb-date { font-size:0.7rem; color:var(--text-dim); }
+    .gb-del { font-size:0.7rem; color:var(--text-dim); background:none; border:none; cursor:pointer; padding:0; box-shadow:none; height:auto; min-width:0; display:none; }
+    .gb-del:hover { color:var(--primary); }
+    body.admin-on .gb-del { display:inline; }
+    .gb-count { font-size:0.75rem; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; }
+    .char-left { font-size:0.7rem; color:var(--text-dim); }
+    .gb-empty { text-align:center; padding:40px; color:var(--text-dim); font-size:0.9rem; font-style:italic; grid-column:1/-1; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <div class="navbar-links" id="nav-links">
+    <a href="index.html"    class="nav-link">Home</a>
+    <a href="About_Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link">Blog</a>
+    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="Contact.html"  class="nav-link">Contact</a>
+  </div>
+  <div class="navbar-controls">
+    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+    <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// guestbook</p>
+    <h2 class="page-title">Leave a <em>message</em></h2>
+    <p class="page-sub">Old school. Sign the guestbook — say hi, drop a thought, let me know you were here.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="page-section" style="max-width:860px;margin:0 auto;">
+
+    <!-- Sign form -->
+    <div class="win" style="margin-bottom:20px">
+      <div class="winbar">
+        <div class="winbar-title">sign.exe — leave your mark</div>
+        <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+      </div>
+      <div style="padding:24px 28px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:5px">Your name</label>
+            <input type="text" id="gb-name" maxlength="50" placeholder="TobyK1DD" style="width:100%;font-family:'Sour Gummy',sans-serif;font-size:0.9rem;background:var(--bg);color:var(--text);border:3px solid var(--border);border-radius:8px;padding:8px 12px;outline:none;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:5px">Where you're from <span style="opacity:0.5;font-weight:400">(optional)</span></label>
+            <input type="text" id="gb-location" maxlength="40" placeholder="Coventry, UK" style="width:100%;font-family:'Sour Gummy',sans-serif;font-size:0.9rem;background:var(--bg);color:var(--text);border:3px solid var(--border);border-radius:8px;padding:8px 12px;outline:none;">
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <label style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em">Message</label>
+            <span class="char-left" id="gb-chars">300 left</span>
+          </div>
+          <textarea id="gb-msg" maxlength="300" rows="3" placeholder="Hey! Found your site via... Love what you're building..." style="width:100%;font-family:'Sour Gummy',sans-serif;font-size:0.9rem;background:var(--bg);color:var(--text);border:3px solid var(--border);border-radius:8px;padding:8px 12px;outline:none;resize:vertical;min-height:80px;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button class="btn" id="gb-submit" onclick="signGuestbook()">Sign the guestbook ✍️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entries -->
+    <div class="win">
+      <div class="winbar">
+        <div class="winbar-title">entries.exe — <span id="gb-count-label">loading...</span></div>
+        <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+      </div>
+      <div style="padding:20px 24px;">
+        <div class="gb-grid" id="gb-grid">
+          <p class="gb-empty">Loading entries...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Coventry, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+<div id="toast-root"></div>
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+const SUPABASE_URL  = 'https://jfxyzehiaynabzsnncjp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmeHl6ZWhpYXluYWJ6c25uY2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDczNjIsImV4cCI6MjA5NjIyMzM2Mn0.k9nqufXZO-wu0UuKBYu5VVZ8y4t4QhCpLUNoSvTfi7I';
+const { createClient } = window.supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+var isAdmin = false;
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg) {
+  var r = document.getElementById('toast-root'); if (!r) return;
+  var t = document.createElement('div'); t.className='toast'; t.textContent=msg; r.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},3000);
+}
+
+async function loadEntries() {
+  var { data, error } = await db.from('guestbook').select('*').order('created_at', { ascending: false });
+  var grid = document.getElementById('gb-grid');
+  var label = document.getElementById('gb-count-label');
+  if (error || !data) { grid.innerHTML = '<p class="gb-empty">Could not load entries.</p>'; return; }
+  if (label) label.textContent = data.length + ' entr' + (data.length === 1 ? 'y' : 'ies');
+  if (!data.length) { grid.innerHTML = '<p class="gb-empty">No entries yet — be the first to sign!</p>'; return; }
+  grid.innerHTML = data.map(function(e) {
+    var date = new Date(e.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+    var loc  = e.location ? ' · ' + esc(e.location) : '';
+    return '<div class="gb-entry">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+        '<span class="gb-name">' + esc(e.name) + '</span>' +
+        '<button class="gb-del" onclick="deleteEntry(\'' + e.id + '\')">🗑️</button>' +
+      '</div>' +
+      '<p class="gb-msg">' + esc(e.message) + '</p>' +
+      '<span class="gb-date">' + date + loc + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+async function signGuestbook() {
+  var name = (document.getElementById('gb-name').value||'').trim();
+  var msg  = (document.getElementById('gb-msg').value||'').trim();
+  var loc  = (document.getElementById('gb-location').value||'').trim();
+  if (!name) { toast('Add your name first'); return; }
+  if (!msg)  { toast('Write a message'); return; }
+
+  // Simple rate limit — one per 10 mins per browser
+  var last = localStorage.getItem('gb_last');
+  if (last && Date.now() - parseInt(last) < 600000) { toast('You already signed recently — thanks!'); return; }
+
+  var btn = document.getElementById('gb-submit');
+  btn.disabled = true; btn.textContent = 'Signing...';
+
+  var row = { name, message: msg };
+  if (loc) row.location = loc;
+
+  var { error } = await db.from('guestbook').insert([row]);
+  btn.disabled = false; btn.textContent = 'Sign the guestbook ✍️';
+
+  if (error) { toast('Error: ' + error.message); return; }
+
+  localStorage.setItem('gb_last', Date.now().toString());
+  document.getElementById('gb-name').value = '';
+  document.getElementById('gb-msg').value  = '';
+  document.getElementById('gb-location').value = '';
+  document.getElementById('gb-chars').textContent = '300 left';
+  toast('Signed ✓ Thanks for leaving a message!');
+  await loadEntries();
+}
+
+async function deleteEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  var { error } = await db.from('guestbook').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Deleted');
+  await loadEntries();
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+  function tick() {
+    var n = new Date(), p = x => String(x).padStart(2,'0');
+    var el = document.getElementById('clock');
+    if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  var btn = document.getElementById('theme-btn');
+  if (btn) {
+    btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+    btn.addEventListener('click', function() {
+      document.body.classList.toggle('darkmode');
+      var dark = document.body.classList.contains('darkmode');
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+    });
+  }
+
+  window.addEventListener('scroll', function() {
+    var s = document.getElementById('scroll-top');
+    if (s) s.classList.toggle('visible', window.scrollY > 300);
+  });
+
+  var ta = document.getElementById('gb-msg');
+  if (ta) ta.addEventListener('input', function() {
+    var el = document.getElementById('gb-chars');
+    if (el) el.textContent = (300 - ta.value.length) + ' left';
+  });
+
+  // Admin check
+  var { data: { session } } = await db.auth.getSession();
+  if (session) { isAdmin = true; document.body.classList.add('admin-on'); }
+
+  await loadEntries();
+});
+</script>
+</body>
+</html>

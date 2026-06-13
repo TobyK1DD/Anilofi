@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Setup — TobyK1DD</title>
+  <meta name="description" content="The tools, software, hardware and learning resources Toby Kidd (TobyK1DD) actually uses — from coding to streaming to gaming.">
+  <meta name="theme-color" content="#f64e4e">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    .setup-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+    .setup-card { background:var(--bg-soft); border:3px solid var(--border); border-radius:10px; overflow:hidden; display:flex; flex-direction:column; transition:transform 0.2s, border-color 0.2s; }
+    .setup-card:hover { transform:translateY(-3px); border-color:var(--primary); }
+    .setup-card-body { padding:18px 20px; flex:1; display:flex; flex-direction:column; gap:6px; }
+    .setup-icon { font-size:1.6rem; margin-bottom:4px; }
+    .setup-name { font-size:1rem; font-weight:700; color:var(--text); }
+    .setup-what { font-size:0.72rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; }
+    .setup-desc { font-size:0.82rem; color:var(--text-mid); line-height:1.6; flex:1; }
+    .setup-footer { border-top:3px solid var(--border); padding:8px 14px; background:var(--bg-card); }
+    .setup-link { font-size:0.75rem; font-weight:700; color:var(--primary); text-decoration:none; }
+    .setup-link:hover { text-decoration:underline; }
+    .setup-free { font-size:0.65rem; font-weight:700; background:var(--green,#3cba6f); color:#fff; padding:2px 7px; border-radius:20px; border:2px solid var(--border); }
+    .setup-aff { font-size:0.65rem; color:var(--text-dim); }
+    .section-intro { font-size:0.9rem; color:var(--text-mid); line-height:1.7; margin-bottom:18px; max-width:600px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <div class="navbar-links" id="nav-links">
+    <a href="index.html"    class="nav-link">Home</a>
+    <a href="About_Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link">Blog</a>
+    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="Contact.html"  class="nav-link">Contact</a>
+  </div>
+  <div class="navbar-controls">
+    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+    <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// my setup</p>
+    <h2 class="page-title">Tools I actually <em>use</em></h2>
+    <p class="page-sub">Everything in my coding, streaming, and gaming setup. No fluff — just what's genuinely part of my workflow.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- DEV TOOLS -->
+  <section class="page-section">
+    <div class="s-head"><span class="s-label">// dev tools</span><div class="s-rule"></div></div>
+    <p class="section-intro">The software and services powering every project I ship.</p>
+    <div class="setup-grid">
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">💻</span>
+          <span class="setup-what">Editor</span>
+          <span class="setup-name">VS Code</span>
+          <p class="setup-desc">I even built my own VS Code theme — TobyK1DD Dark & Light. The editor I learned in, the one I still use daily.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://code.visualstudio.com" target="_blank" rel="noopener" class="setup-link">code.visualstudio.com →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🗄️</span>
+          <span class="setup-what">Database & Backend</span>
+          <span class="setup-name">Supabase</span>
+          <p class="setup-desc">Postgres database, auth, edge functions, real-time — all in one. Every project I've shipped uses it. The free tier gets you surprisingly far.</p>
+          <span class="setup-free">Free tier available</span>
+        </div>
+        <div class="setup-footer"><a href="https://supabase.com" target="_blank" rel="noopener" class="setup-link">supabase.com →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">⚡</span>
+          <span class="setup-what">Real-time</span>
+          <span class="setup-name">Ably</span>
+          <p class="setup-desc">Powers the live multiplayer features in CertReady and Lofi Pomodoro. WebSockets without the infrastructure headache.</p>
+          <span class="setup-free">Free tier available</span>
+        </div>
+        <div class="setup-footer"><a href="https://ably.com" target="_blank" rel="noopener" class="setup-link">ably.com →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🐙</span>
+          <span class="setup-what">Version Control & Hosting</span>
+          <span class="setup-name">GitHub + GitHub Pages</span>
+          <p class="setup-desc">All my code lives here. GitHub Pages hosts my static sites for free — this site included.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://github.com/tobyk1dd" target="_blank" rel="noopener" class="setup-link">github.com/tobyk1dd →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🌐</span>
+          <span class="setup-what">Domains</span>
+          <span class="setup-name">Namecheap</span>
+          <p class="setup-desc">Where I register all my domains. Simple, affordable, and I've never had a problem. tobyk1dd.com lives here.</p>
+          <!-- Replace with your affiliate link -->
+        </div>
+        <div class="setup-footer">
+          <a href="https://namecheap.pxf.io/tobyk1dd" target="_blank" rel="noopener sponsored" class="setup-link">namecheap.com →</a>
+          <span class="setup-aff"> (affiliate link)</span>
+        </div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🔒</span>
+          <span class="setup-what">DNS & CDN</span>
+          <span class="setup-name">Cloudflare</span>
+          <p class="setup-desc">Free DNS management, DDoS protection, and CDN for all my domains. Set it up once, forget about it.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://cloudflare.com" target="_blank" rel="noopener" class="setup-link">cloudflare.com →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🛒</span>
+          <span class="setup-what">Payments</span>
+          <span class="setup-name">Lemon Squeezy</span>
+          <p class="setup-desc">Handles payments and licensing for CertReady Pro. Tax-compliant out of the box, which matters when selling to international customers.</p>
+        </div>
+        <div class="setup-footer"><a href="https://lemonsqueezy.com" target="_blank" rel="noopener" class="setup-link">lemonsqueezy.com →</a></div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- LEARNING -->
+  <section class="page-section">
+    <div class="s-head"><span class="s-label">// how I learned to code</span><div class="s-rule"></div></div>
+    <p class="section-intro">Self-taught from zero. These are the resources that actually moved the needle — not the ones that just get recommended everywhere.</p>
+    <div class="setup-grid">
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🧱</span>
+          <span class="setup-what">Primary curriculum</span>
+          <span class="setup-name">The Odin Project</span>
+          <p class="setup-desc">The backbone of my learning. Free, structured, and project-based. Teaches you how to think like a developer, not just copy syntax.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://www.theodinproject.com" target="_blank" rel="noopener" class="setup-link">theodinproject.com →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">📖</span>
+          <span class="setup-what">JavaScript reference</span>
+          <span class="setup-name">javascript.info</span>
+          <p class="setup-desc">Read this cover to cover. The clearest explanation of JavaScript I've found anywhere. Free, no ads, no fluff.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://javascript.info" target="_blank" rel="noopener" class="setup-link">javascript.info →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🎬</span>
+          <span class="setup-what">CSS</span>
+          <span class="setup-name">Kevin Powell (YouTube)</span>
+          <p class="setup-desc">The best CSS teacher on the internet. If you're struggling with layout, flexbox, or responsive design — watch Kevin Powell first.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://www.youtube.com/@KevinPowell" target="_blank" rel="noopener" class="setup-link">youtube.com/@KevinPowell →</a></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">📚</span>
+          <span class="setup-what">Courses</span>
+          <span class="setup-name">Udemy</span>
+          <p class="setup-desc">Never pay full price. Wait for the sales (they happen constantly) and you can get world-class courses for a few quid. Worth it for specific topics.</p>
+        </div>
+        <div class="setup-footer">
+          <a href="https://click.linksynergy.com/tobyk1dd" target="_blank" rel="noopener sponsored" class="setup-link">udemy.com →</a>
+          <span class="setup-aff"> (affiliate link)</span>
+        </div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🦊</span>
+          <span class="setup-what">Reference</span>
+          <span class="setup-name">MDN Web Docs</span>
+          <p class="setup-desc">The definitive reference for HTML, CSS, and JavaScript. When in doubt, check MDN. Open at all times.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><a href="https://developer.mozilla.org" target="_blank" rel="noopener" class="setup-link">developer.mozilla.org →</a></div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HARDWARE -->
+  <section class="page-section">
+    <div class="s-head"><span class="s-label">// hardware & gaming</span><div class="s-rule"></div></div>
+    <p class="section-intro">What's on the desk. Update the placeholders below with your actual specs.</p>
+    <div class="setup-grid">
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🖥️</span>
+          <span class="setup-what">Computer</span>
+          <span class="setup-name">[ Your PC / Mac ]</span>
+          <p class="setup-desc">Add your machine specs here — CPU, RAM, GPU. Your audience will want to know.</p>
+        </div>
+        <div class="setup-footer"><span class="setup-aff">Edit this with your actual setup</span></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🖱️</span>
+          <span class="setup-what">Monitor</span>
+          <span class="setup-name">[ Your Monitor ]</span>
+          <p class="setup-desc">Add your monitor here — size, refresh rate, resolution.</p>
+        </div>
+        <div class="setup-footer"><span class="setup-aff">Edit this with your actual setup</span></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🎮</span>
+          <span class="setup-what">Controller</span>
+          <span class="setup-name">DualSense Edge</span>
+          <p class="setup-desc">PS5's pro controller. Two profiles set up — Precise curve for hitting, Quick curve for fielding in MLB The Show. The back paddles are game-changing.</p>
+        </div>
+        <div class="setup-footer"><a href="https://amzn.to/tobyk1dd" target="_blank" rel="noopener sponsored" class="setup-link">Amazon UK →</a><span class="setup-aff"> (affiliate)</span></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🎤</span>
+          <span class="setup-what">Microphone</span>
+          <span class="setup-name">[ Your Mic ]</span>
+          <p class="setup-desc">Add your streaming microphone here.</p>
+        </div>
+        <div class="setup-footer"><span class="setup-aff">Edit this with your actual setup</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STREAMING -->
+  <section class="page-section">
+    <div class="s-head"><span class="s-label">// streaming</span><div class="s-rule"></div></div>
+    <div class="setup-grid">
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🎥</span>
+          <span class="setup-what">Streaming software</span>
+          <span class="setup-name">[ OBS / Streamlabs ]</span>
+          <p class="setup-desc">Add what you use to stream.</p>
+          <span class="setup-free">Free</span>
+        </div>
+        <div class="setup-footer"><span class="setup-aff">Edit this with your actual setup</span></div>
+      </div>
+
+      <div class="setup-card">
+        <div class="setup-card-body">
+          <span class="setup-icon">🛡️</span>
+          <span class="setup-what">VPN</span>
+          <span class="setup-name">NordVPN</span>
+          <p class="setup-desc">Use this for general browsing and streaming. Fast enough that I forget it's on. Useful if you're live and don't want your IP exposed.</p>
+        </div>
+        <div class="setup-footer">
+          <a href="https://go.nordvpn.net/tobyk1dd" target="_blank" rel="noopener sponsored" class="setup-link">nordvpn.com →</a>
+          <span class="setup-aff"> (affiliate link)</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p style="font-size:0.75rem;color:var(--text-dim);margin-top:20px;font-style:italic">
+      Some links on this page are affiliate links — marked clearly. I only list things I actually use.
+    </p>
+  </section>
+
+</main>
+
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Coventry, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+<div id="toast-root"></div>
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
+  document.addEventListener('DOMContentLoaded', function() {
+    function tick() {
+      var n = new Date(), p = x => String(x).padStart(2,'0');
+      var el = document.getElementById('clock');
+      if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+    }
+    tick(); setInterval(tick, 1000);
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.addEventListener('click', function() {
+        document.body.classList.toggle('darkmode');
+        var dark = document.body.classList.contains('darkmode');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      });
+    }
+    window.addEventListener('scroll', function() {
+      var s = document.getElementById('scroll-top');
+      if (s) s.classList.toggle('visible', window.scrollY > 300);
+    });
+  });
+</script>
+</body>
+</html>

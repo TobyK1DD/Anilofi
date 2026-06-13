@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Now — TobyK1DD</title>
+  <meta name="description" content="What Toby Kidd (TobyK1DD) is focused on right now — what he's building, playing, learning, and watching.">
+  <meta name="theme-color" content="#f64e4e">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    .now-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .now-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:3px solid var(--border); }
+    .now-item:last-child { border-bottom:none; }
+    .now-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+    .now-label { font-size:0.75rem; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:3px; }
+    .now-value { font-size:0.92rem; font-weight:700; color:var(--text); line-height:1.4; }
+    .now-sub { font-size:0.78rem; color:var(--text-mid); line-height:1.5; margin-top:3px; }
+    .now-tag { font-size:0.65rem; font-weight:700; background:var(--primary); color:#fff; padding:2px 8px; border-radius:20px; border:2px solid var(--border); display:inline-block; margin-top:4px; }
+    .updated-note { font-size:0.75rem; color:var(--text-dim); font-style:italic; text-align:center; margin-top:8px; }
+    @media(max-width:600px) { .now-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <div class="navbar-links" id="nav-links">
+    <a href="index.html"    class="nav-link">Home</a>
+    <a href="About_Me.html" class="nav-link">About Me</a>
+    <a href="Blog.html"     class="nav-link">Blog</a>
+    <a href="My_Work.html"  class="nav-link">My Work</a>
+    <a href="Contact.html"  class="nav-link">Contact</a>
+  </div>
+  <div class="navbar-controls">
+    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+    <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// now</p>
+    <h2 class="page-title">What I'm up to <em>right now</em></h2>
+    <p class="page-sub">A snapshot of what I'm focused on. Updated every few weeks.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="page-section" style="max-width:780px;margin:0 auto;">
+    <div class="now-grid">
+
+      <!-- Building -->
+      <div class="win">
+        <div class="winbar">
+          <div class="winbar-title">⚙️ building</div>
+          <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+        </div>
+        <div style="padding:20px 22px">
+          <div class="now-item">
+            <span class="now-icon">🌐</span>
+            <div>
+              <p class="now-label">Main focus</p>
+              <p class="now-value">tobyk1dd.com</p>
+              <p class="now-sub">Redesigning and rebuilding my personal site from scratch. Blog, projects, guestbook — the works.</p>
+              <span class="now-tag">IN PROGRESS</span>
+            </div>
+          </div>
+          <div class="now-item">
+            <span class="now-icon">📋</span>
+            <div>
+              <p class="now-label">Also working on</p>
+              <p class="now-value">CertReady</p>
+              <p class="now-sub">CompTIA A+ revision platform. Adding new features, fixing bugs, improving the premium tier.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learning -->
+      <div class="win">
+        <div class="winbar">
+          <div class="winbar-title">📚 learning</div>
+          <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+        </div>
+        <div style="padding:20px 22px">
+          <div class="now-item">
+            <span class="now-icon">🟠</span>
+            <div>
+              <p class="now-label">Primary resource</p>
+              <p class="now-value">The Odin Project</p>
+              <p class="now-sub">Working through the full-stack JavaScript path. The most structured self-taught curriculum I've found.</p>
+            </div>
+          </div>
+          <div class="now-item">
+            <span class="now-icon">💛</span>
+            <div>
+              <p class="now-label">Also reading</p>
+              <p class="now-value">javascript.info</p>
+              <p class="now-sub">Cover to cover. The best single resource for understanding JavaScript properly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playing -->
+      <div class="win">
+        <div class="winbar">
+          <div class="winbar-title">🎮 playing</div>
+          <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+        </div>
+        <div style="padding:20px 22px">
+          <div class="now-item">
+            <span class="now-icon">⚾</span>
+            <div>
+              <p class="now-label">Main game</p>
+              <p class="now-value">MLB The Show 26</p>
+              <p class="now-sub">RTTS — Toby Kidd, LF. Speed/contact build. Grinding from Double-A to the majors.</p>
+              <span class="now-tag">CURRENTLY STREAMING</span>
+            </div>
+          </div>
+          <div class="now-item">
+            <span class="now-icon">🗡️</span>
+            <div>
+              <p class="now-label">Side game</p>
+              <!-- Edit this with whatever you're also playing -->
+              <p class="now-value">[ Your side game here ]</p>
+              <p class="now-sub">Update this with whatever else you're playing right now.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watching -->
+      <div class="win">
+        <div class="winbar">
+          <div class="winbar-title">📺 watching</div>
+          <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+        </div>
+        <div style="padding:20px 22px">
+          <div class="now-item">
+            <span class="now-icon">🐉</span>
+            <div>
+              <p class="now-label">Anime</p>
+              <p class="now-value">DragonBall Z Kai</p>
+              <p class="now-sub">Re-watching a classic. Ep 2 / 500. If you know you know.</p>
+            </div>
+          </div>
+          <div class="now-item">
+            <span class="now-icon">📺</span>
+            <div>
+              <p class="now-label">Show</p>
+              <!-- Edit this -->
+              <p class="now-value">[ What you're watching ]</p>
+              <p class="now-sub">Update this whenever you start something new.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streaming -->
+      <div class="win" style="grid-column:1/-1">
+        <div class="winbar">
+          <div class="winbar-title">🎙️ streaming</div>
+          <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+        </div>
+        <div style="padding:20px 22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <p class="now-label" style="margin-bottom:6px">Currently streaming</p>
+            <p class="now-value" style="font-size:1.1rem">MLB The Show 26 RTTS + dev streams</p>
+            <p class="now-sub" style="margin-top:6px">Catch the streams live on Twitch — schedule varies but usually evenings.</p>
+          </div>
+          <a href="https://twitch.tv/tobyk1dd" target="_blank" rel="noopener" class="btn" style="flex-shrink:0">Watch on Twitch →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="updated-note">Last updated: June 2026 — <a href="Blog.html" style="color:var(--primary);text-decoration:none">read the blog</a> for more frequent updates.</p>
+  </div>
+</main>
+
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Coventry, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+<div id="toast-root"></div>
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
+  document.addEventListener('DOMContentLoaded', function() {
+    function tick() {
+      var n = new Date(), p = x => String(x).padStart(2,'0');
+      var el = document.getElementById('clock');
+      if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+    }
+    tick(); setInterval(tick, 1000);
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.addEventListener('click', function() {
+        document.body.classList.toggle('darkmode');
+        var dark = document.body.classList.contains('darkmode');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      });
+    }
+    window.addEventListener('scroll', function() {
+      var s = document.getElementById('scroll-top');
+      if (s) s.classList.toggle('visible', window.scrollY > 300);
+    });
+  });
+</script>
+</body>
+</html>
