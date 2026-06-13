@@ -201,9 +201,9 @@ button:hover, .links a:hover, #navigation a:hover, .Button:hover, .Button2:hover
 
 .nav-link {
   font-family: 'Sour Gummy', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  padding: 8px 18px;
+  padding: 7px 13px;
   border-radius: 8px;
   border: 3px solid var(--border);
   background: var(--primary);

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('darkmode');}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ — TobyK1DD</title>
+  <meta name="description" content="Frequently asked questions about Toby Kidd (TobyK1DD) — self-taught developer and Twitch streamer from Coventry.">
+  <meta property="og:title"       content="FAQ — TobyK1DD">
+  <meta property="og:description" content="Questions people ask about TobyK1DD — the journey, the projects, streaming, and more.">
+  <meta property="og:url"         content="https://tobyk1dd.com/FAQ.html">
+  <meta property="og:image"       content="https://tobyk1dd.com/og-image.png">
+  <meta name="theme-color" content="#f64e4e">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    .faq-section { margin-bottom: 10px; }
+
+    .faq-category {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 24px 10px;
+      background: var(--bg);
+      border-bottom: 3px solid var(--border);
+    }
+    .faq-category-icon { font-size: 1rem; }
+    .faq-category-label {
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em;
+    }
+
+    .faq-item { border-bottom: 3px solid var(--border); }
+    .faq-item:last-child { border-bottom: none; }
+
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 18px 24px; cursor: pointer;
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+      list-style: none; user-select: none;
+      transition: color 0.15s;
+    }
+    .faq-q::-webkit-details-marker { display: none; }
+    .faq-q:hover { color: var(--primary); }
+
+    .faq-arrow {
+      font-size: 0.7rem; color: var(--text-dim); flex-shrink: 0;
+      transition: transform 0.25s; display: inline-block;
+    }
+    details[open] .faq-arrow { transform: rotate(90deg); color: var(--primary); }
+    details[open] .faq-q { color: var(--primary); }
+
+    .faq-a {
+      padding: 0 24px 20px 24px;
+      font-size: 0.88rem; color: var(--text-mid);
+      line-height: 1.75; max-width: 640px;
+    }
+    .faq-a p { margin-bottom: 8px; }
+    .faq-a p:last-child { margin-bottom: 0; }
+    .faq-a a { color: var(--primary); text-decoration: none; }
+    .faq-a a:hover { text-decoration: underline; }
+
+    .faq-count {
+      font-size: 0.75rem; font-weight: 700; color: var(--text-dim);
+      background: var(--bg-card); border: 3px solid var(--border);
+      border-radius: 20px; padding: 2px 10px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="site-wordmark" href="index.html">TOBYK1DD<span>.</span></a>
+  <div class="navbar-links" id="nav-links">
+    <a href="index.html"     class="nav-link">Home</a>
+    <a href="About_Me.html"  class="nav-link">About Me</a>
+    <a href="Blog.html"      class="nav-link">Blog</a>
+    <a href="My_Work.html"   class="nav-link">My Work</a>
+    <a href="My_Setup.html"  class="nav-link">My Setup</a>
+    <a href="now.html"       class="nav-link">Now</a>
+    <a href="guestbook.html" class="nav-link">Guestbook</a>
+    <a href="FAQ.html"       class="nav-link">FAQ</a>
+    <a href="Contact.html"   class="nav-link">Contact</a>
+  </div>
+  <div class="navbar-controls">
+    <button class="nav-toggle" id="theme-btn">🌙 Light / Dark ☀️</button>
+    <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main>
+  <div class="page-hero">
+    <h1 class="hero-logo">TOBYK1DD<span class="logo-dot">.</span></h1>
+    <p class="page-eyebrow">// faq</p>
+    <h2 class="page-title">Questions people <em>actually ask</em></h2>
+    <p class="page-sub">The stuff that comes up most. If something's missing, hit the <a href="Contact.html" style="color:var(--primary);text-decoration:none">contact page</a>.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="page-section" style="max-width:780px;margin:0 auto;">
+    <div class="win">
+      <div class="winbar">
+        <div class="winbar-title">faq.exe — ask me anything</div>
+        <div class="wbtns"><span class="wbtn r"></span><span class="wbtn y"></span><span class="wbtn g"></span></div>
+      </div>
+
+      <!-- ── ABOUT ME ── -->
+      <div class="faq-section">
+        <div class="faq-category">
+          <span class="faq-category-icon">🧑</span>
+          <span class="faq-category-label">About me</span>
+          <span class="faq-count">4 questions</span>
+        </div>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            Who are you and what do you do?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — introduce yourself in your own words. Where you're from, what you do, what you're about. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            How did you get into coding?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — tell the story. Graphic design background, what pulled you toward code, how you got started. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            Are you self-taught?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — yes, what resources you used, how long it took, what the process looked like. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            Where are you based?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — Coventry, UK. Add whatever else feels relevant. ]</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ── CODING ── -->
+      <div class="faq-section">
+        <div class="faq-category">
+          <span class="faq-category-icon">💻</span>
+          <span class="faq-category-label">Coding & tech</span>
+          <span class="faq-count">4 questions</span>
+        </div>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            What's your tech stack?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — HTML, CSS, JS, React, Supabase, GitHub Pages, Lemon Squeezy, Ably. Whatever feels right to mention. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            What resources do you recommend for learning to code?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — The Odin Project, javascript.info, Kevin Powell for CSS, MDN as reference. Link to your <a href="My_Setup.html">My Setup page</a> for the full list. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            Do you take on freelance work?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — yes/no, what kind of work, how to get in touch. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            How long have you been coding?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — when you started, what the progression looked like. ]</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ── STREAMING ── -->
+      <div class="faq-section">
+        <div class="faq-category">
+          <span class="faq-category-icon">🎙️</span>
+          <span class="faq-category-label">Streaming</span>
+          <span class="faq-count">3 questions</span>
+        </div>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            What do you stream?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — coding streams, MLB The Show, gaming variety, whatever you want to say. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            When do you stream?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — schedule, how often, what time, where to follow for updates. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            What streaming setup do you use?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>Full breakdown on the <a href="My_Setup.html">My Setup page</a> — everything from mic to software.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- ── PROJECTS ── -->
+      <div class="faq-section">
+        <div class="faq-category">
+          <span class="faq-category-icon">🚀</span>
+          <span class="faq-category-label">Projects</span>
+          <span class="faq-count">3 questions</span>
+        </div>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            What have you built?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — CertReady, Lofi Pomodoro, Code School. Link to <a href="My_Work.html">My Work</a>. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">
+            What is CertReady?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — CompTIA A+ revision tool, 560+ questions, premium tier, multiplayer study rooms. ]</p>
+          </div>
+        </details>
+
+        <details class="faq-item" style="border-bottom:none">
+          <summary class="faq-q">
+            Can I suggest a feature or report a bug?
+            <span class="faq-arrow">▶</span>
+          </summary>
+          <div class="faq-a">
+            <p>[ Your answer here — best way to reach you, email or Discord, however you prefer to handle it. ]</p>
+          </div>
+        </details>
+      </div>
+
+    </div>
+
+    <p style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-top:14px;font-style:italic">
+      Still got a question? <a href="Contact.html" style="color:var(--primary);text-decoration:none">Get in touch →</a>
+    </p>
+  </div>
+</main>
+
+<footer class="statusbar">
+  <span class="sb-item">tobyk1dd.com</span>
+  <span class="sb-item">Coventry, UK</span>
+  <div class="sb-spacer"></div>
+  <span class="sb-clock" id="clock">--:--:--</span>
+</footer>
+<div id="toast-root"></div>
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('darkmode');
+  document.addEventListener('DOMContentLoaded', function() {
+    function tick() {
+      var n = new Date(), p = x => String(x).padStart(2,'0');
+      var el = document.getElementById('clock');
+      if (el) el.textContent = p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+    }
+    tick(); setInterval(tick, 1000);
+    var btn = document.getElementById('theme-btn');
+    if (btn) {
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      btn.addEventListener('click', function() {
+        document.body.classList.toggle('darkmode');
+        var dark = document.body.classList.contains('darkmode');
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+        btn.textContent = dark ? '☀️ Light / Dark 🌙' : '🌙 Light / Dark ☀️';
+      });
+    }
+    window.addEventListener('scroll', function() {
+      var s = document.getElementById('scroll-top');
+      if (s) s.classList.toggle('visible', window.scrollY > 300);
+    });
+  });
+</script>
+</body>
+</html>
