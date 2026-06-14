@@ -683,7 +683,7 @@ footer, .footer {
   .sb-item + .sb-item { display: none; }
 
   /* ── Scroll-to-top: move above status bar ── */
-  #scroll-top { bottom: 54px; right: 14px; }
+  #scroll-top { bottom: 16px; left: 14px; }
 }
 
 /* ═══════════════════════════════════
@@ -707,8 +707,8 @@ footer, .footer {
 ═══════════════════════════════════ */
 #scroll-top {
   position: fixed;
-  bottom: 56px;
-  right: 20px;
+  bottom: 24px;
+  left: 24px;
   width: 42px;
   height: 42px;
   background: var(--primary);

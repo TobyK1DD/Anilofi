@@ -265,18 +265,33 @@
       height: 11px !important;
       border-radius: 50% !important;
       border: none !important;
-      cursor: pointer;
       padding: 0 !important;
       margin: 0 !important;
       flex-shrink: 0;
       display: block !important;
+    }
+    /* Red dot — blocked out like green, no interaction */
+    #lofiPlayer .lp-close {
+      background: #ff5f57 !important;
+      opacity: 0.35;
+      cursor: default;
+      pointer-events: none;
+    }
+    /* Yellow dot — the only interactive one */
+    #lofiPlayer .lp-min {
+      background: #ffbd2e !important;
+      cursor: pointer;
       transition: opacity 0.15s, transform 0.1s;
     }
-    #lofiPlayer .lp-dot:hover  { opacity: 0.8; transform: scale(1.1); }
-    #lofiPlayer .lp-dot:active { transform: scale(0.9); }
-    #lofiPlayer .lp-close { background: #ff5f57 !important; }
-    #lofiPlayer .lp-min   { background: #ffbd2e !important; }
-    #lofiPlayer .lp-max   { background: #28c840 !important; opacity: 0.35; cursor: default; pointer-events: none; }
+    #lofiPlayer .lp-min:hover  { opacity: 0.8; transform: scale(1.1); }
+    #lofiPlayer .lp-min:active { transform: scale(0.9); }
+    /* Green dot — blocked out */
+    #lofiPlayer .lp-max {
+      background: #28c840 !important;
+      opacity: 0.35;
+      cursor: default;
+      pointer-events: none;
+    }
     #lofiPlayer .lp-title {
       flex: 1;
       text-align: center;
@@ -373,24 +388,24 @@
   <div id="lofiPlayer">
     <div class="lp-bar">
       <div class="lp-dots">
-        <button class="lp-dot lp-close" id="lofiClose"  title="Minimise"></button>
-        <button class="lp-dot lp-min"   id="lofiToggle" title="Minimise"></button>
-        <button class="lp-dot lp-max"   aria-hidden="true"></button>
+        <button class="lp-dot lp-close" aria-hidden="true"></button>
+        <button class="lp-dot lp-min" id="lofiToggle" title="Minimise"></button>
+        <button class="lp-dot lp-max" aria-hidden="true"></button>
       </div>
       <span class="lp-title">lofi.fm</span>
     </div>
     <div id="lofiBody">
       <div class="lp-info">
-        <div id="lofiThumb">🎵</div>
+        <div id="lofiThumb">&#127925;</div>
         <div class="lp-meta">
           <p class="lp-track">lofi hip hop radio</p>
-          <span id="lofiStatus">— paused</span>
+          <span id="lofiStatus">&#8212; paused</span>
         </div>
       </div>
       <div class="lp-controls">
-        <button id="lofiPlay" aria-label="Play">▶</button>
+        <button id="lofiPlay" aria-label="Play">&#9654;</button>
         <div class="lp-vol-wrap">
-          <span class="lp-vol-icon">🔈</span>
+          <span class="lp-vol-icon">&#128264;</span>
           <input type="range" id="lofiVol" min="0" max="100" value="50" aria-label="Volume">
         </div>
       </div>
@@ -399,43 +414,81 @@
 
   <script>
   (function () {
+    var LS = {
+      playing:   'lofi_playing',
+      volume:    'lofi_volume',
+      minimized: 'lofi_minimized'
+    };
     var ytPlayer = null, isPlaying = false, minimized = false;
-    var VIDEO_ID = 'X4VbdwhkE10';
+    var VIDEO_ID  = 'X4VbdwhkE10';
+    var savedVol  = parseInt(localStorage.getItem(LS.volume) || '50');
+
+    /* Restore volume slider immediately */
+    document.getElementById('lofiVol').value = savedVol;
+
+    /* Restore minimized state immediately (no flash) */
+    if (localStorage.getItem(LS.minimized) === 'true') {
+      minimized = true;
+      document.getElementById('lofiPlayer').classList.add('minimized');
+    }
+
+    /* Load YouTube API */
     var tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(tag);
+
     window.onYouTubeIframeAPIReady = function () {
       ytPlayer = new YT.Player('lofi-yt', {
         videoId: VIDEO_ID,
-        playerVars: { autoplay:0, controls:0, disablekb:1, loop:1,
-                      playlist:VIDEO_ID, iv_load_policy:3, modestbranding:1, rel:0 },
+        playerVars: {
+          autoplay: 0, controls: 0, disablekb: 1,
+          loop: 1, playlist: VIDEO_ID,
+          iv_load_policy: 3, modestbranding: 1, rel: 0
+        },
         events: {
-          onReady: function (e) { e.target.setVolume(50); },
-          onStateChange: function (e) { setPlayState(e.data === YT.PlayerState.PLAYING); }
+          onReady: function (e) {
+            e.target.setVolume(savedVol);
+            /* Auto-resume if it was playing on the previous page */
+            if (localStorage.getItem(LS.playing) === 'true') {
+              e.target.playVideo();
+            }
+          },
+          onStateChange: function (e) {
+            setPlayState(e.data === YT.PlayerState.PLAYING);
+          }
         }
       });
     };
+
     function setPlayState(playing) {
       isPlaying = playing;
       document.getElementById('lofiPlay').textContent = playing ? '⏸' : '▶';
       document.getElementById('lofiPlay').setAttribute('aria-label', playing ? 'Pause' : 'Play');
       document.getElementById('lofiStatus').textContent = playing ? '♪ now playing' : '— paused';
       document.getElementById('lofiPlayer').classList.toggle('playing', playing);
+      localStorage.setItem(LS.playing, playing ? 'true' : 'false');
     }
-    function toggleMinimize() {
-      minimized = !minimized;
-      document.getElementById('lofiPlayer').classList.toggle('minimized', minimized);
-    }
+
+    /* Play / pause */
     document.getElementById('lofiPlay').addEventListener('click', function () {
       if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
       isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
     });
+
+    /* Volume — save to localStorage */
     document.getElementById('lofiVol').addEventListener('input', function () {
-      if (ytPlayer && typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(+this.value);
+      if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+        ytPlayer.setVolume(+this.value);
+      }
+      localStorage.setItem(LS.volume, this.value);
     });
-    /* Both red and yellow dots minimise — no permanent close */
-    document.getElementById('lofiToggle').addEventListener('click', toggleMinimize);
-    document.getElementById('lofiClose').addEventListener('click', toggleMinimize);
+
+    /* Yellow dot only — minimise toggle */
+    document.getElementById('lofiToggle').addEventListener('click', function () {
+      minimized = !minimized;
+      document.getElementById('lofiPlayer').classList.toggle('minimized', minimized);
+      localStorage.setItem(LS.minimized, minimized ? 'true' : 'false');
+    });
   })();
   </script>
   <!-- ──────────────────────────────────────────────────── -->
