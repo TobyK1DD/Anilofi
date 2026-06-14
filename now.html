@@ -224,6 +224,8 @@
     });
   });
 </script>
+
+
   <!-- ── Lofi Mini Player ───────────────────────────── -->
   <style>
     #lofiPlayer {
@@ -371,7 +373,7 @@
   <div id="lofiPlayer">
     <div class="lp-bar">
       <div class="lp-dots">
-        <button class="lp-dot lp-close" id="lofiClose"  title="Close"></button>
+        <button class="lp-dot lp-close" id="lofiClose"  title="Minimise"></button>
         <button class="lp-dot lp-min"   id="lofiToggle" title="Minimise"></button>
         <button class="lp-dot lp-max"   aria-hidden="true"></button>
       </div>
@@ -420,6 +422,10 @@
       document.getElementById('lofiStatus').textContent = playing ? '♪ now playing' : '— paused';
       document.getElementById('lofiPlayer').classList.toggle('playing', playing);
     }
+    function toggleMinimize() {
+      minimized = !minimized;
+      document.getElementById('lofiPlayer').classList.toggle('minimized', minimized);
+    }
     document.getElementById('lofiPlay').addEventListener('click', function () {
       if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
       isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
@@ -427,14 +433,9 @@
     document.getElementById('lofiVol').addEventListener('input', function () {
       if (ytPlayer && typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(+this.value);
     });
-    document.getElementById('lofiToggle').addEventListener('click', function () {
-      minimized = !minimized;
-      document.getElementById('lofiPlayer').classList.toggle('minimized', minimized);
-    });
-    document.getElementById('lofiClose').addEventListener('click', function () {
-      if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') ytPlayer.pauseVideo();
-      document.getElementById('lofiPlayer').style.display = 'none';
-    });
+    /* Both red and yellow dots minimise — no permanent close */
+    document.getElementById('lofiToggle').addEventListener('click', toggleMinimize);
+    document.getElementById('lofiClose').addEventListener('click', toggleMinimize);
   })();
   </script>
   <!-- ──────────────────────────────────────────────────── -->
