@@ -320,91 +320,55 @@
   <!-- ── Lofi Mini Player ──────────────────────────────────── -->
   <style id="lofi-style">
     #lofiPlayer {
-      position: fixed !important;
-      bottom: 24px !important;
-      right: 24px !important;
-      width: 230px;
-      background: #111 !important;
-      border: 2px solid #fff !important;
-      border-radius: 10px !important;
-      z-index: 99999 !important;
-      font-family: 'Sour Gummy', sans-serif;
-      box-shadow: 4px 4px 0 #f64e4e;
-      overflow: hidden;
-      transition: box-shadow 0.15s;
-      margin: 0 !important;
-      padding: 0 !important;
+      position:fixed!important;bottom:24px!important;right:24px!important;width:230px;
+      background:#111!important;border:2px solid #fff!important;border-radius:10px!important;
+      z-index:99999!important;font-family:'Sour Gummy',sans-serif;
+      box-shadow:4px 4px 0 #f64e4e;overflow:hidden;transition:box-shadow .15s;
+      margin:0!important;padding:0!important;
     }
-    #lofiPlayer:hover { box-shadow: 5px 5px 0 #f64e4e; }
-    #lofiPlayer.minimized #lofiBody { display: none !important; }
-    #lofiPlayer.playing  #lofiThumb { animation: lofiSpin 6s linear infinite; }
-    @keyframes lofiSpin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
-    #lofiPlayer .lp-bar {
-      display: flex !important; align-items: center;
-      padding: 7px 10px; background: #1a1a1a !important;
-      border-bottom: 1px solid #2a2a2a !important;
-      gap: 6px; user-select: none; margin: 0 !important;
-    }
-    #lofiPlayer .lp-dots { display: flex !important; gap: 5px; align-items: center; }
-    #lofiPlayer .lp-dot {
-      width: 11px !important; height: 11px !important;
-      border-radius: 50% !important; border: none !important;
-      padding: 0 !important; margin: 0 !important;
-      flex-shrink: 0; display: block !important;
-    }
-    #lofiPlayer .lp-close { background: #ff5f57 !important; opacity: 0.35; cursor: default; pointer-events: none; }
-    #lofiPlayer .lp-min   { background: #ffbd2e !important; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
-    #lofiPlayer .lp-min:hover  { opacity: 0.8; transform: scale(1.1); }
-    #lofiPlayer .lp-min:active { transform: scale(0.9); }
-    #lofiPlayer .lp-max   { background: #28c840 !important; opacity: 0.35; cursor: default; pointer-events: none; }
-    #lofiPlayer .lp-title {
-      flex: 1; text-align: center; font-size: 10px !important; color: #666 !important;
-      letter-spacing: 2px; text-transform: uppercase; font-weight: 700 !important; margin-right: 27px;
-    }
-    #lofiBody {
-      padding: 10px !important; display: flex !important;
-      flex-direction: column; gap: 9px; background: #111 !important;
-    }
-    #lofiPlayer .lp-info { display: flex !important; align-items: center; gap: 9px; }
-    #lofiThumb {
-      width: 38px !important; height: 38px !important; background: #f64e4e !important;
-      border-radius: 8px !important; display: flex !important; align-items: center;
-      justify-content: center; font-size: 18px !important; flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.12) !important;
-    }
-    #lofiPlayer .lp-meta { display: flex !important; flex-direction: column; gap: 3px; min-width: 0; }
-    #lofiPlayer .lp-track {
-      font-size: 10px !important; color: #fff !important; font-weight: 700 !important;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin: 0 !important; padding: 0 !important;
-    }
-    #lofiStatus {
-      font-size: 9px !important; color: #f64e4e !important; letter-spacing: 0.8px;
-      font-weight: 600 !important; min-height: 12px; display: block !important;
-      margin: 0 !important; padding: 0 !important;
-    }
-    #lofiPlayer .lp-controls { display: flex !important; align-items: center; gap: 9px; }
-    #lofiPlay {
-      width: 32px !important; height: 32px !important; min-width: 32px !important;
-      border-radius: 50% !important; background: #f64e4e !important;
-      border: 2px solid #fff !important; color: #fff !important; font-size: 12px !important;
-      cursor: pointer; display: flex !important; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: background 0.15s, transform 0.1s;
-      font-family: inherit; line-height: 1; padding: 0 0 0 1px !important; margin: 0 !important;
-    }
-    #lofiPlay:hover  { background: #e03030 !important; transform: scale(1.06); }
-    #lofiPlay:active { transform: scale(0.94); }
-    #lofiPlayer .lp-vol-wrap { flex: 1; display: flex !important; align-items: center; gap: 5px; }
-    #lofiPlayer .lp-vol-icon { font-size: 11px !important; color: #555 !important; user-select: none; }
-    #lofiVol {
-      flex: 1; height: 3px !important; accent-color: #f64e4e; cursor: pointer;
-      border-radius: 2px !important; background: #2a2a2a !important;
-      margin: 0 !important; padding: 0 !important;
-    }
-    @media (max-width: 480px) {
-      #lofiPlayer { bottom: 16px !important; right: 16px !important; width: 210px; }
-    }
+    #lofiPlayer:hover{box-shadow:5px 5px 0 #f64e4e;}
+    #lofiPlayer.minimized #lofiBody{display:none!important;}
+    #lofiPlayer.playing  #lofiThumb{animation:lofiSpin 6s linear infinite;}
+    @keyframes lofiSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    #lofiPlayer .lp-bar{display:flex!important;align-items:center;padding:7px 10px;
+      background:#1a1a1a!important;border-bottom:1px solid #2a2a2a!important;
+      gap:6px;user-select:none;margin:0!important;}
+    #lofiPlayer .lp-dots{display:flex!important;gap:5px;align-items:center;}
+    #lofiPlayer .lp-dot{width:11px!important;height:11px!important;border-radius:50%!important;
+      border:none!important;padding:0!important;margin:0!important;flex-shrink:0;display:block!important;}
+    #lofiPlayer .lp-close{background:#ff5f57!important;opacity:.35;cursor:default;pointer-events:none;}
+    #lofiPlayer .lp-min{background:#ffbd2e!important;cursor:pointer;transition:opacity .15s,transform .1s;}
+    #lofiPlayer .lp-min:hover{opacity:.8;transform:scale(1.1);}
+    #lofiPlayer .lp-min:active{transform:scale(.9);}
+    #lofiPlayer .lp-max{background:#28c840!important;opacity:.35;cursor:default;pointer-events:none;}
+    #lofiPlayer .lp-title{flex:1;text-align:center;font-size:10px!important;color:#666!important;
+      letter-spacing:2px;text-transform:uppercase;font-weight:700!important;margin-right:27px;}
+    #lofiBody{padding:10px!important;display:flex!important;flex-direction:column;gap:9px;background:#111!important;}
+    #lofiPlayer .lp-info{display:flex!important;align-items:center;gap:9px;}
+    #lofiThumb{width:38px!important;height:38px!important;background:#f64e4e!important;
+      border-radius:8px!important;display:flex!important;align-items:center;justify-content:center;
+      font-size:18px!important;flex-shrink:0;border:1px solid rgba(255,255,255,.12)!important;}
+    #lofiPlayer .lp-meta{display:flex!important;flex-direction:column;gap:3px;min-width:0;}
+    #lofiPlayer .lp-track{font-size:10px!important;color:#fff!important;font-weight:700!important;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0!important;padding:0!important;}
+    #lofiStatus{font-size:9px!important;color:#f64e4e!important;letter-spacing:.8px;
+      font-weight:600!important;min-height:12px;display:block!important;margin:0!important;padding:0!important;}
+    #lofiPlayer .lp-controls{display:flex!important;align-items:center;gap:9px;}
+    #lofiPlay{width:32px!important;height:32px!important;min-width:32px!important;border-radius:50%!important;
+      background:#f64e4e!important;border:2px solid #fff!important;color:#fff!important;font-size:12px!important;
+      cursor:pointer;display:flex!important;align-items:center;justify-content:center;flex-shrink:0;
+      transition:background .15s,transform .1s;font-family:inherit;line-height:1;
+      padding:0 0 0 1px!important;margin:0!important;}
+    #lofiPlay:hover{background:#e03030!important;transform:scale(1.06);}
+    #lofiPlay:active{transform:scale(.94);}
+    #lofiPlayer .lp-vol-wrap{flex:1;display:flex!important;align-items:center;gap:5px;}
+    #lofiPlayer .lp-vol-icon{font-size:11px!important;color:#555!important;user-select:none;}
+    #lofiVol{flex:1;height:3px!important;accent-color:#f64e4e;cursor:pointer;
+      border-radius:2px!important;background:#2a2a2a!important;margin:0!important;padding:0!important;}
+    @media(max-width:480px){#lofiPlayer{bottom:16px!important;right:16px!important;width:210px;}}
   </style>
+
+  <div id="lofi-yt" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;top:-9999px;left:-9999px;"></div>
 
   <div id="lofiPlayer">
     <div class="lp-bar">
@@ -427,7 +391,7 @@
         <button id="lofiPlay" aria-label="Play">&#9654;</button>
         <div class="lp-vol-wrap">
           <span class="lp-vol-icon">&#128264;</span>
-          <input type="range" id="lofiVol" min="0" max="100" value="75" aria-label="Volume">
+          <input type="range" id="lofiVol" min="0" max="100" value="50" aria-label="Volume">
         </div>
       </div>
     </div>
@@ -435,66 +399,67 @@
 
   <script>
   (function () {
-    var STREAM = 'https://streams.ilovemusic.de/iloveradio17.mp3';
-    var LS     = { playing:'lofi_playing', volume:'lofi_volume', minimized:'lofi_minimized' };
+    var VIDEO_ID = 'X4VbdwhkE10';
+    var LS = { playing:'lofi_playing', volume:'lofi_volume', minimized:'lofi_minimized' };
+    var ytPlayer = null, isPlaying = false, minimized = false;
+    var savedVol = parseInt(localStorage.getItem(LS.volume) || '50');
 
-    var audio     = new Audio();
-    audio.src     = STREAM;
-    audio.preload = 'none';
-
-    var isPlaying = false;
-    var minimized = false;
-    var savedVol  = parseInt(localStorage.getItem(LS.volume) || '75');
-
-    /* Restore volume */
-    audio.volume = savedVol / 100;
+    /* Restore UI state before API loads */
     document.getElementById('lofiVol').value = savedVol;
-
-    /* Restore minimised */
     if (localStorage.getItem(LS.minimized) === 'true') {
       minimized = true;
       document.getElementById('lofiPlayer').classList.add('minimized');
     }
 
-    /* Auto-resume if was playing on previous page */
-    if (localStorage.getItem(LS.playing) === 'true') {
-      audio.play().catch(function () {
-        /* Browser blocked autoplay — wait for user gesture */
-        setPlayState(false);
+    /* Load YouTube IFrame API */
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+
+    window.onYouTubeIframeAPIReady = function () {
+      ytPlayer = new YT.Player('lofi-yt', {
+        videoId: VIDEO_ID,
+        playerVars: {
+          autoplay:0, controls:0, disablekb:1,
+          loop:1, playlist:VIDEO_ID,
+          iv_load_policy:3, modestbranding:1, rel:0
+        },
+        events: {
+          onReady: function (e) {
+            e.target.setVolume(savedVol);
+            /*
+             * Auto-resume if the user was playing on the previous page.
+             * Works reliably after the user has clicked play at least once
+             * on the domain — Chrome's media engagement policy allows it.
+             * Silently no-ops on first visit (browser blocks cold autoplay).
+             */
+            if (localStorage.getItem(LS.playing) === 'true') {
+              e.target.playVideo();
+            }
+          },
+          onStateChange: function (e) {
+            setPlayState(e.data === YT.PlayerState.PLAYING);
+          }
+        }
       });
-    }
+    };
 
-    audio.addEventListener('playing', function () { setPlayState(true); });
-    audio.addEventListener('pause',   function () { setPlayState(false); });
-    audio.addEventListener('error',   function () {
-      setPlayState(false);
-      document.getElementById('lofiStatus').textContent = '— connection lost';
-    });
-
-    function setPlayState(playing) {
-      isPlaying = playing;
-      document.getElementById('lofiPlay').textContent = playing ? '⏸' : '▶';
-      document.getElementById('lofiPlay').setAttribute('aria-label', playing ? 'Pause' : 'Play');
-      document.getElementById('lofiStatus').textContent = playing ? '♪ now playing' : '— paused';
-      document.getElementById('lofiPlayer').classList.toggle('playing', playing);
-      localStorage.setItem(LS.playing, playing ? 'true' : 'false');
+    function setPlayState(p) {
+      isPlaying = p;
+      document.getElementById('lofiPlay').textContent = p ? '\u23F8' : '\u25B6';
+      document.getElementById('lofiPlay').setAttribute('aria-label', p ? 'Pause' : 'Play');
+      document.getElementById('lofiStatus').textContent = p ? '\u266A now playing' : '\u2014 paused';
+      document.getElementById('lofiPlayer').classList.toggle('playing', p);
+      localStorage.setItem(LS.playing, p ? 'true' : 'false');
     }
 
     document.getElementById('lofiPlay').addEventListener('click', function () {
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        /* Re-src on play to reconnect if stream dropped */
-        if (audio.error || audio.readyState === 0) {
-          audio.src = STREAM;
-          audio.load();
-        }
-        audio.play().catch(function () { setPlayState(false); });
-      }
+      if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
+      isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
     });
 
     document.getElementById('lofiVol').addEventListener('input', function () {
-      audio.volume = +this.value / 100;
+      if (ytPlayer && typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(+this.value);
       localStorage.setItem(LS.volume, this.value);
     });
 
