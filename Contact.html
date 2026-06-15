@@ -272,14 +272,12 @@
     var ytPlayer = null, isPlaying = false, minimized = false;
     var savedVol = parseInt(localStorage.getItem(LS.volume) || '50');
 
-    /* Restore UI state before API loads */
     document.getElementById('lofiVol').value = savedVol;
     if (localStorage.getItem(LS.minimized) === 'true') {
       minimized = true;
       document.getElementById('lofiPlayer').classList.add('minimized');
     }
 
-    /* Load YouTube IFrame API */
     var tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(tag);
@@ -295,16 +293,47 @@
         events: {
           onReady: function (e) {
             e.target.setVolume(savedVol);
+
+            if (localStorage.getItem(LS.playing) !== 'true') return;
+
+            /* Attempt immediate autoplay — works on Chrome after first play */
+            e.target.playVideo();
+
             /*
-             * Auto-resume if the user was playing on the previous page.
-             * Works reliably after the user has clicked play at least once
-             * on the domain — Chrome's media engagement policy allows it.
-             * Silently no-ops on first visit (browser blocks cold autoplay).
+             * Firefox & Safari block autoplay until a user gesture occurs
+             * on the current page. After 800ms, if we're still not playing,
+             * attach a one-time listener to the first interaction
+             * (scroll, click, keypress, touch) and resume then.
+             * Users almost always scroll or click within a second of landing,
+             * so this feels near-seamless across all browsers.
              */
-            if (localStorage.getItem(LS.playing) === 'true') {
-              e.target.playVideo();
-            }
+            setTimeout(function () {
+              if (isPlaying) return; /* Chrome already got it */
+
+              var EVENTS = ['click','mousedown','keydown','scroll','touchstart'];
+              var fired  = false;
+
+              function resumeOnGesture() {
+                if (fired) return;
+                fired = true;
+                EVENTS.forEach(function (ev) {
+                  document.removeEventListener(ev, resumeOnGesture, true);
+                });
+                if (!isPlaying && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                  ytPlayer.playVideo();
+                }
+              }
+
+              EVENTS.forEach(function (ev) {
+                document.addEventListener(ev, resumeOnGesture, {
+                  capture: true,
+                  passive: true,
+                  once:    true
+                });
+              });
+            }, 800);
           },
+
           onStateChange: function (e) {
             setPlayState(e.data === YT.PlayerState.PLAYING);
           }
@@ -325,12 +354,10 @@
       if (!ytPlayer || typeof ytPlayer.playVideo !== 'function') return;
       isPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
     });
-
     document.getElementById('lofiVol').addEventListener('input', function () {
       if (ytPlayer && typeof ytPlayer.setVolume === 'function') ytPlayer.setVolume(+this.value);
       localStorage.setItem(LS.volume, this.value);
     });
-
     document.getElementById('lofiToggle').addEventListener('click', function () {
       minimized = !minimized;
       document.getElementById('lofiPlayer').classList.toggle('minimized', minimized);
