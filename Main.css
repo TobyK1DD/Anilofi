@@ -9,7 +9,7 @@
   --bg-card:  #dce8ed;
   --text:     #000000;
   --text-mid: #444444;
-  --text-dim: #777777;
+  --text-dim: #000000;
   --primary:  #f64e4e;
   --border:   #ffffff;
   --accent:   #aac6d3;
@@ -27,8 +27,8 @@ html.darkmode body {
   --bg-soft:  #1e1e1e;
   --bg-card:  #252525;
   --text:     #ffffff;
-  --text-mid: #aaaaaa;
-  --text-dim: #666666;
+  --text-mid: #ffffff;
+  --text-dim: #ffffff;
   --primary:  #f64e4e;
   --border:   #ffffff;
   --accent:   #2a2a2a;
