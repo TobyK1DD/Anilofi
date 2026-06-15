@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var btn = document.getElementById('theme-btn');
   if (btn) {
-    btn.textContent = document.body.classList.contains('darkmode') ? '☀️' : '🌙';
+    btn.textContent = (document.documentElement.classList.contains('darkmode') || document.body.classList.contains('darkmode')) ? '☀️' : '🌙';
     btn.addEventListener('click', function() {
       document.body.classList.toggle('darkmode');
       var dark = document.body.classList.contains('darkmode');

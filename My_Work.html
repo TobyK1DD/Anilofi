@@ -278,10 +278,11 @@
     tick(); setInterval(tick, 1000);
     var btn = document.getElementById('theme-btn');
     if (btn) {
-      btn.textContent = document.body.classList.contains('darkmode') ? '☀️' : '🌙';
+      btn.textContent = (document.documentElement.classList.contains('darkmode') || document.body.classList.contains('darkmode')) ? '☀️' : '🌙';
       btn.addEventListener('click', function () {
-        document.body.classList.toggle('darkmode');
-        var dark = document.body.classList.contains('darkmode');
+        var dark = !document.documentElement.classList.contains('darkmode');
+        document.documentElement.classList.toggle('darkmode', dark);
+        document.body.classList.toggle('darkmode', dark);
         localStorage.setItem('theme', dark ? 'dark' : 'light');
         btn.textContent = dark ? '☀️' : '🌙';
       });
