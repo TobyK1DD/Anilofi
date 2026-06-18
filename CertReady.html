@@ -2400,7 +2400,7 @@ function saveUserData(user, data) {
 // =====================================================================
 const SUPABASE_URL = 'https://bllxvirgcrpngspmkbtt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbHh2aXJnY3JwbmdzcG1rYnR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2Njk4NjIsImV4cCI6MjA5NTI0NTg2Mn0.dMKkl2a5tN-nNo_G8emXFXM4oSfJwFtuGaUvmNkAXpo';
-const LEMON_CHECKOUT_URL = 'https://certready.lemonsqueezy.com/checkout/buy/d56b6dae-9973-450b-ab16-ea3a96615717';
+const GUMROAD_CHECKOUT_URL = 'https://tobyk1dd.gumroad.com/l/certready';
 const FREE_QUESTION_LIMIT = 30;
 const FREE_LIGHTNING_LIMIT = 15;
 let flaggedQuestions  = new Set(); // indices flagged in current session
@@ -2685,7 +2685,7 @@ async function checkExistingSession() {
 // =====================================================================
 function showPaywall(featureText) {
   document.getElementById('paywall-feature-text').textContent = featureText || 'Upgrade to unlock all features.';
-  const checkoutUrl = LEMON_CHECKOUT_URL + (currentUserEmail ? `?checkout[email]=${encodeURIComponent(currentUserEmail)}` : '');
+  const checkoutUrl = GUMROAD_CHECKOUT_URL + (currentUserEmail ? `?wanted=true&email=${encodeURIComponent(currentUserEmail)}` : '?wanted=true');
   document.getElementById('paywall-checkout-btn').href = checkoutUrl;
   document.getElementById('paywall-modal').style.display = 'flex';
 }
