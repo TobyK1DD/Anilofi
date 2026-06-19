@@ -1028,7 +1028,7 @@ body.darkmode .rq-exp strong{color:#a5d6a7}
     <div style="background:var(--bg-soft);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
       <div style="font-weight:700;margin-bottom:10px;font-size:.95rem">✨ Premium includes:</div>
       <div style="font-size:.88rem;line-height:1.9;opacity:.85">
-        ✅ All 360 questions (Core 1 + Core 2)<br>
+        ✅ All 560 questions (Core 1 + Core 2)<br>
         ✅ Multiplayer  --  study with friends<br>
         ✅ Lightning Round mode<br>
         ✅ Progress tracking &amp; bookmarks<br>
@@ -2646,6 +2646,23 @@ async function loadProfile(user) {
   } else {
     currentUser = profile.username || user.email.split('@')[0];
     isPremium = profile.is_premium || false;
+  }
+
+  // If not yet premium, check for a pending Gumroad purchase (bought before account existed)
+  if (!isPremium && user.email) {
+    try {
+      const { data: claimed } = await _supabase.rpc('claim_pending_purchase', {
+        p_user_id: user.id,
+        p_email: user.email
+      });
+      if (claimed) {
+        isPremium = true;
+        userData.isPremium = true;
+        console.log('✅ Pending Gumroad purchase claimed — premium granted.');
+      }
+    } catch (e) {
+      console.warn('claim_pending_purchase check failed:', e);
+    }
   }
 
   isGuestSession = false;
