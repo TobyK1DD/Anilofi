@@ -108,6 +108,9 @@ body.darkmode .auth-msg.success-msg{color:#a5d6a7}
 .pwa-banner-text span{font-size:.8rem;opacity:.65;line-height:1.4}
 .pwa-banner-ios-steps{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:.78rem;opacity:.7;flex-wrap:wrap}
 .pwa-install-btn{flex-shrink:0;background:var(--primary);color:var(--btn-text);border:none;border-radius:10px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.sw-update-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e2d45;border:1px solid var(--primary);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--text);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.4)}
+.sw-update-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.sw-update-toast button{background:var(--primary);color:var(--btn-text);border:none;border-radius:7px;padding:5px 11px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
 .pwa-dismiss-btn{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:.4;padding:4px;line-height:1}
 .pwa-dismiss-btn:hover{opacity:.8}
 /* ---- FLAG FOR REVIEW ---- */
@@ -5938,6 +5941,39 @@ function cleanupMP() {
     </div>
     <button class="pwa-install-btn" id="pwa-install-btn" onclick="triggerPWAInstall()">Install</button>
   </div>
+
+  <!-- SW UPDATE TOAST -->
+  <div class="sw-update-toast" id="sw-update-toast" role="status" aria-live="polite">
+    🔄 CertReady updated — <button onclick="window.location.reload()">Refresh</button>
+  </div>
+
+  <script>
+  // ── SERVICE WORKER REGISTRATION ──────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js')
+        .then(function(reg) {
+          console.log('[CertReady] SW registered, scope:', reg.scope);
+        })
+        .catch(function(err) {
+          console.warn('[CertReady] SW registration failed:', err);
+        });
+
+      // When the active SW sends an update notification, show the toast
+      navigator.serviceWorker.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          var toast = document.getElementById('sw-update-toast');
+          if (toast) {
+            // Small delay so the toast doesn't collide with page load
+            setTimeout(function() { toast.classList.add('show'); }, 1500);
+            // Auto-dismiss after 12 s if user ignores it
+            setTimeout(function() { toast.classList.remove('show'); }, 13500);
+          }
+        }
+      });
+    });
+  }
+  </script>
 
 </body>
 </html>
