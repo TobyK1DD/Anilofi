@@ -427,7 +427,7 @@
     <span id="admin-chip" class="badge badge-live" style="display:none">Admin 🔐</span>
     <button id="new-post-btn" class="nav-link" onclick="openPostModal()" style="display:none;cursor:pointer;border-style:solid;">+ New Post</button>
     <button id="admin-btn" class="nav-toggle" onclick="handleAdminBtn()" title="Admin login">🔐</button>
-    <button id="theme-btn" class="nav-toggle">🌙 Light / Dark ☀️</button>
+    <button class="nav-toggle" id="theme-btn" title="Toggle light / dark mode" aria-label="Toggle light / dark mode">🌙</button>
     <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -808,13 +808,13 @@
     localStorage.setItem('theme', on ? 'dark' : 'light');
     localStorage.setItem('darkmode', on);
     var btn = document.getElementById('theme-btn');
-    if (btn) btn.textContent = on ? '\u2600\uFE0F Light / Dark \uD83C\uDF19' : '\uD83C\uDF19 Light / Dark \u2600\uFE0F';
+    if (btn) btn.textContent = on ? '☀️' : '🌙';
   }
 
   document.addEventListener('DOMContentLoaded', function() {
     var btn = document.getElementById('theme-btn');
     if (btn) {
-      btn.textContent = document.body.classList.contains('darkmode') ? '\u2600\uFE0F Light / Dark \uD83C\uDF19' : '\uD83C\uDF19 Light / Dark \u2600\uFE0F';
+      btn.textContent = document.body.classList.contains('darkmode') ? '☀️' : '🌙';
       btn.addEventListener('click', toggleDark);
     }
     document.querySelectorAll('.wbtn.r').forEach(b => {
