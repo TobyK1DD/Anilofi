@@ -283,6 +283,30 @@ button:hover, .links a:hover, #navigation a:hover, .Button:hover, .Button2:hover
 .nav-toggle:hover { background: var(--bg); border-color: var(--primary); transform: rotate(20deg); }
 
 /* ═══════════════════════════════════
+   NAV DROPDOWN — "More" group
+═══════════════════════════════════ */
+.nav-more { position: relative; }
+.nav-more-caret { display: inline-block; margin-left: 2px; transition: transform 0.2s; }
+.nav-more.open .nav-more-caret { transform: rotate(180deg); }
+.nav-more-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg);
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  min-width: 140px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  z-index: 1001;
+}
+.nav-more.open .nav-more-menu { display: flex; }
+.nav-more-menu .nav-link { width: 100%; text-align: center; }
+
+/* ═══════════════════════════════════
    STATUS BAR — Ref: overlay goal-strip
 ═══════════════════════════════════ */
 .statusbar {
@@ -625,6 +649,16 @@ footer, .footer {
   }
   .navbar-links.open { display: flex; }
   .navbar-links .nav-link { text-align: center; width: 100%; }
+
+  .nav-more-menu {
+    position: static;
+    right: auto;
+    border: none;
+    box-shadow: none;
+    padding: 4px 0 0;
+    background: transparent;
+  }
+  .nav-more-toggle { width: 100%; }
 
   /* ── Hero ── */
   .page-hero { padding: 32px 16px 24px; }

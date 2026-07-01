@@ -35,17 +35,42 @@
     <a href="About_Me.html"  class="nav-link">About Me</a>
     <a href="Blog.html"      class="nav-link">Blog</a>
     <a href="My_Work.html"   class="nav-link">My Work</a>
-    <a href="My_Setup.html"  class="nav-link">My Setup</a>
-    <a href="now.html"       class="nav-link">Now</a>
     <a href="guestbook.html" class="nav-link">Guestbook</a>
-    <a href="FAQ.html"       class="nav-link">FAQ</a>
     <a href="Contact.html"   class="nav-link">Contact</a>
+    <div class="nav-more" id="nav-more">
+      <button type="button" class="nav-link nav-more-toggle" id="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="var m=document.getElementById('nav-more');var open=m.classList.toggle('open');this.setAttribute('aria-expanded',open);">More <span class="nav-more-caret">&#9662;</span></button>
+      <div class="nav-more-menu" id="nav-more-menu">
+        <a href="My_Setup.html" class="nav-link">My Setup</a>
+        <a href="now.html"      class="nav-link">Now</a>
+        <a href="FAQ.html"      class="nav-link">FAQ</a>
+      </div>
+    </div>
   </div>
   <div class="navbar-controls">
     <button class="nav-toggle" id="theme-btn" title="Toggle light / dark mode" aria-label="Toggle light / dark mode">🌙</button>
     <button class="hamburger" id="hamburger" onclick="var l=document.getElementById('nav-links'),h=this;l.classList.toggle('open');h.classList.toggle('open')" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
+
+<script>
+  document.addEventListener('click', function (e) {
+    var more = document.getElementById('nav-more');
+    if (more && more.classList.contains('open') && !more.contains(e.target)) {
+      more.classList.remove('open');
+      document.getElementById('nav-more-btn').setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var more = document.getElementById('nav-more');
+      if (more) {
+        more.classList.remove('open');
+        var btn = document.getElementById('nav-more-btn');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+</script>
 
 <main>
   <div class="page-hero">
